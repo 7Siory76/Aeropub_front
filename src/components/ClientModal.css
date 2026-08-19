@@ -1,0 +1,256 @@
+/* ==========================================================================
+   CLIENT MODAL & BADGE STYLES (Style discret & épuré)
+   ========================================================================== */
+
+/* Badge discret indiquant le nombre d'abonnements */
+.client-badge-discrete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--accent-primary);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="light"] .client-badge-discrete {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--accent-primary);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+/* Modale des Abonnements Client */
+.client-modal-box {
+  max-width: 680px !important;
+  width: 100% !important;
+}
+
+.client-modal-header {
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 1rem;
+}
+
+.client-modal-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.client-modal-subinfo {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.client-modal-search-wrapper {
+  margin-bottom: 1.25rem;
+}
+
+/* Liste scrollable des abonnements */
+.client-abos-list {
+  max-height: 380px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding-right: 0.25rem;
+}
+
+/* Carte d'abonnement individuelle discrète */
+.client-abo-card {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.client-abo-card:hover {
+  border-color: var(--border-glow);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="light"] .client-abo-card:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.client-abo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.client-abo-ref {
+  font-weight: 800;
+  font-size: 1.02rem;
+  color: var(--accent-primary);
+}
+
+.client-abo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.client-abo-label {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.1rem;
+}
+
+.client-abo-value {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   TYPE DE SUPPORT PANEL & ACCORDION REF STYLES (IMG_20260817_142144.jpg)
+   ========================================================================== */
+
+/* Structure à 2 colonnes (Gauche: Type de Support / Droite: Vue détaillée) */
+.ts-two-panel-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .ts-two-panel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ts-panel-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.ts-panel-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Liste des Cartes Type de Support */
+.ts-card-item {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.ts-card-item:hover, .ts-card-item.active {
+  border-color: var(--accent-primary);
+  background: rgba(99, 102, 241, 0.1);
+  transform: translateX(4px);
+}
+
+.ts-card-name {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--text-main);
+}
+
+/* Barre de filtres (Filtre, Client, Status) */
+.ts-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+}
+
+.ts-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ts-filter-select {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Accordéon de Référence Emplacement (REF: 1AB1 ∨) */
+.ts-ref-accordion-item {
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  margin-bottom: 0.85rem;
+  background: var(--bg-card);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.ts-ref-accordion-header {
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background-color 0.2s ease;
+}
+
+.ts-ref-accordion-header:hover {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.ts-ref-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ts-ref-accordion-body {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  animation: fadeIn 0.25s ease;
+}
