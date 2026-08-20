@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Layers, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 
-export default function TypeSupportsTab({ typeSupports = [], emplacements = [], abonnements = [], clients = [] }) {
+export default function TypeSupportsTab({ typeSupports = [], emplacements = [], abonnements = [], clients = [], zones = [] }) {
   const [selectedTypeSupport, setSelectedTypeSupport] = useState(null);
   const [tsDateFilter, setTsDateFilter] = useState('all');
   const [tsClientFilter, setTsClientFilter] = useState('all');
   const [tsStatusFilter, setTsStatusFilter] = useState('all');
+  const [tsZoneFilter, setTsZoneFilter] = useState('all');
   const [expandedRefAcc, setExpandedRefAcc] = useState({});
 
   const toggleRefExpand = (ref) => {
@@ -26,7 +27,7 @@ export default function TypeSupportsTab({ typeSupports = [], emplacements = [], 
     ? emplacements.filter(e => e.id_type_support === activeTS.id || e.nom_type_support === activeTS.nom_type)
     : [];
 
-  // Application des filtres : Date (Intervalle Contrat), Client, Status
+  // Application des filtres : Date (Intervalle Contrat), Client, Status, Zone
   const filteredTsEmps = tsEmplacements.filter(emp => {
     const abo = abonnements.find(a => (a.reference_emplacement || a.reference) === emp.reference);
 
@@ -61,41 +62,56 @@ export default function TypeSupportsTab({ typeSupports = [], emplacements = [], 
       if (abo || emp.statut !== 'disponible') return false;
     }
 
+    // 4. Filtre Zone Aéroportuaire
+    if (tsZoneFilter !== 'all') {
+      const targetZone = zones.find(z => String(z.id) === String(tsZoneFilter));
+      const empZone = emp.type_zone || emp.nom_zone;
+      const targetZoneName = targetZone?.type_zone || targetZone?.nom_zone;
+
+      const isZoneMatch = (
+        String(emp.id_zone) === String(tsZoneFilter) ||
+        (empZone && targetZoneName && empZone.toLowerCase() === targetZoneName.toLowerCase())
+      );
+      if (!isZoneMatch) return false;
+    }
+
     return true;
   });
 
   return (
     <div className="ts-two-panel-grid">
       {/* COLONNE 1 (GAUCHE) : Type de support */}
-      <div className="ts-panel-box">
+      <div className="ts-panel-box ts-left-panel">
         <h3 className="ts-panel-title">
-          <Layers size={20} style={{ color: 'var(--accent-primary)' }} />
+          <Layers size={18} style={{ color: 'var(--accent-primary)' }} />
           <span>Type de support</span>
         </h3>
 
-        {typeSupports.map((ts) => {
-          const isSelected = activeTS?.id === ts.id;
-          const empCount = emplacements.filter(e => e.id_type_support === ts.id || e.nom_type_support === ts.nom_type).length;
+        <div className="ts-types-list">
+          {typeSupports.map((ts) => {
+            const isSelected = activeTS?.id === ts.id;
+            const empCount = emplacements.filter(e => e.id_type_support === ts.id || e.nom_type_support === ts.nom_type).length;
 
-          return (
-            <div
-              key={ts.id}
-              className={`ts-card-item ${isSelected ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedTypeSupport(ts);
-                setExpandedRefAcc({});
-              }}
-            >
-              <div>
-                <div className="ts-card-name">{ts.nom_type}</div>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  {empCount} emplacement{empCount > 1 ? 's' : ''}
-                </span>
+            return (
+              <div
+                key={ts.id}
+                className={`ts-card-item ${isSelected ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedTypeSupport(ts);
+                  setExpandedRefAcc({});
+                }}
+              >
+                <div>
+                  <div className="ts-card-name">{ts.nom_type}</div>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    {empCount} emplacement{empCount > 1 ? 's' : ''}
+                  </span>
+                </div>
+                <ChevronRight size={18} style={{ color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)' }} className="ts-card-arrow" />
               </div>
-              <ChevronRight size={18} style={{ color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)' }} />
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* COLONNE 2 (DROITE) : Vue détaillée du Type de Support sélectionné */}
@@ -136,6 +152,23 @@ export default function TypeSupportsTab({ typeSupports = [], emplacements = [], 
                     Effacer
                   </button>
                 )}
+              </div>
+
+              {/* Filtre Zone Aéroportuaire */}
+              <div className="ts-filter-group">
+                <span>Zone :</span>
+                <select
+                  className="ts-filter-select"
+                  value={tsZoneFilter}
+                  onChange={(e) => setTsZoneFilter(e.target.value)}
+                >
+                  <option value="all">Toutes 🗺️</option>
+                  {zones.map(z => (
+                    <option key={z.id} value={z.id}>
+                      {z.type_zone || z.nom_zone}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Filtre Client */}

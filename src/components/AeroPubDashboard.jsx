@@ -169,6 +169,7 @@ export default function AeroPubDashboard({ searchQuery = '' }) {
               emplacements={emplacements}
               abonnements={abonnements}
               clients={clients}
+              zones={zones}
             />
           )}
           {activeTab === 'zones' && <ZonesTab zones={zones} localisations={localisations} />}

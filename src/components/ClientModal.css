@@ -131,12 +131,6 @@
   align-items: start;
 }
 
-@media (max-width: 900px) {
-  .ts-two-panel-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .ts-panel-box {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
@@ -155,13 +149,18 @@
   gap: 0.5rem;
 }
 
+.ts-types-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 /* Liste des Cartes Type de Support */
 .ts-card-item {
   background: var(--bg-glass);
   border: 1px solid var(--border-glass);
   border-radius: 12px;
   padding: 1rem 1.25rem;
-  margin-bottom: 0.85rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -169,7 +168,8 @@
   transition: all 0.25s ease;
 }
 
-.ts-card-item:hover, .ts-card-item.active {
+.ts-card-item:hover,
+.ts-card-item.active {
   border-color: var(--accent-primary);
   background: rgba(99, 102, 241, 0.1);
   transform: translateX(4px);
@@ -253,4 +253,115 @@
   border-top: 1px solid var(--border-glass);
   background: var(--bg-glass);
   animation: fadeIn 0.25s ease;
+}
+
+/* ==========================================================================
+   OPTIMISATIONS RESPONSIVES MOBILE (Écran <= 768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+
+  /* 1. Bloquer la grille et le panneau pour ne JAMAIS dépasser la largeur du téléphone */
+  .ts-two-panel-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 1rem !important;
+    box-sizing: border-box !important;
+
+  }
+
+  .ts-left-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.75rem 1rem !important;
+    /* Empêche tout débordement hors du téléphone */
+  }
+
+  /* 2. Liste des types sur UNE SEULE LIGNE avec défilement horizontal interne */
+  .ts-types-list {
+    display: flex !important;
+    flex-direction: row !important;
+    /* Une seule ligne de gauche à droite */
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    /* Défilement horizontal uniquement à l'intérieur */
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    gap: 0.6rem !important;
+    padding-bottom: 0.5rem !important;
+    -webkit-overflow-scrolling: touch !important;
+    /* Défilement fluide au doigt sur iPhone/Android */
+  }
+
+  /* 3. Cartes compactes alignées sur 1 seule ligne */
+  .ts-card-item {
+    flex: 0 0 auto !important;
+    /* Empêche la carte de se déformer */
+    max-width: 220px !important;
+    /* Taille maximale propre par carte */
+    margin-bottom: 0 !important;
+    padding: 0.5rem 0.85rem !important;
+    border-radius: 12px !important;
+  }
+
+  .ts-card-name {
+    font-size: 0.88rem !important;
+  }
+
+  .ts-card-arrow {
+    display: none !important;
+    /* Masquer la flèche pour gagner de la place */
+  }
+
+  .ts-card-item span {
+    display: block !important;
+    font-size: 0.75rem !important;
+  }
+
+
+  /* Titre et filtre */
+  .ts-panel-box h3 {
+    font-size: 1rem !important;
+    /* Réduire la taille du titre */
+    margin-bottom: 0.4rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .ts-filters-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    /* Aligner les filtres côte à côte */
+    gap: 0.35rem 0.6rem !important;
+    padding: 0.45rem 0.6rem !important;
+    margin-bottom: 0.75rem !important;
+    border-radius: 8px !important;
+  }
+
+  .ts-filter-group {
+    display: flex !important;
+    align-items: center !important;
+    font-size: 0.75rem !important;
+    gap: 0.25rem !important;
+  }
+
+  .ts-filter-group span {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+  }
+
+  .ts-filter-select {
+    padding: 0.2rem 0.4rem !important;
+    font-size: 0.75rem !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+
+  .ts-panel-box {
+    padding: 0.85rem !important;
+  }
+
 }
