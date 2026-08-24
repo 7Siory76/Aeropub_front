@@ -101,4 +101,17 @@ export const parametragesApi = {
   delete: (id) => api.delete(`/parametrages/${id}`).then(res => res.data.data),
 };
 
+// 11. IMPORTATION CSV -> http://localhost:5000/api/csv/upload
+export const csvApi = {
+  upload: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/csv/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then(res => res.data);
+  },
+};
+
 export default api;
