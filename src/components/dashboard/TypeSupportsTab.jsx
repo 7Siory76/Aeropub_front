@@ -221,7 +221,7 @@ export default function TypeSupportsTab({ typeSupports = [], emplacements = [], 
                         onClick={() => toggleRefExpand(emp.reference)}
                       >
                         <div className="ts-ref-title">
-                          <span>REF : {emp.reference}</span>
+                          <span>{emp.reference}</span>
                           <span className={`wireframe-badge ${isOccupied ? 'badge-occupied' : 'badge-available'}`} style={{ fontSize: '0.72rem', padding: '0.15rem 0.55rem' }}>
                             {isOccupied ? 'Occupé' : 'Disponible'}
                           </span>
