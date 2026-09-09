@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { User, Search, RotateCcw } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
 
-export default function AbonnementsTab({ abonnements = [], initialSearchQuery = '' }) {
+
+export default function AbonnementsTab({ abonnements = [], typeStatut = [], initialSearchQuery = '', onRefresh }) {
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCommercial, setSelectedCommercial] = useState('all');
@@ -11,6 +13,7 @@ export default function AbonnementsTab({ abonnements = [], initialSearchQuery = 
   const [selectedYear, setSelectedYear] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [selectedAbonnement, setSelectedAbonnement] = useState(null);
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -41,6 +44,14 @@ export default function AbonnementsTab({ abonnements = [], initialSearchQuery = 
       if (a.date_fin) years.add(new Date(a.date_fin).getFullYear());
     });
     return [...years].filter(y => !isNaN(y)).sort((a, b) => b - a);
+  }, [abonnements]);
+
+  const availableStatuses = useMemo(() => {
+    const set = new Set();
+    typeStatut.forEach((a) => {
+      set.add(String(a.nom_statut).trim());
+    });
+    return Array.from(set).sort();
   }, [abonnements]);
 
   const hasActiveFilters =
@@ -142,12 +153,15 @@ export default function AbonnementsTab({ abonnements = [], initialSearchQuery = 
           <select
             className="ts-filter-select"
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
+            onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
           >
             <option value="all">Tous les statuts</option>
-            <option value="Actif">🟢 Actif</option>
-            <option value="Terminé">⚪ Terminé</option>
-            <option value="En attente">🟡 En attente</option>
+            {availableStatuses.map((av) => (
+              <option key={av} value={av}>
+                {av.charAt(0).toUpperCase() + av.slice(1)}
+              </option>
+            ))}
+
           </select>
         </div>
 
@@ -261,7 +275,7 @@ export default function AbonnementsTab({ abonnements = [], initialSearchQuery = 
                   : '80%';
 
                 return (
-                  <tr key={abo.reference || abo.id} className="table-body-row">
+                  <tr key={abo.reference || abo.id} className="table-body-row clickable-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedAbonnement(abo)}>
                     <td className="cell-indigo" style={{ fontWeight: 700 }}>
                       {abo.reference || `#${abo.id}`}
                     </td>
@@ -323,6 +337,16 @@ export default function AbonnementsTab({ abonnements = [], initialSearchQuery = 
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
       />
+
+      {/* Modale createPortal des détails de l'abonnement */}
+      {selectedAbonnement && (
+        <AbonnementDetailsModal
+          abonnement={selectedAbonnement}
+          onClose={() => setSelectedAbonnement(null)}
+          onRefresh={onRefresh}
+          typeStatut={typeStatut}
+        />
+      )}
     </div>
   );
 }

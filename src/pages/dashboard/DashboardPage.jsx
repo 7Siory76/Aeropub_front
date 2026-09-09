@@ -11,6 +11,7 @@ import {
   typeSupportsApi,
   utilisateursApi,
   actionsCommercialesApi,
+  typeStatutAbonnementApi,
   csvApi
 } from '../../api';
 import {
@@ -44,6 +45,7 @@ export default function DashboardPage({ searchQuery = '', setSearchQuery }) {
   const [activeTab, setActiveTab] = useState('emplacements');
   const [emplacements, setEmplacements] = useState([]);
   const [abonnements, setAbonnements] = useState([]);
+  const [typeStatutAbonnement, setTypeStatutAbonnement] = useState([]);
   const [clients, setClients] = useState([]);
   const [zones, setZones] = useState([]);
   const [aeroports, setAeroports] = useState([]);
@@ -67,6 +69,7 @@ export default function DashboardPage({ searchQuery = '', setSearchQuery }) {
       const [
         emps,
         abos,
+        sts,
         cls,
         zns,
         aeros,
@@ -79,6 +82,7 @@ export default function DashboardPage({ searchQuery = '', setSearchQuery }) {
       ] = await Promise.all([
         emplacementsApi.getAll().catch(() => []),
         abonnementsApi.getAll().catch(() => []),
+        typeStatutAbonnementApi.getAll().catch(() => []),
         clientsApi.getAll().catch(() => []),
         zonesApi.getAll().catch(() => []),
         aeroportsApi.getAll().catch(() => []),
@@ -92,6 +96,7 @@ export default function DashboardPage({ searchQuery = '', setSearchQuery }) {
 
       setEmplacements(emps || []);
       setAbonnements(abos || []);
+      setTypeStatutAbonnement(sts || []);
       setClients(cls || []);
       setZones(zns || []);
       setAeroports(aeros || []);
@@ -246,7 +251,9 @@ export default function DashboardPage({ searchQuery = '', setSearchQuery }) {
             {activeTab === 'abonnements' && (
               <AbonnementsTab
                 abonnements={abonnements}
+                typeStatut={typeStatutAbonnement}
                 initialSearchQuery={searchQuery}
+                onRefresh={loadAllData}
               />
             )}
             {activeTab === 'clients' && (
