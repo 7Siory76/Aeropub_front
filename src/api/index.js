@@ -14,3 +14,5 @@ export * from './utilisateursApi';
 export * from './actionsCommercialesApi';
 export * from './documentsApi';
 export * from './parametrageApi';
+export * from './typeEtatSupportApi';
+export * from './typeStatutAbonnementApi';
