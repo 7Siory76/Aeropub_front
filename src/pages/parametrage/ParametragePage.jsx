@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { parametragesApi } from '../api/apiService';
+import { parametragesApi } from '../../api';
 import { Sliders, PlusCircle, Trash2, Edit3, Check, X, RefreshCw } from 'lucide-react';
 import { toast } from 'react-toastify';
 

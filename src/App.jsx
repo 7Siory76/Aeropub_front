@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
-import HeroBanner from './components/HeroBanner';
-import AeroPubDashboard from './components/AeroPubDashboard';
-import ZonePlanningPage from './components/ZonePlanningPage';
-import ParametragePage from './components/ParametragePage';
 import NotificationTester from './components/NotificationTester';
 import Footer from './components/Footer';
-import { checkHealthApi } from './api/apiService';
+import { DashboardPage, PlanningPage, ParametragePage } from './pages';
+import { checkHealthApi } from './api';
 import { toast } from 'react-toastify';
 
 export default function App() {
@@ -68,22 +65,15 @@ export default function App() {
       {/* Main Body */}
       <main className="main-content">
         {activePage === 'dashboard' ? (
-          <>
-            {/* Banner avec recherche d'emplacements et publicités */}
-            <HeroBanner
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
-
-            {/* Tableau de Bord Général AeroPub */}
-            <AeroPubDashboard 
-              key={refreshKey}
-              searchQuery={searchQuery}
-            />
-          </>
+          /* Tableau de Bord Général AeroPub (avec recherche & HeroBanner) */
+          <DashboardPage 
+            key={refreshKey}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
         ) : activePage === 'planning' ? (
           /* Page de Planning & Occupation des Emplacements par Zone */
-          <ZonePlanningPage key={refreshKey} />
+          <PlanningPage key={refreshKey} />
         ) : (
           /* Page de Paramétrage des réglages système */
           <ParametragePage key={refreshKey} />

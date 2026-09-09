@@ -1,0 +1,416 @@
+/* ==========================================================================
+   MODAL : CHANGER LES EMPLACEMENTS (Transfert Kanban 2 Colonnes)
+   ========================================================================== */
+
+.change-emp-modal-box {
+  max-width: 980px !important;
+  width: 95% !important;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #0f172a !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 20px !important;
+  padding: 1.75rem 2rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  position: relative;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+[data-theme="light"] .change-emp-modal-box {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.2) !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* En-tête de la modale */
+.change-emp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1.5px solid var(--border-glass);
+}
+
+.change-emp-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+/* Grille des 2 colonnes Kanban */
+.kanban-transfer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  min-height: 480px;
+}
+
+/* Colonne individuelle */
+.kanban-col {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1.5px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+  min-height: 460px;
+  position: relative;
+}
+
+[data-theme="light"] .kanban-col {
+  background: #f8fafc;
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+/* Colonne de droite quand on survole avec un item drag */
+.kanban-col.drag-over {
+  border: 2px dashed #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  transform: scale(1.01);
+}
+
+/* Titre de colonne */
+.kanban-col-badge {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+  width: fit-content;
+}
+
+.kanban-col-badge.source {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.kanban-col-badge.target {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Sélecteurs carrousels compacts pour les colonnes */
+.kanban-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.kanban-arrow-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1.5px solid var(--border-glass);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.kanban-arrow-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+  transform: scale(1.06);
+}
+
+.kanban-arrow-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.kanban-nav-box {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-theme="light"] .kanban-nav-box {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+.kanban-nav-prefix {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.kanban-nav-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Liste des références / cartes */
+.kanban-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0.85rem 0;
+  flex: 1;
+  min-height: 250px;
+}
+
+/* Carte de référence (Rectangle comme sur le dessin) */
+.kanban-ref-card {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-glass);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .kanban-ref-card {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+.kanban-ref-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
+}
+
+.kanban-ref-card:active {
+  cursor: grabbing;
+}
+
+.kanban-ref-text {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kanban-ref-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.kanban-empty-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 200px;
+  border: 2px dashed var(--border-glass);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 1.5rem;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+/* Pagination compacte en bas de colonne */
+.kanban-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-glass);
+  margin-top: auto;
+}
+
+.kanban-page-btn {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid var(--border-glass);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .kanban-page-btn {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+.kanban-page-btn:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.kanban-page-btn.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+}
+
+.kanban-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   BOÎTE DE CONFIRMATION (NON / OUI)
+   ========================================================================== */
+
+.confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  border-radius: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.confirm-card {
+  max-width: 480px;
+  width: 90%;
+  background: #0f172a;
+  border: 2px solid var(--accent-primary);
+  border-radius: 18px;
+  padding: 2rem 2.25rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  animation: scaleUp 0.2s ease;
+}
+
+[data-theme="light"] .confirm-card {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+}
+
+.confirm-question {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+  line-height: 1.35;
+}
+
+.confirm-details {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+  line-height: 1.5;
+}
+
+.confirm-details strong {
+  color: var(--accent-primary);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+}
+
+.btn-confirm-no {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border-radius: 10px;
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-no:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.3);
+}
+
+.btn-confirm-yes {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-confirm-yes:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 768px) {
+  .kanban-transfer-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .change-emp-modal-box {
+    padding: 1.25rem !important;
+  }
+}

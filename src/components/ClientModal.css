@@ -50,15 +50,115 @@
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* Modale des Abonnements Client */
+/* Modale des Abonnements & Modales de Création/Détails */
 .client-modal-box {
   max-width: 680px !important;
   width: 100% !important;
+  padding: 2.2rem 2.5rem !important;
+  border-radius: 20px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  background: #0f172a !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+  box-sizing: border-box !important;
+  position: relative;
+}
+
+[data-theme="light"] .client-modal-box {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(15, 23, 42, 0.2) !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+}
+
+.client-modal-box .close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(15, 23, 42, 0.14);
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+[data-theme="dark"] .client-modal-box .close-btn {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.client-modal-box .close-btn:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: scale(1.08);
+}
+
+/* Form Styles propres pour les modales */
+.modal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.modal-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.35rem;
+}
+
+.modal-input,
+.modal-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.68rem 0.95rem;
+  font-size: 0.92rem;
+  font-family: inherit;
+  border-radius: 10px;
+  border: 1.5px solid rgba(15, 23, 42, 0.2);
+  background: #ffffff;
+  color: #0f172a;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+[data-theme="dark"] .modal-input,
+[data-theme="dark"] .modal-select {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(30, 41, 59, 0.85);
+  color: #f8fafc;
+}
+
+.modal-input:focus,
+.modal-select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.modal-input::placeholder {
+  color: var(--text-dim);
+  opacity: 0.7;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1.5px solid var(--border-glass);
 }
 
 .client-modal-header {
-  margin-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-glass);
+  margin-bottom: 1.35rem;
+  border-bottom: 1.5px solid var(--border-glass);
   padding-bottom: 1rem;
 }
 
@@ -239,6 +339,55 @@
   font-size: 0.85rem;
   outline: none;
   cursor: pointer;
+}
+
+.ts-filter-input {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  color: var(--text-main);
+  font-weight: 500;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.ts-filter-input:focus {
+  border-color: var(--accent-primary);
+}
+
+.ts-reset-btn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.ts-reset-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+.ts-filter-badge-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(234, 179, 8, 0.12);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 /* Accordéon de Référence Emplacement (REF: 1AB1 ∨) */
