@@ -4,7 +4,7 @@ import Pagination from '../../../components/Pagination';
 import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
 
 
-export default function AbonnementsTab({ abonnements = [], typeStatut = [], initialSearchQuery = '', onRefresh }) {
+export default function AbonnementsTab({ abonnements = [], emplacements = [], typeStatut = [], initialSearchQuery = '', onRefresh }) {
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCommercial, setSelectedCommercial] = useState('all');
@@ -345,6 +345,8 @@ export default function AbonnementsTab({ abonnements = [], typeStatut = [], init
           onClose={() => setSelectedAbonnement(null)}
           onRefresh={onRefresh}
           typeStatut={typeStatut}
+          emplacements={emplacements}
+          allAbonnements={abonnements}
         />
       )}
     </div>

@@ -1,42 +1,63 @@
 import React from 'react';
-import { RefreshCw, Radio, Sun, Moon, LayoutDashboard, MapPin, Settings } from 'lucide-react';
+import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ChevronRight } from 'lucide-react';
 
-export default function Header({ isBackendOnline, onRefresh, theme, toggleTheme, activePage, setActivePage }) {
+export default function Header({
+  isBackendOnline,
+  onRefresh,
+  theme,
+  toggleTheme,
+  activePage,
+  activeTab
+}) {
+  const tabLabels = {
+    emplacements: 'Supports & Emplacements',
+    abonnements: 'Abonnements & Contrats',
+    clients: 'Clients & Contacts',
+    typesupports: 'Types de Support',
+    zones: 'Aéroports & Zones',
+    formats: 'Catégories',
+    utilisateurs: 'Équipe & Rôles',
+    actions: 'Suivi & Alertes J-30'
+  };
+
+  const getBreadcrumb = () => {
+    if (activePage === 'planning') {
+      return (
+        <div className="header-breadcrumb">
+          <MapPin size={16} className="breadcrumb-icon" />
+          <span className="breadcrumb-root">AeroPub</span>
+          <ChevronRight size={14} className="breadcrumb-separator" />
+          <span className="breadcrumb-active">Planning & Zones</span>
+        </div>
+      );
+    }
+    if (activePage === 'settings') {
+      return (
+        <div className="header-breadcrumb">
+          <Settings size={16} className="breadcrumb-icon" />
+          <span className="breadcrumb-root">AeroPub</span>
+          <ChevronRight size={14} className="breadcrumb-separator" />
+          <span className="breadcrumb-active">Paramètres</span>
+        </div>
+      );
+    }
+    return (
+      <div className="header-breadcrumb">
+        <LayoutDashboard size={16} className="breadcrumb-icon" />
+        <span className="breadcrumb-root">AeroPub</span>
+        <ChevronRight size={14} className="breadcrumb-separator" />
+        <span className="breadcrumb-sub">Tableau de Bord</span>
+        <ChevronRight size={14} className="breadcrumb-separator" />
+        <span className="breadcrumb-active">{tabLabels[activeTab] || 'Référentiel'}</span>
+      </div>
+    );
+  };
+
   return (
     <header className="header-glass">
       <div className="header-inner">
-        {/* Logo AeroPub */}
-        <div className="logo-badge">
-          <Radio size={28} className="logo-icon" />
-          <span>AeroPub FRONT_OFFICE</span>
-        </div>
-
-        {/* Boutons de Navigation de Page */}
-        <div className="category-pills" style={{ width: 'auto', marginBottom: 0 }}>
-          <button
-            className={`pill-btn ${activePage === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActivePage('dashboard')}
-          >
-            <LayoutDashboard size={15} style={{ display: 'inline', marginRight: '6px' }} />
-            Tableau de Bord
-          </button>
-
-          <button
-            className={`pill-btn ${activePage === 'planning' ? 'active' : ''}`}
-            onClick={() => setActivePage('planning')}
-          >
-            <MapPin size={15} style={{ display: 'inline', marginRight: '6px' }} />
-            Planning & Zones
-          </button>
-
-          <button
-            className={`pill-btn ${activePage === 'settings' ? 'active' : ''}`}
-            onClick={() => setActivePage('settings')}
-          >
-            <Settings size={15} style={{ display: 'inline', marginRight: '6px' }} />
-            Paramètres
-          </button>
-        </div>
+        {/* Fil d'ariane (Breadcrumb) dynamique */}
+        {getBreadcrumb()}
 
         {/* API Status Badge, Theme Toggle & Refresh */}
         <div className="header-actions">

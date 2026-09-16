@@ -200,19 +200,78 @@ button {
   font-family: inherit;
 }
 
-/* Layout Main Container */
+/* Layout Main Container with Left Sidebar */
 .app-container {
   min-height: 100vh;
   display: flex;
+  flex-direction: row;
+  width: 100%;
+  position: relative;
+}
+
+.app-main-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .main-content {
   flex: 1;
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem;
   width: 100%;
+}
+
+/* Header Breadcrumb */
+.header-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumb-icon {
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.breadcrumb-root {
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.breadcrumb-separator {
+  color: var(--text-dim);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.breadcrumb-sub {
+  color: var(--text-muted);
+}
+
+.breadcrumb-active {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+[data-theme="light"] .breadcrumb-root {
+  color: #64748b;
+}
+
+[data-theme="light"] .breadcrumb-sub {
+  color: #475569;
+}
+
+[data-theme="light"] .breadcrumb-active {
+  color: #0f172a;
 }
 
 /* Glassmorphism Utilities */
@@ -234,11 +293,11 @@ button {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-glass);
-  padding: 1rem 2rem;
+  padding: 0.85rem 1.5rem;
 }
 
 .header-inner {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -1091,6 +1150,12 @@ button {
   background: rgba(16, 185, 129, 0.2);
   color: #10b981;
   border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .wireframe-card-body {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { emplacementsApi, abonnementsApi, zonesApi, aeroportsApi, clientsApi } from '../../api';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, PlusCircle, User, Clock, CheckCircle2, XCircle, X, RotateCw, Tag, Monitor, Layers, Plane, MapPin, ArrowLeftRight } from 'lucide-react';
-import { toast } from 'react-toastify';
-import SearchableClientSelect from './components/SearchableClientSelect';
 import AssociateAbonnementModal from './modals/AssociateAbonnementModal';
 import ChangeEmplacementModal from './modals/ChangeEmplacementModal';
+import AssociateExistingAbonnementModal from './modals/AssociateExistingAbonnementModal';
+
 
 
 export default function PlanningPage() {
@@ -35,6 +35,9 @@ export default function PlanningPage() {
 
   // Modal de changement d'emplacement (Transfert Kanban)
   const [showChangeModal, setShowChangeModal] = useState(false);
+
+  // Modal d'association d'un abonnement pas encore actif
+  const [showExistingAboModal, setShowExistingAboModal] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -139,9 +142,18 @@ export default function PlanningPage() {
     const targetTime = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10), 12, 0, 0).getTime();
 
     return abonnements.find(abo => {
-      const aboRef = String(abo.reference_emplacement || abo.reference || '').trim().toUpperCase();
-      if (aboRef !== targetRef) return false;
+      const supportsList = (abo.supports_associes || '')
+        .split(',')
+        .map(s => s.trim().toUpperCase());
 
+      // Vérifier si cet emplacement fait partie des supports de l'abonnement
+      const isSupportMatch =
+        supportsList.includes(targetRef) ||
+        String(abo.reference_emplacement || '').trim().toUpperCase() === targetRef ||
+        String(abo.reference_support || '').trim().toUpperCase() === targetRef ||
+        String(abo.reference || '').trim().toUpperCase() === targetRef;
+
+      if (!isSupportMatch) return false;
       const startStr = String(abo.date_debut || '').trim().replace(' ', 'T');
       const endStr = String(abo.date_fin || abo.date_echeance || '').trim().replace(' ', 'T');
 
@@ -165,6 +177,32 @@ export default function PlanningPage() {
     const d = new Date(String(dateStr).replace(' ', 'T'));
     return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('fr-FR');
   };
+
+  //ASSOSIATION UN REF A UN ABONNEMENT PAS ENCORE CONFIRMER
+  //1 Normalisation de la date cible sélectionnée à midi (évite les décalages de fuseau horaire)
+  const targetTime = new Date(selectedDate + 'T12:00:00').getTime();
+
+  //2 Filtrage des abonnements éligibles
+  const eligibleAbonnements = abonnements.filter((abo) => {
+    // A. Vérification du statut : PAS "actif" et PAS "archivé"
+    const statut = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+
+    if (statut.includes('actif') || statut.includes('archiv')) {
+      return false; // On élimine les abonnements actifs ou archivés
+    }
+    // B. Vérification de la date : la date doit être comprise entre date_debut et date_fin / date_echeance
+    const startStr = String(abo.date_debut || '').trim().replace(' ', 'T');
+    const endStr = String(abo.date_fin || abo.date_echeance || '').trim().replace(' ', 'T');
+    const startTime = new Date(startStr).getTime();
+    const endTime = new Date(endStr).getTime();
+    // Si l'une des dates est invalide, on l'ignore
+    if (isNaN(startTime) || isNaN(endTime)) return false;
+    // La date du planning doit être comprise dans la période de l'abonnement
+    return targetTime >= startTime && targetTime <= endTime;
+  });
+
+
+
 
   return (
     <section className="glass-panel planning-container">
@@ -267,7 +305,7 @@ export default function PlanningPage() {
                       <div className="wireframe-status-badge-container">
                         {isOccupied ? (
                           <span className="wireframe-badge badge-occupied">
-                            <XCircle size={14} /> (OCCUPÉ)
+                            <XCircle size={14} /> (RESERVÉ)
                           </span>
                         ) : (
                           <span className="wireframe-badge badge-available">
@@ -298,7 +336,18 @@ export default function PlanningPage() {
                           )}
                         </div>
                       ) : (
+
                         <div className="wireframe-card-body">
+                          <button
+                            onClick={() => {
+                              setTargetEmp(emp);
+                              setShowExistingAboModal(true);
+                            }}
+                            className="wireframe-action-btn"
+                          >
+                            <PlusCircle size={16} />
+                            <span>Associer à un abonnement pas encore actif</span>
+                          </button>
                           <button
                             onClick={() => openAssociateModal(emp)}
                             className="wireframe-action-btn"
@@ -399,6 +448,17 @@ export default function PlanningPage() {
           zones={zones}
           emplacements={emplacements}
           onClose={() => setShowChangeModal(false)}
+          onSuccess={loadData}
+        />
+      )}
+
+      {/* MODAL : Associer à un abonnement existant pas encore actif */}
+      {showExistingAboModal && targetEmp && (
+        <AssociateExistingAbonnementModal
+          targetEmp={targetEmp}
+          abonnements={abonnements}
+          selectedDate={selectedDate}
+          onClose={() => setShowExistingAboModal(false)}
           onSuccess={loadData}
         />
       )}

@@ -14,6 +14,7 @@ export default function AssociateAbonnementModal({
     onSuccess
 }) {
     // 1. États internes propres au formulaire
+    const [referenceAbo, setReferenceAbo] = useState('');
     const [clientId, setClientId] = useState(clients[0]?.id || '');
     const [startDate, setStartDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
 
@@ -59,10 +60,22 @@ export default function AssociateAbonnementModal({
     //2. Soumission du formulaire
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!clientId || !startDate || !endDate) {
-            toast.error('Veuillez remplir tous les champs du formulaire.');
+        const cleanRef = referenceAbo.trim();
+
+        if (!cleanRef || !clientId || !startDate || !endDate) {
+            toast.error("Veuillez renseigner la référence du contrat et tous les champs obligatoires.");
             return;
         }
+
+        // Vérifier si la référence du contrat existe déjà
+        const isRefTaken = abonnements.some(
+            (a) => String(a.reference || '').trim().toLowerCase() === cleanRef.toLowerCase()
+        );
+        if (isRefTaken) {
+            toast.error(`❌ La référence "${cleanRef}" existe déjà. Veuillez en choisir une autre.`);
+            return;
+        }
+
         setLoanding(true);
         try {
             if (new Date(startDate) > new Date(endDate)) {
@@ -75,8 +88,14 @@ export default function AssociateAbonnementModal({
             const newEnd = new Date(endDate).getTime();
 
             const conflictAbo = abonnements.find(abo => {
-                const aboRef = String(abo.reference_emplacement || abo.reference_support || '').trim().toUpperCase();
-                if (aboRef !== targetRef) return false;
+                const supportsList = (abo.supports_associes || '')
+                    .split(',')
+                    .map(s => s.trim().toUpperCase());
+                const isMatch =
+                    supportsList.includes(targetRef) ||
+                    String(abo.reference_emplacement || '').trim().toUpperCase() === targetRef ||
+                    String(abo.reference_support || '').trim().toUpperCase() === targetRef;
+                if (!isMatch) return false;
                 if (abo.statut === 'Résilié' || abo.statut === 'Annulé') return false;
 
                 const existStart = new Date(abo.date_debut).getTime();
@@ -98,17 +117,23 @@ export default function AssociateAbonnementModal({
                 return;
             }
 
+            const dureeFinale = getDureeContratText(dureeValeur, dureeUnite);
+
             await abonnementsApi.create({
+                reference: cleanRef,
                 reference_emplacement: targetEmp.reference,
-                reference: targetEmp.reference,
+                reference_support: targetEmp.reference,
                 id_client: parseInt(clientId, 10),
                 date_debut: startDate,
                 date_fin: endDate,
-                duree_contrat: duree,
-                ref_facture: facture
+                date_echeance: endDate,
+                duree_contrat: dureeFinale,
+                ref_facture: facture,
+                id_type_statut: 2,
+                statut: 'à valider'
             });
 
-            toast.success(`Nouvel abonnement associe a ${targetEmp.refence} avec succes !`);
+            toast.success(`Nouvel abonnement "${cleanRef}" associé à ${targetEmp.reference} avec succès (statut : À valider) !`);
             onClose();
             if (onSuccess) onSuccess(); // Rafraîchit les données du planning
         } catch (err) {
@@ -133,10 +158,26 @@ export default function AssociateAbonnementModal({
                     Emplacement sélectionné : <strong style={{ color: '#6366f1' }}>{targetEmp.reference}</strong> ({targetEmp.nom_type_support || 'Support Standard'} - {targetEmp.ref_format || targetEmp.caracteristiques || 'Format N/A'})
                 </p>
                 <form onSubmit={handleSubmit}>
+                    {/* Référence de l'Abonnement */}
+                    <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+                            Référence du Contrat / Abonnement : <span style={{ color: '#ef4444' }}>*</span>
+                        </label>
+                        <input
+                            type="text"
+                            className="search-input"
+                            style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                            placeholder="ex: ABO-2026-005"
+                            value={referenceAbo}
+                            onChange={(e) => setReferenceAbo(e.target.value)}
+                            required
+                        />
+                    </div>
+
                     {/* Sélection Client */}
                     <div style={{ marginBottom: '1.25rem' }}>
                         <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
-                            Sélectionner un Client :
+                            Sélectionner un Client : <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <SearchableClientSelect
                             clients={clients}

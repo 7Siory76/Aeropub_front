@@ -79,6 +79,18 @@ export default function EmplacementsTab({
     setCurrentPage(1);
   };
 
+
+  // Fonction pour calculer l'état réel d'un support aujourd'hui
+  const getStatusAujourdhui = (emp) => {
+    const now = new Date().getTime();
+    const start = emp.date_debut_etat ? new Date(emp.date_debut_etat).getTime() : null;
+    const end = emp.date_fin_etat ? new Date(emp.date_fin_etat).getTime() : null;
+
+    // Est-ce valide aujourd'hui ?
+    const isValidToday = (!start || start <= now) && (!end || end >= now);
+    return isValidToday ? (emp.etat || 'disponible') : 'disponible';
+  };
+
   // Filtrage multicritère combiné
   const filteredEmplacements = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
@@ -130,12 +142,18 @@ export default function EmplacementsTab({
         }
       }
 
-      // 6. Statut (Disponible / Occupé)
+      // 6. Statut (Disponible / Occupé / Réservé / En maintenance)
       if (selectedStatus !== 'all') {
-        const stateDisplay = (emp.etat || emp.statut || 'Disponible').toLowerCase();
-        const isOccupied = stateDisplay.includes('occup');
-        if (selectedStatus === 'Disponible' && isOccupied) return false;
-        if (selectedStatus === 'Occupé' && !isOccupied) return false;
+        const stateDisplay = getStatusAujourdhui(emp).toLowerCase();
+        if (selectedStatus.toLowerCase() === 'disponible') {
+          if (stateDisplay.includes('occup') || stateDisplay.includes('maint') || stateDisplay.includes('indispo') || stateDisplay.includes('archiv')) {
+            return false;
+          }
+        } else if (selectedStatus.toLowerCase() === 'occupé') {
+          if (!stateDisplay.includes('occup')) return false;
+        } else {
+          if (!stateDisplay.includes(selectedStatus.toLowerCase())) return false;
+        }
       }
 
       return true;
@@ -247,6 +265,8 @@ export default function EmplacementsTab({
             <option value="all">Tous les statuts</option>
             <option value="Disponible">🟢 Disponible</option>
             <option value="Occupé">🔴 Occupé</option>
+            <option value="Réservé">🟡 Réservé</option>
+            <option value="En maintenance">🟠 En maintenance</option>
           </select>
         </div>
 
@@ -287,8 +307,11 @@ export default function EmplacementsTab({
               {paginatedEmplacements.map((emp) => {
                 const zoneDisplay = emp.nom_zone || emp.nom_lieu || 'Zone N/A';
                 const aeroDisplay = emp.nom_aeroport ? ` - ${emp.nom_aeroport}` : (emp.type_zone ? ` (${emp.type_zone})` : '');
-                const stateDisplay = emp.etat || emp.statut || 'Disponible';
-                const isOccupied = stateDisplay.toLowerCase() === 'occupé' || stateDisplay.toLowerCase() === 'occupe';
+                const stateDisplay = getStatusAujourdhui(emp);
+                const stLower = stateDisplay.toLowerCase();
+                const isOccupied = stLower.includes('occup');
+                const isWarning = stLower.includes('maint') || stLower.includes('réserv') || stLower.includes('reserv');
+                const badgeClass = isOccupied ? 'badge-occupied' : isWarning ? 'badge-warning' : 'badge-available';
 
                 return (
                   <tr
@@ -308,7 +331,7 @@ export default function EmplacementsTab({
                       {emp.caracteristiques || emp.ref_format || '-'}
                     </td>
                     <td className="table-body-cell" style={{ textAlign: 'center' }}>
-                      <span className={`wireframe-badge ${!isOccupied ? 'badge-available' : 'badge-occupied'}`}>
+                      <span className={`wireframe-badge ${badgeClass}`}>
                         {stateDisplay}
                       </span>
                     </td>

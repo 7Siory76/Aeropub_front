@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import Sidebar from './components/Sidebar';
 import NotificationTester from './components/NotificationTester';
 import Footer from './components/Footer';
 import { DashboardPage, PlanningPage, ParametragePage } from './pages';
@@ -11,7 +12,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [activePage, setActivePage] = useState('planning'); // 'dashboard', 'planning' ou 'settings'
-  
+  const [activeTab, setActiveTab] = useState('emplacements'); // sous-compartiment CRUD sélectionné
+  const [counts, setCounts] = useState({});
+
   // État du thème Nuit (dark) ou Jour (light)
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('aeropub_theme') || 'dark';
@@ -52,39 +55,55 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Navigation Header avec Statut API, Switcher de Page & Thème */}
-      <Header
-        isBackendOnline={isBackendOnline}
-        onRefresh={handleRefresh}
-        theme={theme}
-        toggleTheme={toggleTheme}
+      {/* 1. Navbar latérale gauche avec poche accordéon pour les tables CRUD */}
+      <Sidebar
         activePage={activePage}
         setActivePage={setActivePage}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isBackendOnline={isBackendOnline}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        onRefresh={handleRefresh}
+        counts={counts}
       />
 
-      {/* Main Body */}
-      <main className="main-content">
-        {activePage === 'dashboard' ? (
-          /* Tableau de Bord Général AeroPub (avec recherche & HeroBanner) */
-          <DashboardPage 
-            key={refreshKey}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-        ) : activePage === 'planning' ? (
-          /* Page de Planning & Occupation des Emplacements par Zone */
-          <PlanningPage key={refreshKey} />
-        ) : (
-          /* Page de Paramétrage des réglages système */
-          <ParametragePage key={refreshKey} />
-        )}
+      {/* 2. Zone Principale (Header supérieur + Contenu de page + Footer) */}
+      <div className="app-main-wrapper">
+        <Header
+          isBackendOnline={isBackendOnline}
+          onRefresh={handleRefresh}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          activePage={activePage}
+          activeTab={activeTab}
+        />
 
-        {/* Panneau de Test des Notifications In-App */}
-        <NotificationTester onSimulateImport={handleRefresh} />
-      </main>
+        <main className="main-content">
+          {activePage === 'dashboard' ? (
+            /* Tableau de Bord Général AeroPub (avec recherche & HeroBanner) */
+            <DashboardPage 
+              key={refreshKey}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              onCountsLoaded={setCounts}
+            />
+          ) : activePage === 'planning' ? (
+            /* Page de Planning & Occupation des Emplacements par Zone */
+            <PlanningPage key={refreshKey} />
+          ) : (
+            /* Page de Paramétrage des réglages système */
+            <ParametragePage key={refreshKey} />
+          )}
 
-      {/* Footer */}
-      <Footer />
+          {/* Panneau de Test des Notifications In-App */}
+          <NotificationTester onSimulateImport={handleRefresh} />
+        </main>
+
+        <Footer />
+      </div>
     </div>
   );
 }
