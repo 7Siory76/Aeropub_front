@@ -80,16 +80,8 @@ export default function EmplacementsTab({
   };
 
 
-  // Fonction pour calculer l'état réel d'un support aujourd'hui
-  const getStatusAujourdhui = (emp) => {
-    const now = new Date().getTime();
-    const start = emp.date_debut_etat ? new Date(emp.date_debut_etat).getTime() : null;
-    const end = emp.date_fin_etat ? new Date(emp.date_fin_etat).getTime() : null;
-
-    // Est-ce valide aujourd'hui ?
-    const isValidToday = (!start || start <= now) && (!end || end >= now);
-    return isValidToday ? (emp.etat || 'disponible') : 'disponible';
-  };
+  // État actuel du support (issu de la dernière saisie enregistrée)
+  const getStatusSupport = (emp) => emp.etat || emp.statut || 'disponible';
 
   // Filtrage multicritère combiné
   const filteredEmplacements = useMemo(() => {
@@ -144,7 +136,7 @@ export default function EmplacementsTab({
 
       // 6. Statut (Disponible / Occupé / Réservé / En maintenance)
       if (selectedStatus !== 'all') {
-        const stateDisplay = getStatusAujourdhui(emp).toLowerCase();
+        const stateDisplay = getStatusSupport(emp).toLowerCase();
         if (selectedStatus.toLowerCase() === 'disponible') {
           if (stateDisplay.includes('occup') || stateDisplay.includes('maint') || stateDisplay.includes('indispo') || stateDisplay.includes('archiv')) {
             return false;
@@ -307,7 +299,7 @@ export default function EmplacementsTab({
               {paginatedEmplacements.map((emp) => {
                 const zoneDisplay = emp.nom_zone || emp.nom_lieu || 'Zone N/A';
                 const aeroDisplay = emp.nom_aeroport ? ` - ${emp.nom_aeroport}` : (emp.type_zone ? ` (${emp.type_zone})` : '');
-                const stateDisplay = getStatusAujourdhui(emp);
+                const stateDisplay = getStatusSupport(emp);
                 const stLower = stateDisplay.toLowerCase();
                 const isOccupied = stLower.includes('occup');
                 const isWarning = stLower.includes('maint') || stLower.includes('réserv') || stLower.includes('reserv');

@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Search, RotateCcw } from 'lucide-react';
+import { User, Search, RotateCcw, Plus } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
+import AddAbonnementModal from '../modals/AddAbonnementModal';
 
-
-export default function AbonnementsTab({ abonnements = [], emplacements = [], typeStatut = [], initialSearchQuery = '', onRefresh }) {
+export default function AbonnementsTab({
+  abonnements = [],
+  emplacements = [],
+  typeStatut = [],
+  clients = [],
+  utilisateurs = [],
+  initialSearchQuery = '',
+  onRefresh
+}) {
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCommercial, setSelectedCommercial] = useState('all');
@@ -14,6 +22,8 @@ export default function AbonnementsTab({ abonnements = [], emplacements = [], ty
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [selectedAbonnement, setSelectedAbonnement] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -338,6 +348,19 @@ export default function AbonnementsTab({ abonnements = [], emplacements = [], ty
         onPageSizeChange={setPageSize}
       />
 
+      {/* Bouton d'ajout / duplication de contrat */}
+      <div className="add-support-bar">
+        <button
+          type="button"
+          onClick={() => setShowAddModal(true)}
+          className="btn-add-support"
+        >
+          <Plus size={20} strokeWidth={2.6} />
+          <span>Nouveau contrat / Dupliquer</span>
+        </button>
+      </div>
+
+
       {/* Modale createPortal des détails de l'abonnement */}
       {selectedAbonnement && (
         <AbonnementDetailsModal
@@ -347,8 +370,24 @@ export default function AbonnementsTab({ abonnements = [], emplacements = [], ty
           typeStatut={typeStatut}
           emplacements={emplacements}
           allAbonnements={abonnements}
+          clients={clients}
+          utilisateurs={utilisateurs}
         />
       )}
+
+      {/* Modale d'ajout ou duplication de contrat */}
+      {showAddModal && (
+        <AddAbonnementModal
+          onClose={() => setShowAddModal(false)}
+          onRefresh={onRefresh}
+          allAbonnements={abonnements}
+          emplacements={emplacements}
+          clients={clients}
+          utilisateurs={utilisateurs}
+          typeStatut={typeStatut}
+        />
+      )}
+
     </div>
   );
 }

@@ -165,6 +165,8 @@ export default function DashboardPage({
                 abonnements={abonnements}
                 emplacements={emplacements}
                 typeStatut={typeStatutAbonnement}
+                clients={clients}
+                utilisateurs={utilisateurs}
                 initialSearchQuery={searchQuery}
                 onRefresh={loadAllData}
               />
