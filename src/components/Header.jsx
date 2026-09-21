@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ChevronRight } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 
 export default function Header({
   isBackendOnline,
@@ -66,6 +67,8 @@ export default function Header({
             <span>{isBackendOnline ? 'API En Ligne' : 'API Hors Ligne'}</span>
           </div>
 
+          {/* notifications */}
+          <NotificationBell />
           {/* Mode Nuit / Jour */}
           <button
             onClick={toggleTheme}
@@ -85,9 +88,9 @@ export default function Header({
             )}
           </button>
 
-          <button 
-            onClick={onRefresh} 
-            className="btn-secondary btn-refresh" 
+          <button
+            onClick={onRefresh}
+            className="btn-secondary btn-refresh"
             title="Rafraîchir les données API"
           >
             <RefreshCw size={16} />

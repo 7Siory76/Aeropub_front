@@ -16,3 +16,4 @@ export * from './documentsApi';
 export * from './parametrageApi';
 export * from './typeEtatSupportApi';
 export * from './typeStatutAbonnementApi';
+export * from './journalNotificationApi';

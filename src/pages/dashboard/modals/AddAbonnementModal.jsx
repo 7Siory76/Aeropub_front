@@ -32,6 +32,17 @@ export default function AddAbonnementModal({
     const [availableEmplacements, setAvailableEmplacements] = useState(emplacements);
     const [abonnementsList, setAbonnementsList] = useState(allAbonnements);
 
+    const [dureeValeur, setDureeValeur] = useState(1);
+    const [dureeUnite, setDureeUnite] = useState('an');
+
+    const getDureeContratText = (val, unite) => {
+        const n = parseInt(val, 10) || 1;
+        if (unite === 'an') {
+            return `${n} ${n > 1 ? 'ans' : 'an'}`;
+        }
+        return `${n} mois`;
+    };
+
     const formatDateForInput = (d) => {
         if (!d) return '';
         try {
@@ -66,6 +77,42 @@ export default function AddAbonnementModal({
     });
     const [selectedSupports, setSelectedSupports] = useState([]);
     const [supportToAdd, setSupportToAdd] = useState('');
+
+    // Recalcul automatique de la date d'échéance selon la durée et date_debut
+    useEffect(() => {
+        if (!formData.date_debut) return;
+        const [year, month, day] = formData.date_debut.split('-').map(Number);
+        if (!year || !month || !day) return;
+
+        const d = new Date(year, month - 1, day);
+        const val = parseInt(dureeValeur, 10) || 1;
+
+        if (dureeUnite === 'an') {
+            d.setFullYear(d.getFullYear() + val);
+        } else if (dureeUnite === 'mois') {
+            d.setMonth(d.getMonth() + val);
+        }
+
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(d.getDate()).padStart(2, '0');
+
+        let autoPeriodicite = 'Annuel';
+        if (dureeUnite === 'mois') {
+            if (val <= 1) autoPeriodicite = 'Mensuel';
+            else if (val >= 2 && val <= 4) autoPeriodicite = 'Trimestriel';
+            else if (val >= 5 && val <= 8) autoPeriodicite = 'Semestriel';
+            else autoPeriodicite = 'Annuel';
+        } else {
+            autoPeriodicite = 'Annuel';
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            date_echeance: `${y}-${m}-${dayStr}`,
+            periodicite: autoPeriodicite
+        }));
+    }, [formData.date_debut, dureeValeur, dureeUnite]);
 
     //chargement des données
     useEffect(() => {
@@ -176,8 +223,19 @@ export default function AddAbonnementModal({
         const targetEndTime = new Date(endDateStr + 'T23:59:59').getTime();
         if (isNaN(targetStartTime) || isNaN(targetEndTime)) return { available: true };
         for (const otherAbo of abonnementsList) {
-            const st = String(otherAbo.statut_abonnement || otherAbo.statut || '').trim().toLowerCase();
-            if (st.includes('archiv') || st.includes('resili') || st.includes('annul')) continue;
+            const rawSt = String(otherAbo.statut_abonnement || otherAbo.statut || '').trim().toLowerCase();
+            const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            if (
+                cleanSt.includes('archiv') ||
+                cleanSt.includes('resili') ||
+                cleanSt.includes('annul') ||
+                cleanSt.includes('expir') ||
+                rawSt.includes('résili') ||
+                rawSt.includes('archiv') ||
+                rawSt.includes('expir')
+            ) {
+                continue;
+            }
             const supsList = (otherAbo.supports_associes || '').split(',').map(s => s.trim().toUpperCase());
             const firstSup = String(otherAbo.reference_emplacement || otherAbo.reference_support || '').trim().toUpperCase();
             if (firstSup) supsList.push(firstSup);
@@ -409,7 +467,36 @@ export default function AddAbonnementModal({
                             </select>
                         </div>
                     </div>
-                    {/* Dates du contrat */}
+                    {/* Durée du contrat & Dates */}
+                    <div style={{ marginBottom: '1rem', background: 'rgba(255, 255, 255, 0.02)', padding: '0.8rem', borderRadius: '10px', border: '1px solid var(--border-glass)' }}>
+                        <label className="modal-label" style={{ marginBottom: '0.4rem', color: '#06b6d4', fontWeight: 600 }}>
+                            ⏱️ Durée du contrat :
+                        </label>
+                        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                            <input
+                                type="number"
+                                min="1"
+                                max="120"
+                                className="modal-input"
+                                style={{ width: '85px', textAlign: 'center', fontWeight: 700 }}
+                                value={dureeValeur}
+                                onChange={(e) => setDureeValeur(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                            />
+                            <select
+                                className="modal-select"
+                                style={{ width: '130px' }}
+                                value={dureeUnite}
+                                onChange={(e) => setDureeUnite(e.target.value)}
+                            >
+                                <option value="an">An(s)</option>
+                                <option value="mois">Mois</option>
+                            </select>
+                            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                                (Contrat de {getDureeContratText(dureeValeur, dureeUnite)})
+                            </span>
+                        </div>
+                    </div>
+
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                         <div className="modal-form-group">
                             <label className="modal-label">Date de début * :</label>
@@ -422,7 +509,7 @@ export default function AddAbonnementModal({
                             />
                         </div>
                         <div className="modal-form-group">
-                            <label className="modal-label">Date d'échéance * :</label>
+                            <label className="modal-label">Date d'échéance * (Calculée) :</label>
                             <input
                                 type="date"
                                 required

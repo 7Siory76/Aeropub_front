@@ -28,8 +28,18 @@ export default function AssociateAbonnementModal({
     const [duree, setDuree] = useState('1 an');
     const [dureeValeur, setDureeValeur] = useState(1);
     const [dureeUnite, setDureeUnite] = useState('an');
+    const [periodicite, setPeriodicite] = useState('Annuel');
     const [facture, setFacture] = useState('');
     const [loading, setLoanding] = useState(false);
+
+    const deducePeriodicite = (val, unite) => {
+        const n = parseInt(val, 10) || 1;
+        if (unite === 'an') return 'Annuel';
+        if (n <= 1) return 'Mensuel';
+        if (n >= 2 && n <= 4) return 'Trimestriel';
+        if (n >= 5 && n <= 8) return 'Semestriel';
+        return 'Annuel';
+    };
 
     const getDureeContratText = (val, unite) => {
         const n = parseInt(val, 10) || 1;
@@ -55,6 +65,9 @@ export default function AssociateAbonnementModal({
         const m = String(d.getMonth() + 1).padStart(2, '0');
         const dayStr = String(d.getDate()).padStart(2, '0');
         setEndDate(`${y}-${m}-${dayStr}`);
+
+        // Déduire la périodicité adaptée à la durée
+        setPeriodicite(deducePeriodicite(val, dureeUnite));
     }, [startDate, dureeValeur, dureeUnite]);
 
     //2. Soumission du formulaire
@@ -96,7 +109,11 @@ export default function AssociateAbonnementModal({
                     String(abo.reference_emplacement || '').trim().toUpperCase() === targetRef ||
                     String(abo.reference_support || '').trim().toUpperCase() === targetRef;
                 if (!isMatch) return false;
-                if (abo.statut === 'Résilié' || abo.statut === 'Annulé') return false;
+                const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+                const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                if (cleanSt.includes('resili') || cleanSt.includes('annul') || cleanSt.includes('archiv') || cleanSt.includes('expir')) {
+                    return false;
+                }
 
                 const existStart = new Date(abo.date_debut).getTime();
                 const existEnd = new Date(abo.date_fin || abo.date_echeance).getTime();
@@ -127,6 +144,7 @@ export default function AssociateAbonnementModal({
                 date_debut: startDate,
                 date_fin: endDate,
                 date_echeance: endDate,
+                periodicite: periodicite || deducePeriodicite(dureeValeur, dureeUnite),
                 duree_contrat: dureeFinale,
                 ref_facture: facture,
                 id_type_statut: 2,
@@ -185,7 +203,7 @@ export default function AssociateAbonnementModal({
                             onChange={(val) => setClientId(val)}
                         />
                     </div>
-                    {/* Durée & Facture */}
+                    {/* Durée & Périodicité */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
                         <div>
                             <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
@@ -217,20 +235,24 @@ export default function AssociateAbonnementModal({
 
                         <div>
                             <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
-                                Référence Facture / Cde :
+                                Périodicité :
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 className="search-input"
-                                style={{ borderRadius: '10px', padding: '0.65rem 0.85rem' }}
-                                placeholder="ex: FA 240"
-                                value={facture}
-                                onChange={(e) => setFacture(e.target.value)}
-                            />
+                                style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                                value={periodicite}
+                                onChange={(e) => setPeriodicite(e.target.value)}
+                            >
+                                <option value="Mensuel">Mensuel</option>
+                                <option value="Trimestriel">Trimestriel</option>
+                                <option value="Semestriel">Semestriel</option>
+                                <option value="Annuel">Annuel</option>
+                            </select>
                         </div>
                     </div>
+
                     {/* Dates Début / Fin */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
                         <div>
                             <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
                                 Date de début :
@@ -255,6 +277,20 @@ export default function AssociateAbonnementModal({
                                 onChange={(e) => setEndDate(e.target.value)}
                             />
                         </div>
+                    </div>
+                    {/* Référence Facture / Cde */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                            Référence Facture / Cde (optionnel) :
+                        </label>
+                        <input
+                            type="text"
+                            className="search-input"
+                            style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                            placeholder="ex: FA 240"
+                            value={facture}
+                            onChange={(e) => setFacture(e.target.value)}
+                        />
                     </div>
                     {/* Boutons d'action */}
                     <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>

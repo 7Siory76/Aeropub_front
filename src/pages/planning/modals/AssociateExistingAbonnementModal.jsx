@@ -18,9 +18,16 @@ export default function AssociateExistingAbonnementModal({
         if (!selectedDate) return [];
         const targetTime = new Date(selectedDate + 'T12:00:00').getTime();
         return abonnements.filter((abo) => {
-            const statut = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
-            // Exclure "actif" et "archivé"
-            if (statut.includes('actif') || statut.includes('archiv')) {
+            const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+            const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            // Exclure "actif", "archivé", "résilié", "annulé", "expiré"
+            if (
+                cleanSt.includes('actif') || 
+                cleanSt.includes('archiv') || 
+                cleanSt.includes('resili') || 
+                cleanSt.includes('annul') || 
+                cleanSt.includes('expir')
+            ) {
                 return false;
             }
             // Vérifier que la date sélectionnée est comprise entre début et fin

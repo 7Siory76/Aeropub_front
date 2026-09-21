@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X, Edit3, Trash2, Calendar, User, DollarSign, Layers, ShieldCheck,
@@ -52,6 +52,18 @@ export default function AbonnementDetailsModal({
   const [selectedSupports, setSelectedSupports] = useState(initialSupports);
   const [supportToAdd, setSupportToAdd] = useState('');
 
+  const [dureeValeur, setDureeValeur] = useState(1);
+  const [dureeUnite, setDureeUnite] = useState('an');
+  const prevDurationRef = useRef({ val: 1, unite: 'an' });
+
+  const getDureeContratText = (val, unite) => {
+    const n = parseInt(val, 10) || 1;
+    if (unite === 'an') {
+      return `${n} ${n > 1 ? 'ans' : 'an'}`;
+    }
+    return `${n} mois`;
+  };
+
   // Utilitaire pour formater la date au format YYYY-MM-DD requis par <input type="date" />
   const formatDateForInput = (d) => {
     if (!d) return '';
@@ -104,6 +116,25 @@ export default function AbonnementDetailsModal({
       });
       setSelectedNewStatut(abonnement.statut_abonnement || abonnement.statut || 'Actif');
 
+      // Calculer la durée initiale pour initialiser le sélecteur
+      if (abonnement.date_debut && (abonnement.date_echeance || abonnement.date_fin)) {
+        const d1 = new Date(abonnement.date_debut);
+        const d2 = new Date(abonnement.date_echeance || abonnement.date_fin);
+        const diffMonths = (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+        let initVal = 1;
+        let initUnite = 'an';
+        if (diffMonths > 0 && diffMonths % 12 === 0) {
+          initVal = diffMonths / 12;
+          initUnite = 'an';
+        } else if (diffMonths > 0) {
+          initVal = diffMonths;
+          initUnite = 'mois';
+        }
+        setDureeValeur(initVal);
+        setDureeUnite(initUnite);
+        prevDurationRef.current = { val: initVal, unite: initUnite };
+      }
+
       // Charger l'historique des statuts de l'abonnement
       setLoadingHistorique(true);
       abonnementsApi.getHistoriqueStatuts(abonnement.reference)
@@ -112,6 +143,50 @@ export default function AbonnementDetailsModal({
         .finally(() => setLoadingHistorique(false));
     }
   }, [abonnement, initialSupports]);
+
+  // Recalcul de l'échéance en mode édition lorsque la durée change
+  useEffect(() => {
+    if (!isEditing || !formData.date_debut) return;
+
+    const [year, month, day] = formData.date_debut.split('-').map(Number);
+    if (!year || !month || !day) return;
+
+    const d = new Date(year, month - 1, day);
+    const val = parseInt(dureeValeur, 10) || 1;
+
+    if (dureeUnite === 'an') {
+      d.setFullYear(d.getFullYear() + val);
+    } else if (dureeUnite === 'mois') {
+      d.setMonth(d.getMonth() + val);
+    }
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(d.getDate()).padStart(2, '0');
+
+    const durationChanged =
+      prevDurationRef.current.val !== val ||
+      prevDurationRef.current.unite !== dureeUnite;
+
+    let autoPeriodicite = null;
+    if (durationChanged) {
+      if (dureeUnite === 'mois') {
+        if (val <= 1) autoPeriodicite = 'Mensuel';
+        else if (val >= 2 && val <= 4) autoPeriodicite = 'Trimestriel';
+        else if (val >= 5 && val <= 8) autoPeriodicite = 'Semestriel';
+        else autoPeriodicite = 'Annuel';
+      } else {
+        autoPeriodicite = 'Annuel';
+      }
+      prevDurationRef.current = { val, unite: dureeUnite };
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      date_echeance: `${y}-${m}-${dayStr}`,
+      ...(autoPeriodicite ? { periodicite: autoPeriodicite } : {})
+    }));
+  }, [isEditing, formData.date_debut, dureeValeur, dureeUnite]);
 
   // Charger les listes nécessaires si non passées en props
   useEffect(() => {
@@ -166,9 +241,20 @@ export default function AbonnementDetailsModal({
       // Ignorer le contrat actuel en cours d'édition
       if (otherAbo.reference === abonnement.reference) continue;
 
-      // Ignorer les contrats archivés, résiliés ou annulés
-      const st = String(otherAbo.statut_abonnement || otherAbo.statut || '').trim().toLowerCase();
-      if (st.includes('archiv') || st.includes('resili') || st.includes('annul')) continue;
+      // Ignorer les contrats archivés, résiliés, expirés ou annulés
+      const rawSt = String(otherAbo.statut_abonnement || otherAbo.statut || '').trim().toLowerCase();
+      const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (
+        cleanSt.includes('archiv') || 
+        cleanSt.includes('resili') || 
+        cleanSt.includes('annul') || 
+        cleanSt.includes('expir') ||
+        rawSt.includes('résili') ||
+        rawSt.includes('archiv') ||
+        rawSt.includes('expir')
+      ) {
+        continue;
+      }
 
       // Vérifier si ce contrat utilise ce support
       const supsList = (otherAbo.supports_associes || '')
@@ -270,6 +356,10 @@ export default function AbonnementDetailsModal({
   // Action : Sauvegarder les modifications complètes
   const handleSaveUpdate = async (e) => {
     e.preventDefault();
+    if (formData.date_debut && formData.date_echeance && new Date(formData.date_echeance) < new Date(formData.date_debut)) {
+      alert("La date d'échéance doit être postérieure ou égale à la date de début.");
+      return;
+    }
     setLoading(true);
     try {
       // 1. Vérification de la disponibilité de tous les supports sélectionnés sur la période
@@ -600,6 +690,36 @@ export default function AbonnementDetailsModal({
               </div>
             </div>
 
+            {/* Sélecteur de durée du contrat */}
+            <div style={{ marginBottom: '0.8rem', background: 'rgba(255, 255, 255, 0.02)', padding: '0.7rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
+              <label className="modal-label" style={{ marginBottom: '0.35rem', color: '#06b6d4', fontWeight: 600 }}>
+                ⏱️ Durée du contrat :
+              </label>
+              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  className="modal-input"
+                  style={{ width: '85px', textAlign: 'center', fontWeight: 700 }}
+                  value={dureeValeur}
+                  onChange={(e) => setDureeValeur(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                />
+                <select
+                  className="modal-select"
+                  style={{ width: '130px' }}
+                  value={dureeUnite}
+                  onChange={(e) => setDureeUnite(e.target.value)}
+                >
+                  <option value="an">An(s)</option>
+                  <option value="mois">Mois</option>
+                </select>
+                <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                  (Soit {getDureeContratText(dureeValeur, dureeUnite)})
+                </span>
+              </div>
+            </div>
+
             {/* Ligne 4 : Date Début et Date Échéance */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
               <div className="modal-form-group">
@@ -612,7 +732,7 @@ export default function AbonnementDetailsModal({
                 />
               </div>
               <div className="modal-form-group">
-                <label className="modal-label">Date d'échéance :</label>
+                <label className="modal-label">Date d'échéance (Calculée) :</label>
                 <input
                   type="date"
                   className="modal-input"

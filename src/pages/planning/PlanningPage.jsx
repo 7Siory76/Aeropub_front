@@ -142,6 +142,19 @@ export default function PlanningPage() {
     const targetTime = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10), 12, 0, 0).getTime();
 
     return abonnements.find(abo => {
+      const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+      const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (
+        cleanSt.includes('archiv') ||
+        cleanSt.includes('resili') ||
+        cleanSt.includes('annul') ||
+        cleanSt.includes('expir') ||
+        rawSt.includes('résili') ||
+        rawSt.includes('archiv') ||
+        rawSt.includes('expir')
+      ) {
+        return false; // L'abonnement résilié ou expiré est ignoré -> l'emplacement redevient disponible !
+      }
       const supportsList = (abo.supports_associes || '')
         .split(',')
         .map(s => s.trim().toUpperCase());
@@ -184,11 +197,17 @@ export default function PlanningPage() {
 
   //2 Filtrage des abonnements éligibles
   const eligibleAbonnements = abonnements.filter((abo) => {
-    // A. Vérification du statut : PAS "actif" et PAS "archivé"
-    const statut = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+    // A. Vérification du statut : PAS "actif", "archivé", "résilié" ou "annulé"
+    const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+    const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    if (statut.includes('actif') || statut.includes('archiv')) {
-      return false; // On élimine les abonnements actifs ou archivés
+    if (
+      cleanSt.includes('actif') || 
+      cleanSt.includes('archiv') || 
+      cleanSt.includes('resili') || 
+      cleanSt.includes('annul')
+    ) {
+      return false; // On élimine les abonnements actifs, archivés ou résiliés
     }
     // B. Vérification de la date : la date doit être comprise entre date_debut et date_fin / date_echeance
     const startStr = String(abo.date_debut || '').trim().replace(' ', 'T');
