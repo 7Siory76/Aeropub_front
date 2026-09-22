@@ -1,6 +1,8 @@
 import React from 'react';
-import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ChevronRight } from 'lucide-react';
+import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ScrollText, ChevronRight } from 'lucide-react';
 import NotificationBell from './NotificationBell';
+import { useAuth } from '../context/AuthContext';
+import { LogOut, User as UserIcon } from 'lucide-react';
 
 export default function Header({
   isBackendOnline,
@@ -21,6 +23,13 @@ export default function Header({
     actions: 'Suivi & Alertes J-30'
   };
 
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    if (window.confirm('Voulez-vous vraiment vous déconnecter ?')) {
+      logout();
+    }
+  };
   const getBreadcrumb = () => {
     if (activePage === 'planning') {
       return (
@@ -38,7 +47,17 @@ export default function Header({
           <Settings size={16} className="breadcrumb-icon" />
           <span className="breadcrumb-root">AeroPub</span>
           <ChevronRight size={14} className="breadcrumb-separator" />
-          <span className="breadcrumb-active">Paramètres</span>
+          <span className="breadcrumb-active">Paramètres / Configuration</span>
+        </div>
+      );
+    }
+    if (activePage === 'audit') {
+      return (
+        <div className="header-breadcrumb">
+          <ScrollText size={16} className="breadcrumb-icon" />
+          <span className="breadcrumb-root">AeroPub</span>
+          <ChevronRight size={14} className="breadcrumb-separator" />
+          <span className="breadcrumb-active">Journal technique & Audit Log</span>
         </div>
       );
     }
@@ -96,6 +115,28 @@ export default function Header({
             <RefreshCw size={16} />
             <span>Actualiser</span>
           </button>
+
+          {/* Profil utilisateur & Rôle */}
+          {user && (
+            <div className="user-header-badge">
+              <div className="user-avatar">
+                {user.nom ? user.nom.charAt(0).toUpperCase() : <UserIcon size={14} />}
+              </div>
+              <div className="user-details">
+                <span className="user-name">{user.nom}</span>
+                <span className={`user-role-pill role-${user.role?.toLowerCase()}`}>
+                  {user.role}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                className="btn-logout"
+                title="Déconnexion"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

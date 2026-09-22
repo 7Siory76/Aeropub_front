@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Search, RotateCcw, Plus } from 'lucide-react';
+import { User, Search, RotateCcw, Plus, Download } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
 import AddAbonnementModal from '../modals/AddAbonnementModal';
+import { useAuth } from '../../../context/AuthContext';
+import { hasRole } from '../../../utils/rbac';
+import { toast } from 'react-toastify';
 
 export default function AbonnementsTab({
   abonnements = [],
@@ -13,6 +16,14 @@ export default function AbonnementsTab({
   initialSearchQuery = '',
   onRefresh
 }) {
+  const { user } = useAuth();
+
+  // Permissions RBAC
+  const canCreateOrDuplicate = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
+  const canViewGlobalFilter = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Lecture_Seule']);
+  const isRestrictedCommercial = !canViewGlobalFilter && hasRole(user, ['Commercial']);
+  const canExport = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Commercial', 'Lecture_Seule']);
+
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCommercial, setSelectedCommercial] = useState('all');
@@ -98,14 +109,23 @@ export default function AbonnementsTab({
         if (!matchText) return false;
       }
 
+      // Restriction portefeuille pour commercial simple
+      if (isRestrictedCommercial) {
+        const userNom = (user?.nom || '').trim().toLowerCase();
+        const aboCom = (abo.nom_commercial || '').trim().toLowerCase();
+        const isMyContrat = (userNom && (aboCom.includes(userNom) || userNom.includes(aboCom))) ||
+                            (abo.id_commercial && user?.id && String(abo.id_commercial) === String(user.id));
+        if (!isMyContrat) return false;
+      }
+
       // 2. Statut
       if (selectedStatus !== 'all') {
         const statut = (abo.statut_abonnement || abo.statut || 'Actif').toLowerCase();
         if (statut !== selectedStatus.toLowerCase()) return false;
       }
 
-      // 3. Commercial
-      if (selectedCommercial !== 'all') {
+      // 3. Commercial (filtre global)
+      if (canViewGlobalFilter && selectedCommercial !== 'all') {
         if ((abo.nom_commercial || '').toLowerCase() !== selectedCommercial.toLowerCase()) {
           return false;
         }
@@ -135,12 +155,42 @@ export default function AbonnementsTab({
 
       return true;
     });
-  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear]);
+  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter]);
 
   const paginatedAbonnements = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filteredAbonnements.slice(start, start + pageSize);
   }, [filteredAbonnements, currentPage, pageSize]);
+
+  // Fonction d'exportation Excel / CSV (Module 4)
+  const handleExportCSV = () => {
+    if (filteredAbonnements.length === 0) {
+      toast.info('Aucun contrat à exporter.');
+      return;
+    }
+    const headers = ['Reference', 'Client', 'Commercial', 'Supports', 'Tarif', 'Devise', 'Periodicite', 'Date_Debut', 'Date_Echeance', 'Statut'];
+    const rows = filteredAbonnements.map(a => [
+      `"${a.reference || a.id || ''}"`,
+      `"${a.raison_sociale || a.nom_client || ''}"`,
+      `"${a.nom_commercial || ''}"`,
+      `"${a.supports_associes || a.reference_emplacement || ''}"`,
+      `"${a.tarif || ''}"`,
+      `"${a.devise || 'MGA'}"`,
+      `"${a.periodicite || ''}"`,
+      `"${a.date_debut ? new Date(a.date_debut).toLocaleDateString('fr-FR') : ''}"`,
+      `"${a.date_echeance ? new Date(a.date_echeance).toLocaleDateString('fr-FR') : ''}"`,
+      `"${a.statut_abonnement || a.statut || ''}"`
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `contrats_aeropub_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Exportation des contrats réussie !');
+  };
 
   return (
     <div>
@@ -175,21 +225,31 @@ export default function AbonnementsTab({
           </select>
         </div>
 
-        <div className="ts-filter-group">
-          <span>Commercial :</span>
-          <select
-            className="ts-filter-select"
-            value={selectedCommercial}
-            onChange={(e) => setSelectedCommercial(e.target.value)}
-          >
-            <option value="all">Tous les commerciaux 👤</option>
-            {commercialOptions.map((com) => (
-              <option key={com} value={com}>
-                {com}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Filtre global Commercial : réservé à Admin, Direction, Resp_Com, Lecture_Seule */}
+        {canViewGlobalFilter ? (
+          <div className="ts-filter-group">
+            <span>Commercial :</span>
+            <select
+              className="ts-filter-select"
+              value={selectedCommercial}
+              onChange={(e) => setSelectedCommercial(e.target.value)}
+            >
+              <option value="all">Tous les commerciaux 👤</option>
+              {commercialOptions.map((com) => (
+                <option key={com} value={com}>
+                  {com}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div className="ts-filter-group" style={{ opacity: 0.9 }}>
+            <span>Portefeuille :</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--accent-primary)', padding: '0.2rem 0.5rem', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '6px' }}>
+              👤 {user?.nom || 'Mon portefeuille'}
+            </span>
+          </div>
+        )}
 
         <div className="ts-filter-group">
           <span>Périodicité :</span>
@@ -247,6 +307,20 @@ export default function AbonnementsTab({
           >
             <RotateCcw size={13} />
             <span>Réinitialiser</span>
+          </button>
+        )}
+
+        {/* Bouton Exporter en Excel / PDF (Module 4) */}
+        {canExport && (
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={handleExportCSV}
+            title="Exporter les contrats en fichier CSV / Excel"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', padding: '0.35rem 0.75rem' }}
+          >
+            <Download size={14} />
+            <span>Exporter (Excel / CSV)</span>
           </button>
         )}
 
@@ -348,17 +422,19 @@ export default function AbonnementsTab({
         onPageSizeChange={setPageSize}
       />
 
-      {/* Bouton d'ajout / duplication de contrat */}
-      <div className="add-support-bar">
-        <button
-          type="button"
-          onClick={() => setShowAddModal(true)}
-          className="btn-add-support"
-        >
-          <Plus size={20} strokeWidth={2.6} />
-          <span>Nouveau contrat / Dupliquer</span>
-        </button>
-      </div>
+      {/* Bouton d'ajout / duplication de contrat (Module 1 : Admin, Resp_Com, Commercial) */}
+      {canCreateOrDuplicate && (
+        <div className="add-support-bar">
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="btn-add-support"
+          >
+            <Plus size={20} strokeWidth={2.6} />
+            <span>+ Créer un contrat / Dupliquer</span>
+          </button>
+        </div>
+      )}
 
 
       {/* Modale createPortal des détails de l'abonnement */}

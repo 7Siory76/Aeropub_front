@@ -19,10 +19,13 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Upload,
-  Loader2
+  Loader2,
+  ScrollText
 } from 'lucide-react';
 import { csvApi } from '../api';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
+import { hasRole } from '../utils/rbac';
 import './Sidebar.css';
 
 export default function Sidebar({
@@ -36,6 +39,9 @@ export default function Sidebar({
   onRefresh,
   counts = {}
 }) {
+  const { user } = useAuth();
+  const isAdmin = hasRole(user, ['Admin']);
+
   // État de la "poche" (accordéon ouvert par défaut)
   const [isCrudPocketOpen, setIsCrudPocketOpen] = useState(true);
   // État de réduction/compactage de la barre latérale
@@ -44,17 +50,19 @@ export default function Sidebar({
   const [uploadingCsv, setUploadingCsv] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Sous-compartiments de la table CRUD
-  const crudItems = [
+  // Sous-compartiments de la table CRUD (réservé admin pour utilisateurs)
+  const allCrudItems = [
     { key: 'emplacements', label: 'Supports', icon: Tv, count: counts.emplacements },
     { key: 'abonnements', label: 'Abonnements', icon: Calendar, count: counts.abonnements },
     { key: 'clients', label: 'Clients & Contacts', icon: Users, count: counts.clients },
     { key: 'typesupports', label: 'Types de Support', icon: Layers, count: counts.typeSupports },
     { key: 'zones', label: 'Aéroports & Zones', icon: MapPin, count: counts.zones },
     { key: 'formats', label: 'Catégories', icon: FolderKanban, count: counts.categories },
-    { key: 'utilisateurs', label: 'Équipe & Rôles', icon: ShieldCheck, count: counts.utilisateurs },
+    { key: 'utilisateurs', label: 'Équipe & Rôles', icon: ShieldCheck, count: counts.utilisateurs, adminOnly: true },
     { key: 'actions', label: 'Suivi & Alertes', icon: Bell, count: counts.actionsCommerciales },
   ];
+
+  const crudItems = allCrudItems.filter(item => !item.adminOnly || isAdmin);
 
   const handleSelectCrudTab = (tabKey) => {
     setActivePage('dashboard');
@@ -244,20 +252,34 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* Section 3 : Paramètres */}
-        <div className="sidebar-section">
-          {!isCollapsed && <span className="sidebar-section-title">Système</span>}
-          
-          <button
-            type="button"
-            className={`sidebar-nav-item ${activePage === 'settings' ? 'active' : ''}`}
-            onClick={() => setActivePage('settings')}
-            title="Paramètres de configuration"
-          >
-            <Settings size={18} className="sidebar-item-icon" />
-            {!isCollapsed && <span className="sidebar-item-label">Paramètres</span>}
-          </button>
-        </div>
+        {/* Section 3 : Administration & Paramétrage (Module 5 : Strictement réservé à Admin) */}
+        {hasRole(user, ['Admin']) && (
+          <div className="sidebar-section">
+            {!isCollapsed && <span className="sidebar-section-title">Administration</span>}
+            
+            {/* Menu "Paramètres / Configuration" */}
+            <button
+              type="button"
+              className={`sidebar-nav-item ${activePage === 'settings' ? 'active' : ''}`}
+              onClick={() => setActivePage('settings')}
+              title="Paramètres / Configuration (Réservé Admin)"
+            >
+              <Settings size={18} className="sidebar-item-icon" />
+              {!isCollapsed && <span className="sidebar-item-label">Paramètres / Config</span>}
+            </button>
+
+            {/* Menu "Journal technique & Audit Log" */}
+            <button
+              type="button"
+              className={`sidebar-nav-item ${activePage === 'audit' ? 'active' : ''}`}
+              onClick={() => setActivePage('audit')}
+              title="Journal technique & Audit Log (Réservé Admin)"
+            >
+              <ScrollText size={18} className="sidebar-item-icon" />
+              {!isCollapsed && <span className="sidebar-item-label">Journal & Audit Log</span>}
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Pied de page de la Sidebar : État API, Thème et Actualisation */}

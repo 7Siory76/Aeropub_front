@@ -2,11 +2,14 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X, Edit3, Trash2, Calendar, User, DollarSign, Layers, ShieldCheck,
-  Percent, FileText, AlertTriangle, Plus, Clock, History, CheckCircle2
+  Percent, FileText, AlertTriangle, Plus, Clock, History, CheckCircle2, Gift
 } from 'lucide-react';
 import {
   abonnementsApi, emplacementsApi, clientsApi, utilisateursApi, typeStatutAbonnementApi
 } from '../../../api';
+import { useAuth } from '../../../context/AuthContext';
+import { hasRole } from '../../../utils/rbac';
+import { toast } from 'react-toastify';
 
 export default function AbonnementDetailsModal({
   abonnement,
@@ -18,8 +21,19 @@ export default function AbonnementDetailsModal({
   clients = [],
   utilisateurs = []
 }) {
+  const { user } = useAuth();
+
+  // Permissions RBAC (Module 1)
+  const canEditDatesMontant = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
+  const canValidateRenewalDiscount = hasRole(user, ['Admin', 'Direction', 'Resp_Com']);
+  const canDeleteContract = hasRole(user, ['Admin', 'Resp_Com']);
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showRenewalModal, setShowRenewalModal] = useState(false);
+  const [remisePercent, setRemisePercent] = useState(10);
+  const [remiseMotif, setRemiseMotif] = useState('');
+  const [remiseDureeMois, setRemiseDureeMois] = useState(12);
 
   // État pour basculer en mode sélection rapide du statut
   const [isChangingStatut, setIsChangingStatut] = useState(false);
@@ -439,13 +453,140 @@ export default function AbonnementDetailsModal({
     return months > 0 ? months : 1;
   };
 
+  // Validation d'un renouvellement avec remise exceptionnelle (Module 1 : Admin, Direction, Resp_Com)
+  const handleValidateRenewalWithDiscount = async (e) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    try {
+      const baseTarif = Number(abonnement.tarif) || 0;
+      const discountRatio = Math.max(0, Math.min(100, Number(remisePercent) || 0)) / 100;
+      const newTarif = Math.round(baseTarif * (1 - discountRatio));
+
+      const currentEnd = new Date(abonnement.date_echeance || abonnement.date_fin || Date.now());
+      const nextEnd = new Date(currentEnd);
+      nextEnd.setMonth(nextEnd.getMonth() + parseInt(remiseDureeMois, 10));
+
+      await abonnementsApi.update(abonnement.reference, {
+        tarif: newTarif,
+        date_echeance: nextEnd.toISOString(),
+        probabilite_renouvellement: 100,
+        statut_abonnement: 'Actif',
+        commentaire: `Renouvellement validé par ${user?.nom || 'Direction'} avec remise exceptionnelle de ${remisePercent}%. Motif: ${remiseMotif || 'Geste commercial'}.`
+      });
+
+      toast.success(`🎉 Renouvellement validé avec ${remisePercent}% de remise (Nouveau tarif: ${newTarif.toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}) !`);
+      setShowRenewalModal(false);
+      if (onRefresh) onRefresh();
+      onClose();
+    } catch (err) {
+      console.error('Erreur validation renouvellement:', err);
+      toast.error(err.response?.data?.message || 'Erreur lors de la validation du renouvellement.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return createPortal(
     <div className="modal-backdrop-portal" onClick={onClose}>
       <div
         className="glass-panel client-modal-box"
-        style={{ maxWidth: '780px', maxHeight: '92vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
+        style={{ maxWidth: '840px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Modale de validation de renouvellement avec remise exceptionnelle */}
+        {showRenewalModal && (
+          <div className="modal-backdrop-portal" style={{ zIndex: 10000 }} onClick={() => setShowRenewalModal(false)}>
+            <div className="glass-panel client-modal-box" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+              <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981' }}>
+                  <Gift size={20} />
+                  <span>Renouvellement avec Remise Exceptionnelle</span>
+                </h3>
+                <button type="button" className="close-btn" onClick={() => setShowRenewalModal(false)}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                  Contrat : <strong style={{ color: 'var(--text-main)' }}>{abonnement.reference}</strong> ({abonnement.nom_client || abonnement.raison_sociale})
+                </div>
+
+                <div className="modal-form-group">
+                  <label className="modal-label">Pourcentage de Remise Accordée (%) :</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="90"
+                    className="modal-input"
+                    value={remisePercent}
+                    onChange={(e) => setRemisePercent(e.target.value)}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                    {[5, 10, 15, 20, 25].map(pct => (
+                      <button
+                        key={pct}
+                        type="button"
+                        className="pill-btn"
+                        style={{ fontSize: '0.75rem', padding: '0.2rem 0.55rem' }}
+                        onClick={() => setRemisePercent(pct)}
+                      >
+                        {pct}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="modal-form-group">
+                  <label className="modal-label">Prolongation (durée) :</label>
+                  <select
+                    className="modal-select"
+                    value={remiseDureeMois}
+                    onChange={(e) => setRemiseDureeMois(e.target.value)}
+                  >
+                    <option value="6">6 mois</option>
+                    <option value="12">1 an (12 mois)</option>
+                    <option value="24">2 ans (24 mois)</option>
+                  </select>
+                </div>
+
+                <div className="modal-form-group">
+                  <label className="modal-label">Motif de la remise :</label>
+                  <input
+                    type="text"
+                    className="modal-input"
+                    placeholder="Ex: Fidélité client grand compte, geste commercial..."
+                    value={remiseMotif}
+                    onChange={(e) => setRemiseMotif(e.target.value)}
+                  />
+                </div>
+
+                {/* Calcul d'impact tarifaire en direct */}
+                <div style={{ padding: '0.85rem', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', fontSize: '0.88rem' }}>
+                  <div style={{ color: 'var(--text-muted)' }}>Tarif actuel : {Number(abonnement.tarif || 0).toLocaleString('fr-FR')} {abonnement.devise || 'MGA'}</div>
+                  <div style={{ fontWeight: 700, color: '#10b981', marginTop: '0.25rem' }}>
+                    Nouveau tarif remisé : {Math.round(Number(abonnement.tarif || 0) * (1 - (remisePercent / 100))).toLocaleString('fr-FR')} {abonnement.devise || 'MGA'}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <button type="button" className="pill-btn" onClick={() => setShowRenewalModal(false)}>
+                    Annuler
+                  </button>
+                  <button
+                    type="button"
+                    className="pill-btn active"
+                    style={{ background: '#10b981', borderColor: '#10b981' }}
+                    onClick={handleValidateRenewalWithDiscount}
+                    disabled={loading}
+                  >
+                    {loading ? 'Validation...' : 'Valider le renouvellement'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* En-tête */}
         <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -1112,19 +1253,24 @@ export default function AbonnementDetailsModal({
               )}
             </div>
 
-            {/* Pied de Modale : Supprimer, Fermer, Modifier */}
+            {/* Pied de Modale : Supprimer (Admin, Resp_Com), Fermer, Renouveler remise (Admin, Direction, Resp_Com), Modifier dates/montant (Admin, Resp_Com, Commercial) */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
-              <button
-                type="button"
-                className="pill-btn"
-                style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                <Trash2 size={15} />
-                <span>Supprimer</span>
-              </button>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              {canDeleteContract ? (
+                <button
+                  type="button"
+                  className="pill-btn"
+                  style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                  onClick={handleDelete}
+                  disabled={loading}
+                  title="Supprimer définitivement ce contrat (Admin / Resp_Com)"
+                >
+                  <Trash2 size={15} />
+                  <span>Supprimer</span>
+                </button>
+              ) : (
+                <div />
+              )}
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                 <button
                   type="button"
                   className="pill-btn"
@@ -1132,15 +1278,34 @@ export default function AbonnementDetailsModal({
                 >
                   Fermer
                 </button>
-                <button
-                  type="button"
-                  className="pill-btn active"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-                  onClick={() => setIsEditing(true)}
-                >
-                  <Edit3 size={15} />
-                  <span>Modifier</span>
-                </button>
+
+                {/* Valider un renouvellement avec remise exceptionnelle (Module 1 : Admin, Direction, Resp_Com) */}
+                {canValidateRenewalDiscount && (
+                  <button
+                    type="button"
+                    className="pill-btn"
+                    style={{ borderColor: '#10b981', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                    onClick={() => setShowRenewalModal(true)}
+                    title="Valider un renouvellement avec remise exceptionnelle (Admin, Direction, Resp_Com)"
+                  >
+                    <Gift size={15} />
+                    <span>Valider renouvellement (remise)</span>
+                  </button>
+                )}
+
+                {/* Modifier les dates / le montant (Module 1 : Admin, Resp_Com, Commercial) */}
+                {canEditDatesMontant && (
+                  <button
+                    type="button"
+                    className="pill-btn active"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                    onClick={() => setIsEditing(true)}
+                    title="Modifier les dates / le montant (Admin, Resp_Com, Commercial)"
+                  >
+                    <Edit3 size={15} />
+                    <span>Modifier les dates / montant</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

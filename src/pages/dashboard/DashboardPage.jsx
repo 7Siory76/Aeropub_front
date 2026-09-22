@@ -29,6 +29,7 @@ import UtilisateursTab from './tabs/UtilisateursTab';
 import ActionsCommercialesTab from './tabs/ActionsCommercialesTab';
 import EmplacementDetailsModal from './modals/EmplacementDetailsModal';
 import AddEmplacementModal from './modals/AddEmplacementModal';
+import { useAuth } from '../../context/AuthContext';
 import '../../components/ClientModal.css';
 
 export default function DashboardPage({
@@ -38,6 +39,8 @@ export default function DashboardPage({
   setActiveTab: propSetActiveTab,
   onCountsLoaded
 }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.toLowerCase().includes('admin');
   const [internalActiveTab, setInternalActiveTab] = useState('emplacements');
   const activeTab = propActiveTab !== undefined ? propActiveTab : internalActiveTab;
   const setActiveTab = propSetActiveTab !== undefined ? propSetActiveTab : setInternalActiveTab;
@@ -177,6 +180,7 @@ export default function DashboardPage({
                 abonnements={abonnements}
                 initialSearchQuery={searchQuery}
                 onSelectClient={(cli) => setSelectedClientModal(cli)}
+                onRefresh={loadAllData}
               />
             )}
             {activeTab === 'typesupports' && (
@@ -209,10 +213,20 @@ export default function DashboardPage({
               />
             )}
             {activeTab === 'utilisateurs' && (
-              <UtilisateursTab
-                utilisateurs={utilisateurs}
-                initialSearchQuery={searchQuery}
-              />
+              isAdmin ? (
+                <UtilisateursTab
+                  utilisateurs={utilisateurs}
+                  initialSearchQuery={searchQuery}
+                  onRefresh={loadAllData}
+                />
+              ) : (
+                <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: '#f87171' }}>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>🛡️ Accès réservé aux Administrateurs</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    Seuls les comptes avec le rôle Administrateur ont l'autorisation de consulter et gérer les utilisateurs, rôles et mots de passe.
+                  </p>
+                </div>
+              )
             )}
             {activeTab === 'actions' && (
               <ActionsCommercialesTab

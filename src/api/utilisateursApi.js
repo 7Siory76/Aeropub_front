@@ -10,4 +10,5 @@ export const utilisateursApi = {
   create: (data) => api.post('/utilisateurs', data).then(res => res.data.data),
   update: (id, data) => api.put(`/utilisateurs/${id}`, data).then(res => res.data.data),
   delete: (id) => api.delete(`/utilisateurs/${id}`).then(res => res.data.data),
+  login: (data) => api.post('/utilisateurs/login', data).then(res => res.data),
 };
