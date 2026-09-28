@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Shield, User, Mail, Lock, Check } from 'lucide-react';
 import { utilisateursApi } from '../../../api';
 import { toast } from 'react-toastify';
+import { getRoleGuide } from '../../../utils/rbac';
 
 export default function UserModal({ userToEdit, onClose, onRefresh }) {
   const isEditing = Boolean(userToEdit);
@@ -191,6 +192,44 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
               </select>
             </div>
           </div>
+
+          {/* Bloc d'aide explicatif sur les habilitations du rôle sélectionné */}
+          {(() => {
+            const selectedRoleObj = displayRoles.find(r => String(r.id) === String(formData.id_role));
+            const roleGuide = getRoleGuide(selectedRoleObj?.nom_role || formData.id_role);
+            return (
+              <div style={{
+                background: roleGuide.badgeBg,
+                border: `1px solid ${roleGuide.badgeBorder}`,
+                borderRadius: '10px',
+                padding: '0.85rem 1rem',
+                fontSize: '0.82rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.35rem' }}>
+                  <span style={{ fontWeight: 700, color: roleGuide.badgeColor, display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.88rem' }}>
+                    <Shield size={14} />
+                    <span>Aide : Périmètre du rôle {roleGuide.nom}</span>
+                  </span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                    {roleGuide.summary}
+                  </span>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.35rem' }}>
+                  {roleGuide.permissions.map((p, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.78rem' }}>
+                      <span style={{ color: p.allowed ? '#10b981' : '#ef4444', fontWeight: 800, lineHeight: 1.1 }}>
+                        {p.allowed ? '✓' : '✗'}
+                      </span>
+                      <span style={{ color: p.allowed ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                        {p.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Mot de passe avec indication de hachage */}
           <div className="modal-form-group">

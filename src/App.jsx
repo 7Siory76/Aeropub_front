@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import NotificationTester from './components/NotificationTester';
 import Footer from './components/Footer';
-import { DashboardPage, PlanningPage, ParametragePage } from './pages';
+import { DashboardPage, PlanningPage, ParametragePage, KpiStatsPage } from './pages';
 import { checkHealthApi } from './api';
 import { toast } from 'react-toastify';
 import { useAuth } from './context/AuthContext';
@@ -15,9 +15,10 @@ export default function App() {
   const [isBackendOnline, setIsBackendOnline] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activePage, setActivePage] = useState('planning'); // 'dashboard', 'planning', 'settings' ou 'audit'
+  const [activePage, setActivePage] = useState('kpis'); // 'kpis', 'planning', 'dashboard', 'settings' ou 'audit'
   const [activeTab, setActiveTab] = useState('emplacements'); // sous-compartiment CRUD sélectionné
   const [counts, setCounts] = useState({});
+  const [kpiFilter, setKpiFilter] = useState(null);
 
   // État du thème Nuit (dark) ou Jour (light)
   const [theme, setTheme] = useState(() => {
@@ -89,7 +90,17 @@ export default function App() {
         />
 
         <main className="main-content">
-          {activePage === 'dashboard' ? (
+          {activePage === 'kpis' ? (
+            /* Nouvelle Page Dédiée : KPI & Statistiques de Pilotage */
+            <KpiStatsPage
+              key={refreshKey}
+              onNavigateToAbonnements={(filterKey) => {
+                setKpiFilter(filterKey);
+                setActiveTab('abonnements');
+                setActivePage('dashboard');
+              }}
+            />
+          ) : activePage === 'dashboard' ? (
             /* Tableau de Bord Général AeroPub (avec recherche & HeroBanner) */
             <DashboardPage
               key={refreshKey}
@@ -98,6 +109,8 @@ export default function App() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               onCountsLoaded={setCounts}
+              kpiFilter={kpiFilter}
+              onClearKpiFilter={() => setKpiFilter(null)}
             />
           ) : activePage === 'planning' ? (
             /* Page de Planning & Occupation des Emplacements par Zone */

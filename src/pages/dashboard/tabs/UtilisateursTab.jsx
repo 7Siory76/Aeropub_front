@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, UserCheck, Lock } from 'lucide-react';
+import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, UserCheck, Lock, HelpCircle, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import UserModal from '../modals/UserModal';
 import { utilisateursApi } from '../../../api';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../../context/AuthContext';
+import { ROLES_GUIDE, getRoleGuide } from '../../../utils/rbac';
 
 export default function UtilisateursTab({
   utilisateurs = [],
@@ -17,6 +18,10 @@ export default function UtilisateursTab({
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+
+  // État du panneau d'aide des rôles & permissions
+  const [showRoleGuide, setShowRoleGuide] = useState(false);
+  const [selectedGuideRole, setSelectedGuideRole] = useState(ROLES_GUIDE[0].code);
 
   // Modales d'ajout et d'édition d'utilisateur
   const [showAddModal, setShowAddModal] = useState(false);
@@ -169,17 +174,137 @@ export default function UtilisateursTab({
           </div>
         </div>
 
-        {/* Bouton Créer Utilisateur */}
-        <button
-          type="button"
-          className="btn-primary"
-          onClick={() => setShowAddModal(true)}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 0.9rem', fontSize: '0.88rem' }}
-        >
-          <Plus size={16} />
-          <span>Nouvel Utilisateur</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          {/* Bouton d'aide des rôles & permissions */}
+          <button
+            type="button"
+            className={`pill-btn ${showRoleGuide ? 'active' : ''}`}
+            onClick={() => setShowRoleGuide(!showRoleGuide)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontSize: '0.82rem',
+              padding: '0.45rem 0.85rem'
+            }}
+            title="Consulter le guide des rôles et des autorisations"
+          >
+            <HelpCircle size={15} />
+            <span>{showRoleGuide ? 'Masquer l\'aide' : 'Guide des Rôles 💡'}</span>
+            {showRoleGuide ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+
+          {/* Bouton Créer Utilisateur */}
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => setShowAddModal(true)}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 0.9rem', fontSize: '0.88rem' }}
+          >
+            <Plus size={16} />
+            <span>Nouvel Utilisateur</span>
+          </button>
+        </div>
       </div>
+
+      {/* Panneau d'aide & Matrice des Rôles (Qui peut faire quoi ?) */}
+      {showRoleGuide && (
+        <div className="glass-panel" style={{
+          marginBottom: '1.25rem',
+          padding: '1.25rem 1.5rem',
+          borderRadius: '14px',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          background: 'rgba(15, 23, 42, 0.65)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}>
+                <ShieldCheck size={18} style={{ color: 'var(--accent-secondary)' }} />
+                <span>Guide des Rôles : Qui peut faire quoi ?</span>
+              </h4>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                Consultez les habilitations, droits d'accès et restrictions assignés à chaque profil utilisateur.
+              </p>
+            </div>
+
+            {/* Boutons d'onglets pour chaque rôle */}
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+              {ROLES_GUIDE.map((r) => {
+                const isSelected = selectedGuideRole === r.code;
+                return (
+                  <button
+                    key={r.code}
+                    type="button"
+                    onClick={() => setSelectedGuideRole(r.code)}
+                    className={`pill-btn ${isSelected ? 'active' : ''}`}
+                    style={{
+                      fontSize: '0.78rem',
+                      padding: '0.25rem 0.65rem',
+                      borderColor: isSelected ? r.badgeColor : undefined,
+                      color: isSelected ? r.badgeColor : undefined,
+                      fontWeight: isSelected ? 700 : 500
+                    }}
+                  >
+                    {r.nom}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Carte détaillée du rôle sélectionné dans l'aide */}
+          {(() => {
+            const activeGuide = ROLES_GUIDE.find(r => r.code === selectedGuideRole) || ROLES_GUIDE[0];
+            return (
+              <div style={{
+                background: activeGuide.badgeBg,
+                border: `1px solid ${activeGuide.badgeBorder}`,
+                borderRadius: '10px',
+                padding: '1rem 1.25rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                  <span style={{
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '9999px',
+                    background: 'rgba(0,0,0,0.3)',
+                    color: activeGuide.badgeColor,
+                    border: `1px solid ${activeGuide.badgeColor}`,
+                    fontWeight: 700,
+                    fontSize: '0.85rem'
+                  }}>
+                    {activeGuide.nom}
+                  </span>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                    {activeGuide.summary}
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '0.55rem' }}>
+                  {activeGuide.permissions.map((p, idx) => (
+                    <div key={idx} style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.55rem',
+                      fontSize: '0.82rem',
+                      background: 'rgba(0,0,0,0.22)',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.05)'
+                    }}>
+                      <span style={{ color: p.allowed ? '#10b981' : '#ef4444', fontWeight: 800, fontSize: '0.95rem', lineHeight: 1.1 }}>
+                        {p.allowed ? '✓' : '✗'}
+                      </span>
+                      <span style={{ color: p.allowed ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                        {p.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       <div className="aeropub-table-wrapper">
         {filteredUtilisateurs.length === 0 ? (
@@ -236,33 +361,35 @@ export default function UtilisateursTab({
                       </div>
                     </td>
                     <td className="cell-cyan">
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        padding: '0.22rem 0.65rem',
-                        borderRadius: '9999px',
-                        background: u.nom_role?.toLowerCase() === 'administrateur'
-                          ? 'rgba(239, 68, 68, 0.15)'
-                          : u.nom_role?.toLowerCase() === 'direction'
-                          ? 'rgba(168, 85, 247, 0.15)'
-                          : 'rgba(59, 130, 246, 0.15)',
-                        border: u.nom_role?.toLowerCase() === 'administrateur'
-                          ? '1px solid rgba(239, 68, 68, 0.35)'
-                          : u.nom_role?.toLowerCase() === 'direction'
-                          ? '1px solid rgba(168, 85, 247, 0.35)'
-                          : '1px solid rgba(59, 130, 246, 0.35)',
-                        color: u.nom_role?.toLowerCase() === 'administrateur'
-                          ? '#f87171'
-                          : u.nom_role?.toLowerCase() === 'direction'
-                          ? '#c084fc'
-                          : '#60a5fa',
-                        fontSize: '0.82rem',
-                        fontWeight: 600
-                      }}>
-                        <Shield size={13} />
-                        <span>{u.nom_role || `Rôle #${u.id_role}`}</span>
-                      </span>
+                      {(() => {
+                        const roleInfo = getRoleGuide(u.nom_role || u.id_role);
+                        return (
+                          <div>
+                            <span
+                              title={roleInfo.summary}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.22rem 0.65rem',
+                                borderRadius: '9999px',
+                                background: roleInfo.badgeBg,
+                                border: `1px solid ${roleInfo.badgeBorder}`,
+                                color: roleInfo.badgeColor,
+                                fontSize: '0.82rem',
+                                fontWeight: 600,
+                                cursor: 'help'
+                              }}
+                            >
+                              <Shield size={13} />
+                              <span>{u.nom_role || roleInfo.nom}</span>
+                            </span>
+                            <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginTop: '0.2rem', maxWidth: '210px', lineHeight: 1.25 }}>
+                              {roleInfo.summary}
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="table-body-cell" style={{ textAlign: 'center' }}>
                       <span className={`wireframe-badge ${u.actif ? 'badge-available' : 'badge-occupied'}`}>

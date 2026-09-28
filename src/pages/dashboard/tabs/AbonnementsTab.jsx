@@ -14,7 +14,9 @@ export default function AbonnementsTab({
   clients = [],
   utilisateurs = [],
   initialSearchQuery = '',
-  onRefresh
+  onRefresh,
+  kpiFilter = null,
+  onClearKpiFilter
 }) {
   const { user } = useAuth();
 
@@ -23,6 +25,35 @@ export default function AbonnementsTab({
   const canViewGlobalFilter = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Lecture_Seule']);
   const isRestrictedCommercial = !canViewGlobalFilter && hasRole(user, ['Commercial']);
   const canExport = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Commercial', 'Lecture_Seule']);
+
+  // Ensemble des contrats parents qui ont été renouvelés avec continuité
+  const renewedParentRefs = useMemo(() => {
+    const set = new Set();
+    abonnements.forEach(c => {
+      if (c.id_abonnement_precedent) {
+        set.add(String(c.id_abonnement_precedent).trim());
+      }
+    });
+    return set;
+  }, [abonnements]);
+
+  // Libellé explicatif pour la bannière de filtre KPI
+  const kpiFilterLabel = useMemo(() => {
+    switch (kpiFilter) {
+      case 'echeance_7': return 'Échéance imminente (≤ 7 jours non renouvelés)';
+      case 'echeance_30': return 'Échéance J-30 (8 à 30 jours non renouvelés)';
+      case 'echeance_60': return 'Échéance J-60 (31 à 60 jours non renouvelés)';
+      case 'echeance_90': return 'Échéance J-90 (61 à 90 jours non renouvelés)';
+      case 'echus_non_renouveles': return 'Contrats échus non renouvelés (sans continuité -R)';
+      case 'sans_action': return 'Contrats proches sans action commerciale planifiée';
+      case 'montant_actifs': return 'Contrats Actifs (dernier statut enregistré : Actif)';
+      case 'montant_renouveles': return 'Contrats Renouvelés (-R1, -R2...)';
+      case 'a_valider': return 'Contrats À Valider (en attente de validation)';
+      case 'brouillon': return 'Contrats Brouillons (non finalisés)';
+      case 'montant_a_renouveler': return 'Contrats À Renouveler (≤ 90 jours)';
+      default: return null;
+    }
+  }, [kpiFilter]);
 
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -81,7 +112,8 @@ export default function AbonnementsTab({
     selectedCommercial !== 'all' ||
     selectedPeriodicite !== 'all' ||
     selectedProba !== 'all' ||
-    selectedYear !== 'all';
+    selectedYear !== 'all' ||
+    Boolean(kpiFilter);
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -91,6 +123,16 @@ export default function AbonnementsTab({
     setSelectedProba('all');
     setSelectedYear('all');
     setCurrentPage(1);
+    if (typeof onClearKpiFilter === 'function') {
+      onClearKpiFilter();
+    }
+  };
+
+  const handleClearKpi = () => {
+    setCurrentPage(1);
+    if (typeof onClearKpiFilter === 'function') {
+      onClearKpiFilter();
+    }
   };
 
   const filteredAbonnements = useMemo(() => {
@@ -153,9 +195,48 @@ export default function AbonnementsTab({
         if (startY !== targetYear && endY !== targetYear) return false;
       }
 
+      // 7. Filtre issu d'un clic sur un KPI Dashboard
+      if (kpiFilter) {
+        const now = new Date();
+        const diffJours = Math.ceil((new Date(abo.date_echeance || abo.date_fin) - now) / 86400000);
+        const statut = (abo.statut_abonnement || abo.statut || '').toLowerCase();
+        const aEteRenouvele = renewedParentRefs.has(String(abo.reference).trim());
+        const estFilsRenouvellement = Boolean(abo.id_abonnement_precedent) || /-R\d+$/i.test(abo.reference || '');
+
+        if (kpiFilter === 'echeance_7' && (diffJours < 0 || diffJours > 7 || aEteRenouvele || statut === 'résilié')) return false;
+        if (kpiFilter === 'echeance_30' && (diffJours <= 7 || diffJours > 30 || aEteRenouvele || statut === 'résilié')) return false;
+        if (kpiFilter === 'echeance_60' && (diffJours <= 30 || diffJours > 60 || aEteRenouvele || statut === 'résilié')) return false;
+        if (kpiFilter === 'echeance_90' && (diffJours <= 60 || diffJours > 90 || aEteRenouvele || statut === 'résilié')) return false;
+
+        if (kpiFilter === 'echus_non_renouveles') {
+          if (diffJours >= 0 || aEteRenouvele || statut === 'résilié') return false;
+        }
+
+        if (kpiFilter === 'sans_action') {
+          if (diffJours < -15 || diffJours > 90 || aEteRenouvele || statut === 'résilié') return false;
+        }
+
+        if (kpiFilter === 'montant_actifs') {
+          if (statut !== 'actif') return false;
+        }
+        if (kpiFilter === 'montant_renouveles') {
+          if (!(estFilsRenouvellement || aEteRenouvele)) return false;
+        }
+        if (kpiFilter === 'a_valider') {
+          const isAValider = statut === 'à valider' || statut === 'a valider' || statut.includes('valid');
+          if (!isAValider) return false;
+        }
+        if (kpiFilter === 'brouillon') {
+          if (statut !== 'brouillon') return false;
+        }
+        if (kpiFilter === 'montant_a_renouveler') {
+          if (statut !== 'actif' || diffJours < 0 || diffJours > 90 || aEteRenouvele) return false;
+        }
+      }
+
       return true;
     });
-  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter]);
+  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs]);
 
   const paginatedAbonnements = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -194,6 +275,51 @@ export default function AbonnementsTab({
 
   return (
     <div>
+      {/* Bannière d'état pour le filtre KPI interactif */}
+      {kpiFilter && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.1))',
+          border: '1px solid rgba(6, 182, 212, 0.4)',
+          borderRadius: '10px',
+          padding: '0.65rem 1rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '0.75rem',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#06b6d4', fontSize: '0.88rem' }}>
+            <span style={{ fontSize: '1.2rem' }}>🎯</span>
+            <span>
+              Filtre KPI actif : <strong>{kpiFilterLabel}</strong> ({filteredAbonnements.length} contrat{filteredAbonnements.length > 1 ? 's' : ''} correspondant{filteredAbonnements.length > 1 ? 's' : ''})
+            </span>
+          </div>
+          {onClearKpiFilter && (
+            <button
+              type="button"
+              onClick={handleClearKpi}
+              style={{
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                color: '#ef4444',
+                borderRadius: '8px',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span>✕ Retirer le filtre KPI</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Barre de filtres multicritères */}
       <div className="ts-filters-bar">
         <div className="ts-filter-group">
@@ -361,7 +487,43 @@ export default function AbonnementsTab({
                 return (
                   <tr key={abo.reference || abo.id} className="table-body-row clickable-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedAbonnement(abo)}>
                     <td className="cell-indigo" style={{ fontWeight: 700 }}>
-                      {abo.reference || `#${abo.id}`}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                        <span>{abo.reference || `#${abo.id}`}</span>
+                        {/* Badge si ce contrat est issu d'un renouvellement (-R ou id_precedent) */}
+                        {(abo.id_abonnement_precedent || /-R\d+$/i.test(abo.reference || '')) && (
+                          <span
+                            title={`Issu du renouvellement du contrat parent : ${abo.id_abonnement_precedent || 'origine'}`}
+                            style={{
+                              background: 'rgba(6, 182, 212, 0.18)',
+                              border: '1px solid rgba(6, 182, 212, 0.45)',
+                              color: '#38bdf8',
+                              fontSize: '0.68rem',
+                              padding: '0.1rem 0.45rem',
+                              borderRadius: '9999px',
+                              fontWeight: 700
+                            }}
+                          >
+                            {abo.reference?.match(/-R\d+$/i) ? abo.reference.match(/-R\d+$/i)[0] : '🔄 R'}
+                          </span>
+                        )}
+                        {/* Badge si ce contrat a déjà été renouvelé vers un successeur */}
+                        {renewedParentRefs.has(String(abo.reference).trim()) && (
+                          <span
+                            title="Ce contrat a été reconduit vers un nouveau contrat successeur"
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.18)',
+                              border: '1px solid rgba(16, 185, 129, 0.45)',
+                              color: '#10b981',
+                              fontSize: '0.68rem',
+                              padding: '0.1rem 0.45rem',
+                              borderRadius: '9999px',
+                              fontWeight: 700
+                            }}
+                          >
+                            ✓ Reconduit
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="cell-bold-white">
                       <strong>{abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}</strong>

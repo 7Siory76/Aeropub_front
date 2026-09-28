@@ -20,12 +20,14 @@ import {
   PanelLeftOpen,
   Upload,
   Loader2,
-  ScrollText
+  ScrollText,
+  BarChart3
 } from 'lucide-react';
 import { csvApi } from '../api';
 import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { hasRole } from '../utils/rbac';
+import RoleGuideModal from './RoleGuideModal';
 import './Sidebar.css';
 
 export default function Sidebar({
@@ -41,6 +43,7 @@ export default function Sidebar({
 }) {
   const { user } = useAuth();
   const isAdmin = hasRole(user, ['Admin']);
+  const [showRoleGuide, setShowRoleGuide] = useState(false);
 
   // État de la "poche" (accordéon ouvert par défaut)
   const [isCrudPocketOpen, setIsCrudPocketOpen] = useState(true);
@@ -131,10 +134,20 @@ export default function Sidebar({
 
       {/* Navigation Principale */}
       <nav className="sidebar-nav">
-        {/* Section 1 : Planning direct */}
+        {/* Section 1 : Planning direct & Guide des Rôles */}
         <div className="sidebar-section">
           {!isCollapsed && <span className="sidebar-section-title">Navigation</span>}
           
+          <button
+            type="button"
+            className={`sidebar-nav-item ${activePage === 'kpis' ? 'active' : ''}`}
+            onClick={() => setActivePage('kpis')}
+            title="KPI & Statistiques de pilotage"
+          >
+            <BarChart3 size={18} className="sidebar-item-icon" style={{ color: '#06b6d4' }} />
+            {!isCollapsed && <span className="sidebar-item-label">KPI & Statistiques 📊</span>}
+          </button>
+
           <button
             type="button"
             className={`sidebar-nav-item ${activePage === 'planning' ? 'active' : ''}`}
@@ -143,6 +156,16 @@ export default function Sidebar({
           >
             <MapPin size={18} className="sidebar-item-icon" />
             {!isCollapsed && <span className="sidebar-item-label">Planning & Zones</span>}
+          </button>
+
+          <button
+            type="button"
+            className="sidebar-nav-item"
+            onClick={() => setShowRoleGuide(true)}
+            title="Guide des Rôles & Permissions (Qui peut faire quoi ?)"
+          >
+            <ShieldCheck size={18} className="sidebar-item-icon" style={{ color: 'var(--accent-secondary)' }} />
+            {!isCollapsed && <span className="sidebar-item-label">Guide des Rôles 💡</span>}
           </button>
         </div>
 
@@ -317,6 +340,12 @@ export default function Sidebar({
           </button>
         </div>
       </div>
+
+      {/* Modale d'aide globale sur les rôles accessible à tout le monde */}
+      <RoleGuideModal
+        isOpen={showRoleGuide}
+        onClose={() => setShowRoleGuide(false)}
+      />
     </aside>
   );
 }

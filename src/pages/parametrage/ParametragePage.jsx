@@ -246,11 +246,13 @@ export default function ParametragePage({ initialTab = 'params' }) {
   const fetchAuditLogs = async () => {
     setLoadingAudit(true);
     try {
-      const data = await journalNotificationApi.getAll(auditCategory, auditNonLu);
-      setAuditLogs(data || []);
+      const res = await journalNotificationApi.getAll(auditCategory, auditNonLu);
+      const logs = Array.isArray(res) ? res : (res?.data || []);
+      setAuditLogs(logs);
     } catch (err) {
       console.error('Erreur chargement journal audit:', err);
       toast.error('❌ Impossible de charger le journal technique.');
+      setAuditLogs([]);
     } finally {
       setLoadingAudit(false);
     }
@@ -300,8 +302,9 @@ export default function ParametragePage({ initialTab = 'params' }) {
   };
 
   const filteredAuditLogs = useMemo(() => {
+    const list = Array.isArray(auditLogs) ? auditLogs : [];
     const q = auditSearch.trim().toLowerCase();
-    return auditLogs.filter(log => {
+    return list.filter(log => {
       if (!q) return true;
       return (
         (log.message_notification || '').toLowerCase().includes(q) ||
@@ -406,7 +409,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
         >
           <ScrollText size={15} />
           <span>Journal & Audit Log</span>
-          <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({auditLogs.length})</span>
+          <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({Array.isArray(auditLogs) ? auditLogs.length : 0})</span>
         </button>
       </div>
 

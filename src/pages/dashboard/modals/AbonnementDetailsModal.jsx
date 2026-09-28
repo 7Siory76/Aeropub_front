@@ -49,6 +49,14 @@ export default function AbonnementDetailsModal({
   const [loadingHistorique, setLoadingHistorique] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
 
+  // Détection du contrat successeur ayant renouvelé le contrat courant
+  const renewedByContract = useMemo(() => {
+    if (!abonnement?.reference) return null;
+    return (allAbonnements || []).find(a =>
+      String(a.id_abonnement_precedent || '').trim() === String(abonnement.reference).trim()
+    );
+  }, [abonnement, allAbonnements]);
+
   // Initialiser les supports rattachés
   const initialSupports = useMemo(() => {
     if (Array.isArray(abonnement?.supports) && abonnement.supports.length > 0) {
@@ -1164,12 +1172,22 @@ export default function AbonnementDetailsModal({
                 </div>
               )}
 
-              {/* Contrat précédent (si présent) */}
+              {/* Contrat précédent (Parent) */}
               {abonnement.id_abonnement_precedent && (
-                <div className="client-abo-card">
-                  <span className="client-abo-label">Contrat Précédent :</span>
-                  <div className="client-abo-value" style={{ color: '#06b6d4' }}>
-                    Contrat N° {abonnement.id_abonnement_precedent}
+                <div className="client-abo-card" style={{ background: 'rgba(6, 182, 212, 0.08)', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+                  <span className="client-abo-label" style={{ color: '#06b6d4' }}>🔄 Contrat Précédent (Origine) :</span>
+                  <div className="client-abo-value" style={{ color: '#38bdf8', fontWeight: 700 }}>
+                    N° {abonnement.id_abonnement_precedent}
+                  </div>
+                </div>
+              )}
+
+              {/* Contrat suivant (Successeur ayant renouvelé ce contrat) */}
+              {renewedByContract && (
+                <div className="client-abo-card" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+                  <span className="client-abo-label" style={{ color: '#10b981' }}>✅ Renouvelé avec succès par :</span>
+                  <div className="client-abo-value" style={{ color: '#10b981', fontWeight: 700 }}>
+                    N° {renewedByContract.reference}
                   </div>
                 </div>
               )}

@@ -157,23 +157,46 @@ export default function AddAbonnementModal({
 
         const sourceSupports = extractSupports(source);
 
+        // Calcul automatique du suffixe de renouvellement (-R1, -R2...)
+        const refStr = String(source.reference || '').trim();
+        const match = refStr.match(/^(.*?)(?:-R(\d+))?$/i);
+        const baseRef = match && match[1] ? match[1] : refStr;
+        const currentR = match && match[2] ? parseInt(match[2], 10) : 0;
+        const nextReference = `${baseRef}-R${currentR + 1}`;
+
+        // Calcul des dates : Début au lendemain de l'échéance précédente (ou aujourd'hui)
+        let newDateDebut = todayStr;
+        let newDateFin = nextYearStr;
+        if (source.date_echeance || source.date_fin) {
+            const oldFin = new Date(source.date_echeance || source.date_fin);
+            if (!isNaN(oldFin.getTime())) {
+                const nextDebut = new Date(oldFin);
+                nextDebut.setDate(nextDebut.getDate() + 1);
+                newDateDebut = formatDateForInput(nextDebut);
+
+                const nextFin = new Date(nextDebut);
+                nextFin.setFullYear(nextFin.getFullYear() + 1);
+                newDateFin = formatDateForInput(nextFin);
+            }
+        }
+
         // Pré-remplissage avec les données du contrat source
         setFormData({
-            reference: '', // Nouvelle référence générée automatiquement
+            reference: nextReference, // Suffixe incrémental généré (-R1, -R2...)
             id_client: source.id_client || '',
             id_commercial: source.id_commercial || '',
-            annonceur_campagne: source.annonceur_campagne ? `Copie - ${source.annonceur_campagne}` : '',
+            annonceur_campagne: source.annonceur_campagne ? `${source.annonceur_campagne} (Renouvellement)` : '',
             tarif: source.tarif ?? '',
             devise: source.devise || 'MGA',
             periodicite: source.periodicite || 'Annuel',
-            date_debut: todayStr,
-            date_echeance: nextYearStr,
-            probabilite_renouvellement: source.probabilite_renouvellement ?? 80,
+            date_debut: newDateDebut,
+            date_echeance: newDateFin,
+            probabilite_renouvellement: source.probabilite_renouvellement ?? 85,
             preavis_jours: source.preavis_jours ?? 30,
             reconduction_tacite: Boolean(source.reconduction_tacite),
             motif_non_renouvellement: '',
-            id_abonnement_precedent: source.reference, // Lie au contrat original
-            statut: 'Brouillon'
+            id_abonnement_precedent: source.reference, // Liaison directe avec l'ancien contrat
+            statut: 'Actif'
         });
 
         setSelectedSupports(sourceSupports);
@@ -410,6 +433,44 @@ export default function AddAbonnementModal({
                 )}
                 {/* Formulaire de saisie */}
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginTop: '0.8rem' }}>
+                    {/* Alerte Visuelle de Continuité & Renouvellement */}
+                    {formData.id_abonnement_precedent && (
+                        <div style={{
+                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1))',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            borderRadius: '10px',
+                            padding: '0.75rem 1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '0.75rem',
+                            flexWrap: 'wrap'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                <span style={{ fontSize: '1.3rem' }}>🔄</span>
+                                <div>
+                                    <div style={{ color: '#10b981', fontWeight: 700, fontSize: '0.88rem' }}>
+                                        Dossier de renouvellement lié
+                                    </div>
+                                    <div style={{ color: 'var(--text-muted, #94a3b8)', fontSize: '0.78rem' }}>
+                                        Contrat parent d'origine : <strong style={{ color: '#38bdf8' }}>{formData.id_abonnement_precedent}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <span style={{
+                                background: 'rgba(16, 185, 129, 0.2)',
+                                border: '1px solid rgba(16, 185, 129, 0.5)',
+                                color: '#10b981',
+                                fontWeight: 700,
+                                fontSize: '0.78rem',
+                                padding: '0.25rem 0.65rem',
+                                borderRadius: '9999px'
+                            }}>
+                                Suffixe : {formData.reference || 'Auto'}
+                            </span>
+                        </div>
+                    )}
+
                     {/* Référence personnalisée optionnelle */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.9rem' }}>
                         <div className="modal-form-group">

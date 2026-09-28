@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   emplacementsApi,
   abonnementsApi,
@@ -37,7 +37,9 @@ export default function DashboardPage({
   setSearchQuery,
   activeTab: propActiveTab,
   setActiveTab: propSetActiveTab,
-  onCountsLoaded
+  onCountsLoaded,
+  kpiFilter: propKpiFilter,
+  onClearKpiFilter: propOnClearKpiFilter
 }) {
   const { user } = useAuth();
   const isAdmin = user?.role?.toLowerCase().includes('admin');
@@ -61,6 +63,9 @@ export default function DashboardPage({
   const [selectedClientModal, setSelectedClientModal] = useState(null);
   const [selectedEmplacementModal, setSelectedEmplacementModal] = useState(null);
   const [showAddEmplacementModal, setShowAddEmplacementModal] = useState(false);
+  const [internalKpiFilter, setInternalKpiFilter] = useState(null);
+  const kpiFilter = propKpiFilter !== undefined ? propKpiFilter : internalKpiFilter;
+  const onClearKpiFilter = propOnClearKpiFilter !== undefined ? propOnClearKpiFilter : () => setInternalKpiFilter(null);
 
   const loadAllData = async () => {
     setLoading(true);
@@ -172,6 +177,8 @@ export default function DashboardPage({
                 utilisateurs={utilisateurs}
                 initialSearchQuery={searchQuery}
                 onRefresh={loadAllData}
+                kpiFilter={kpiFilter}
+                onClearKpiFilter={onClearKpiFilter}
               />
             )}
             {activeTab === 'clients' && (
