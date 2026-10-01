@@ -9,4 +9,6 @@ export const actionsCommercialesApi = {
   create: (data) => api.post('/actions-commerciales', data).then(res => res.data.data),
   update: (id, data) => api.put(`/actions-commerciales/${id}`, data).then(res => res.data.data),
   delete: (id) => api.delete(`/actions-commerciales/${id}`).then(res => res.data.data),
+  envoyerRelanceManuelle: (reference, id_utilisateur) => 
+    api.post('/actions-commerciales/relance-manuelle', { reference, id_utilisateur }).then(res => res.data),
 };

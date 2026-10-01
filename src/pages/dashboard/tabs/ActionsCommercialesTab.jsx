@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Bell, Calendar, User, Search, RotateCcw, Filter, Send, Settings, Mail, Check, X } from 'lucide-react';
+import { Bell, Calendar, User, Search, RotateCcw, Filter, Send, Settings, Mail, Check, X, Loader2 } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
 import { toast } from 'react-toastify';
+import { actionsCommercialesApi } from '../../../api/actionsCommercialesApi';
+import { modeleCourrielApi } from '../../../api/modeleCourrielApi';
 
 export default function ActionsCommercialesTab({
   actions = [],
@@ -24,29 +26,86 @@ export default function ActionsCommercialesTab({
   const [showOnlyJ30, setShowOnlyJ30] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [sendingRef, setSendingRef] = useState(null);
 
-  // État du modèle d'email par défaut (Admin seul)
+  // État du modèle d'email par défaut (Table Modele_Courriel)
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [emailTemplate, setEmailTemplate] = useState(() => {
-    const saved = localStorage.getItem('aeropub_email_template');
-    return saved ? JSON.parse(saved) : {
-      sujet: 'Rappel : Échéance de votre contrat publicitaire dans 30 jours',
-      corps: `Madame, Monsieur,\n\nNous vous informons que votre contrat publicitaire arrive à échéance sous 30 jours.\nNous vous invitons à prendre contact avec votre commercial attitré afin d'examiner les options de reconduction ou d'ajustement de vos espaces.\n\nCordialement,\nL'équipe commerciale AeroPub`
-    };
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [emailTemplate, setEmailTemplate] = useState({
+    sujet: 'Échéance prochaine de votre contrat publicitaire AEROPUB - {reference}',
+    corps: `Bonjour {destNom},\n\nNous vous informons que votre contrat n° {reference}, relatif au(x) support(s) {supports}, arrivera à échéance dans {diffJours} jour(s), le {dateFr}.\n\nVotre interlocuteur AEROPUB ({interlocuteur}) prendra contact avec vous afin d'étudier son renouvellement.\n\nBien cordialement,\nL'équipe commerciale AEROPUB`
   });
 
-  const handleSaveTemplate = (e) => {
-    e.preventDefault();
-    localStorage.setItem('aeropub_email_template', JSON.stringify(emailTemplate));
-    toast.success('Modèle de courriel par défaut mis à jour avec succès !');
-    setShowTemplateModal(false);
+  const fetchTemplate = async () => {
+    try {
+      setLoadingTemplate(true);
+      const data = await modeleCourrielApi.getByCode('RELANCE_ECHEANCE');
+      if (data) {
+        setEmailTemplate({
+          sujet: data.sujet || '',
+          corps: data.corps || ''
+        });
+      }
+    } catch (err) {
+      console.warn('Impossible de charger le modèle depuis la base :', err.message);
+    } finally {
+      setLoadingTemplate(false);
+    }
   };
 
-  const handleSendManualEmail = (targetInfo) => {
-    const ref = targetInfo.reference || targetInfo.id_abonnement || 'Contrat';
+  useEffect(() => {
+    fetchTemplate();
+  }, []);
+
+  const handleSaveTemplate = async (e) => {
+    e.preventDefault();
+    setSavingTemplate(true);
+    try {
+      await modeleCourrielApi.updateByCode('RELANCE_ECHEANCE', {
+        sujet: emailTemplate.sujet,
+        corps: emailTemplate.corps
+      });
+      toast.success('Modèle de courriel mis à jour avec succès dans la base de données !');
+      setShowTemplateModal(false);
+    } catch (err) {
+      toast.error(`Erreur lors de la sauvegarde : ${err.response?.data?.message || err.message}`);
+    } finally {
+      setSavingTemplate(false);
+    }
+  };
+
+  const handleSendManualEmail = async (targetInfo) => {
+    const ref = targetInfo.reference || targetInfo.id_abonnement;
     const client = targetInfo.nom_client || targetInfo.raison_sociale || 'Client';
-    toast.success(`✉️ Courriel de relance manuel envoyé avec succès pour ${ref} (${client}) !`);
-    if (onRefresh) onRefresh();
+
+    if (!ref) {
+      toast.warning("Impossible d'envoyer la relance : aucun contrat n'est associé à cette action.");
+      return;
+    }
+
+    // 1. Alerte de confirmation préalable avant envoi
+    const confirmation = window.confirm(
+      `⚠️ Confirmation d'envoi de relance\n\nÊtes-vous sûr de vouloir envoyer un courriel de relance pour le contrat "${ref}" au client "${client}" ?`
+    );
+
+    if (!confirmation) {
+      return; // L'utilisateur annule
+    }
+
+    setSendingRef(ref);
+    const toastId = toast.loading(`Envoi du courriel de relance pour ${ref} en cours...`);
+
+    try {
+      const res = await actionsCommercialesApi.envoyerRelanceManuelle(ref, user?.id);
+      toast.success(res?.message || `✉️ Courriel de relance envoyé avec succès pour ${ref} (${client}) !`, { id: toastId });
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.message || "Erreur lors de l'envoi du courriel.";
+      toast.error(`❌ Échec de l'envoi : ${errorMsg}`, { id: toastId });
+    } finally {
+      setSendingRef(null);
+    }
   };
 
   useEffect(() => {
@@ -60,15 +119,36 @@ export default function ActionsCommercialesTab({
   }, [searchTerm, selectedTypeAction, selectedCommercial, selectedEmailStatus, showOnlyJ30]);
 
   // Calcul des contrats à échéance J-30 (alerte renouvellement)
+  // Recuperation des references de contrats deja renouveles (ceux ayant un contrat enfant)
+  const renewedParentRefs = useMemo(() => {
+    const set = new Set();
+    abonnements.forEach((c) => {
+      if (c.id_abonnement_precedent) {
+        set.add(String(c.id_abonnement_precedent).trim());
+      }
+    });
+    return set;
+  }, [abonnements]);
+
   const now = new Date();
   const alertJ30Abos = useMemo(() => {
     return abonnements.filter((abo) => {
       if (!abo.date_echeance && !abo.date_fin) return false;
+
+      const ref = String(abo.reference || '').trim();
+      const statut = String(abo.statut || abo.nom_statut || '').toLowerCase();
+
+      if (['renouvelé', 'expiré', 'résilié', 'archivé'].includes(statut)) {
+        return false;
+      }
+      if (renewedParentRefs.has(ref)) {
+        return false;
+      }
       const echeance = new Date(abo.date_echeance || abo.date_fin);
       const diffDays = Math.ceil((echeance.getTime() - now.getTime()) / (1000 * 3600 * 24));
       return diffDays >= 0 && diffDays <= 30;
     });
-  }, [abonnements]);
+  }, [abonnements, renewedParentRefs])
 
   const typeActionOptions = useMemo(() => {
     const types = [...new Set(actions.map(a => a.type_action).filter(Boolean))];
@@ -141,8 +221,8 @@ export default function ActionsCommercialesTab({
       if (showOnlyJ30) {
         const isJ30 = alertJ30Abos.some(
           a => a.reference === act.id_abonnement ||
-               a.nom_client === act.nom_client ||
-               a.raison_sociale === act.nom_client
+            a.nom_client === act.nom_client ||
+            a.raison_sociale === act.nom_client
         );
         if (!isJ30) return false;
       }
@@ -229,10 +309,11 @@ export default function ActionsCommercialesTab({
                     className="pill-btn active"
                     style={{ fontSize: '0.74rem', padding: '0.2rem 0.55rem', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}
                     onClick={() => handleSendManualEmail(abo)}
+                    disabled={sendingRef === abo.reference}
                     title="Envoyer l'e-mail de relance manuel au client"
                   >
-                    <Send size={11} />
-                    <span>Envoyer relance manuelle</span>
+                    {sendingRef === abo.reference ? <Loader2 size={11} className="spin" /> : <Send size={11} />}
+                    <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer relance manuelle'}</span>
                   </button>
                 )}
               </div>
@@ -385,11 +466,19 @@ export default function ActionsCommercialesTab({
                         <button
                           type="button"
                           className="pill-btn"
-                          style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                          style={{
+                            fontSize: '0.72rem',
+                            padding: '0.2rem 0.5rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            opacity: (!act.id_abonnement && !act.reference) ? 0.45 : 1
+                          }}
                           onClick={() => handleSendManualEmail(act)}
-                          title="Renvoyer l'e-mail de relance manuel"
+                          disabled={(!act.id_abonnement && !act.reference) || sendingRef === (act.id_abonnement || act.reference)}
+                          title={(!act.id_abonnement && !act.reference) ? "Aucun contrat associé à cette action" : "Renvoyer l'e-mail de relance manuel"}
                         >
-                          <Send size={11} />
+                          {sendingRef === (act.id_abonnement || act.reference) ? <Loader2 size={11} className="spin" /> : <Send size={11} />}
                           <span>Renvoyer</span>
                         </button>
                       </td>
@@ -479,7 +568,7 @@ export default function ActionsCommercialesTab({
                   Corps du message :
                 </label>
                 <textarea
-                  rows={6}
+                  rows={7}
                   value={emailTemplate.corps}
                   onChange={(e) => setEmailTemplate({ ...emailTemplate, corps: e.target.value })}
                   required
@@ -497,21 +586,62 @@ export default function ActionsCommercialesTab({
                 />
               </div>
 
+              {/* Guide des variables dynamiques */}
+              <div style={{
+                padding: '0.65rem 0.85rem',
+                borderRadius: '8px',
+                background: 'rgba(59, 130, 246, 0.1)',
+                border: '1px solid rgba(59, 130, 246, 0.25)',
+                fontSize: '0.78rem'
+              }}>
+                <div style={{ fontWeight: 600, color: 'var(--accent-secondary, #38bdf8)', marginBottom: '0.35rem' }}>
+                  💡 Variables dynamiques (remplacées automatiquement à l'envoi) :
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                  {[
+                    { tag: '{destNom}', desc: 'Nom du destinataire / client' },
+                    { tag: '{reference}', desc: 'Réf contrat' },
+                    { tag: '{supports}', desc: 'Supports' },
+                    { tag: '{diffJours}', desc: 'Jours restants' },
+                    { tag: '{dateFr}', desc: 'Date d\'échéance' },
+                    { tag: '{interlocuteur}', desc: 'Commercial' },
+                  ].map(({ tag, desc }) => (
+                    <code
+                      key={tag}
+                      style={{
+                        background: 'rgba(15, 23, 42, 0.7)',
+                        padding: '0.15rem 0.4rem',
+                        borderRadius: '4px',
+                        color: '#93c5fd',
+                        border: '1px solid rgba(147, 197, 253, 0.3)',
+                        cursor: 'pointer'
+                      }}
+                      title={`${desc} - Cliquer pour insérer à la fin du message`}
+                      onClick={() => setEmailTemplate(prev => ({ ...prev, corps: prev.corps + ' ' + tag }))}
+                    >
+                      {tag}
+                    </code>
+                  ))}
+                </div>
+              </div>
+
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
                 <button
                   type="button"
                   className="pill-btn"
                   onClick={() => setShowTemplateModal(false)}
+                  disabled={savingTemplate}
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   className="pill-btn active"
+                  disabled={savingTemplate}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
                 >
-                  <Check size={14} />
-                  <span>Enregistrer le modèle</span>
+                  {savingTemplate ? <Loader2 size={14} className="spin" /> : <Check size={14} />}
+                  <span>{savingTemplate ? 'Enregistrement...' : 'Enregistrer le modèle'}</span>
                 </button>
               </div>
             </form>

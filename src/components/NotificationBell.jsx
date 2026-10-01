@@ -11,7 +11,9 @@ const CATEGORIES = [
     { id: 'CREATION', label: 'Création', color: '#10b981' },
     { id: 'MODIFICATION', label: 'Modif', color: '#06b6d4' },
     { id: 'SUPPRESSION', label: 'Suppression', color: '#ef4444' },
-    { id: 'STATUT', label: 'Statuts', color: '#8b5cf6' }
+    { id: 'STATUT', label: 'Statuts', color: '#8b5cf6' },
+    { id: 'ECHEANCE', label: 'Echeance', color: '#dc5cf6ff' },
+    { id: 'EMAIL_ECHEANCE', label: 'Echeance_mail', color: '#dc5cf6ff' }
 ];
 
 export default function NotificationBell() {

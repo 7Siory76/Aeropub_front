@@ -17,3 +17,5 @@ export * from './parametrageApi';
 export * from './typeEtatSupportApi';
 export * from './typeStatutAbonnementApi';
 export * from './journalNotificationApi';
+export * from './modeleCourrielApi';
+

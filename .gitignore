@@ -1,6 +1,22 @@
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+dist-ssr/
+
+# Environment files & secrets (Protection anti-bot / fuite de données)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!.env.example
+
+# Editor & OS files
 *.local
-.vscode
+.vscode/
+.idea/
 .DS_Store
+*.log
