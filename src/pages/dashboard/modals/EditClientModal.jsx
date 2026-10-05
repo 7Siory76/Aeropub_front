@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Edit3, Check, Building2, Mail, MapPin, User } from 'lucide-react';
+import { X, Edit3, Check, Building2, Mail, MapPin, User, Loader2 } from 'lucide-react';
 import { clientsApi, utilisateursApi } from '../../../api';
-import { toast } from 'react-toastify';
 import { useAuth } from '../../../context/AuthContext';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import { hasRole } from '../../../utils/rbac';
 
 export default function EditClientModal({ client, onClose, onRefresh }) {
   const { user } = useAuth();
+  const { showSuccess, scrollToTop } = useFeedback();
   const canAssignCommercial = hasRole(user, ['Admin', 'Resp_Com']);
 
   const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
   const [commercials, setCommercials] = useState([]);
+
+  useEffect(() => {
+    if (modalError) {
+      scrollToTop();
+    }
+  }, [modalError, scrollToTop]);
   const [formData, setFormData] = useState({
     raison_sociale: '',
     nom_contact: '',
@@ -51,8 +60,9 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setModalError('');
     if (!formData.raison_sociale.trim()) {
-      toast.warning('La raison sociale ne peut pas être vide.');
+      setModalError('La raison sociale ne peut pas être vide.');
       return;
     }
 
@@ -68,12 +78,12 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
         id_commercial: formData.id_commercial ? parseInt(formData.id_commercial, 10) : undefined
       });
 
-      toast.success(`Client « ${formData.raison_sociale} » mis à jour avec succès !`);
       if (onRefresh) onRefresh();
+      showSuccess(`Client « ${formData.raison_sociale} » mis à jour avec succès !`);
       onClose();
     } catch (err) {
-      console.error('Erreur lors de la mise à jour du client:', err);
-      toast.error(err.response?.data?.message || 'Erreur lors de la mise à jour du client.');
+      const friendlyMsg = sanitizeUserError(err, 'Impossible de modifier ce client.');
+      setModalError(friendlyMsg);
     } finally {
       setLoading(false);
     }
@@ -83,7 +93,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
     <div className="modal-backdrop-portal" onClick={onClose}>
       <div
         className="glass-panel client-modal-box"
-        style={{ maxWidth: '600px', animation: 'scaleUp 0.25s ease' }}
+        style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -100,6 +110,12 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
             <X size={18} />
           </button>
         </div>
+
+        {modalError && (
+          <div className="modal-error-box">
+            <span>⚠️ {modalError}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', marginTop: '1.25rem' }}>
           {/* Raison Sociale */}
@@ -226,8 +242,17 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
               disabled={loading}
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              <Check size={16} />
-              <span>{loading ? 'Enregistrement...' : 'Enregistrer'}</span>
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="btn-spinner" />
+                  <span>Enregistrement...</span>
+                </>
+              ) : (
+                <>
+                  <Check size={16} />
+                  <span>Enregistrer</span>
+                </>
+              )}
             </button>
           </div>
         </form>

@@ -24,9 +24,10 @@ import {
   BarChart3
 } from 'lucide-react';
 import { csvApi } from '../api';
-import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { hasRole } from '../utils/rbac';
+import { useFeedback } from '../context/FeedbackContext';
+import { sanitizeUserError } from '../utils/errorHandler';
 import RoleGuideModal from './RoleGuideModal';
 import './Sidebar.css';
 
@@ -42,6 +43,7 @@ export default function Sidebar({
   counts = {}
 }) {
   const { user } = useAuth();
+  const { showSuccess, showError } = useFeedback();
   const isAdmin = hasRole(user, ['Admin']);
   const [showRoleGuide, setShowRoleGuide] = useState(false);
 
@@ -51,6 +53,7 @@ export default function Sidebar({
   const [isCollapsed, setIsCollapsed] = useState(false);
   // État d'importation CSV
   const [uploadingCsv, setUploadingCsv] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const fileInputRef = useRef(null);
 
   // Sous-compartiments de la table CRUD (réservé admin pour utilisateurs)
@@ -85,21 +88,12 @@ export default function Sidebar({
     setUploadingCsv(true);
     try {
       const result = await csvApi.upload(file);
-      const msg = `✅ Importation réussie ! ${result.data?.emplacementsImportes || 0} supports et ${result.data?.abonnementsCrees || 0} abonnements synchronisés.`;
-      if (typeof toast !== 'undefined' && toast?.success) {
-        toast.success(msg);
-      } else {
-        alert(msg);
-      }
+      const msg = `Importation réussie : ${result.data?.emplacementsImportes || 0} supports et ${result.data?.abonnementsCrees || 0} abonnements synchronisés.`;
+      showSuccess(msg);
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error("Erreur lors de l'importation CSV:", err);
-      const errMsg = err.response?.data?.message || "❌ Erreur lors de l'importation du fichier CSV.";
-      if (typeof toast !== 'undefined' && toast?.error) {
-        toast.error(errMsg);
-      } else {
-        alert(errMsg);
-      }
+      const errMsg = sanitizeUserError(err, "Erreur lors de l'importation du fichier CSV.");
+      showError(errMsg);
     } finally {
       setUploadingCsv(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -332,11 +326,20 @@ export default function Sidebar({
           <button
             type="button"
             className="sidebar-tool-btn"
-            onClick={onRefresh}
+            disabled={refreshing}
+            onClick={async () => {
+              if (refreshing) return;
+              setRefreshing(true);
+              try {
+                if (onRefresh) await onRefresh();
+              } finally {
+                setTimeout(() => setRefreshing(false), 500);
+              }
+            }}
             title="Rafraîchir les données API"
           >
-            <RefreshCw size={16} />
-            {!isCollapsed && <span>Actualiser</span>}
+            <RefreshCw size={16} className={refreshing ? 'btn-spinner' : ''} />
+            {!isCollapsed && <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>}
           </button>
         </div>
       </div>

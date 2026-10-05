@@ -5,13 +5,15 @@ import NotificationTester from './components/NotificationTester';
 import Footer from './components/Footer';
 import { DashboardPage, PlanningPage, ParametragePage, KpiStatsPage } from './pages';
 import { checkHealthApi } from './api';
-import { toast } from 'react-toastify';
 import { useAuth } from './context/AuthContext';
+import { useFeedback } from './context/FeedbackContext';
+import DiscreetBanner from './components/DiscreetBanner';
 import LoginPage from './pages/LoginPage';
 
 import { hasRole } from './utils/rbac';
 
 export default function App() {
+  const { feedback, clearFeedback, registerNavigationHandler, showInfo } = useFeedback();
   const [isBackendOnline, setIsBackendOnline] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -19,6 +21,14 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('emplacements'); // sous-compartiment CRUD sélectionné
   const [counts, setCounts] = useState({});
   const [kpiFilter, setKpiFilter] = useState(null);
+
+  // Enregistrer le gestionnaire de navigation pour les redirections logiques
+  useEffect(() => {
+    registerNavigationHandler((page, tab) => {
+      if (page) setActivePage(page);
+      if (tab) setActiveTab(tab);
+    });
+  }, [registerNavigationHandler]);
 
   // État du thème Nuit (dark) ou Jour (light)
   const [theme, setTheme] = useState(() => {
@@ -34,10 +44,6 @@ export default function App() {
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
-    toast.info(nextTheme === 'light' ? '☀️ Mode Jour activé' : '🌙 Mode Nuit activé', {
-      position: 'bottom-right',
-      autoClose: 2000
-    });
   };
 
   const checkStatus = async () => {
@@ -90,6 +96,9 @@ export default function App() {
         />
 
         <main className="main-content">
+          {/* Bannière de feedback discrète globale */}
+          <DiscreetBanner feedback={feedback} onDismiss={clearFeedback} />
+
           {activePage === 'kpis' ? (
             /* Nouvelle Page Dédiée : KPI & Statistiques de Pilotage */
             <KpiStatsPage

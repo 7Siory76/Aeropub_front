@@ -1,41 +1,28 @@
 import React from 'react';
 import { Bell, CheckCircle2, Info, AlertTriangle, XCircle, FileSpreadsheet } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../context/FeedbackContext';
 
 export default function NotificationTester({ onSimulateImport }) {
+  const { showSuccess, showInfo, showError } = useFeedback();
+
   const triggerSuccess = () => {
-    toast.success('🎉 Opération réussie ! Vos données sont synchronisées.', {
-      position: 'bottom-right',
-      autoClose: 3500
-    });
+    showSuccess('Opération réussie ! Vos données sont synchronisées.');
   };
 
   const triggerInfo = () => {
-    toast.info('💡 Astuce : Vous pouvez filtrer les éléments par mot-clé.', {
-      position: 'bottom-right',
-      autoClose: 3500
-    });
+    showInfo('Astuce : Vous pouvez filtrer les éléments par mot-clé.');
   };
 
   const triggerWarning = () => {
-    toast.warning('⚠️ Connexion au serveur instable. Tentative de reconnexion...', {
-      position: 'bottom-right',
-      autoClose: 4000
-    });
+    showInfo('Avertissement : Connexion au serveur instable.');
   };
 
   const triggerError = () => {
-    toast.error('❌ Une erreur est survenue lors de l\'enregistrement.', {
-      position: 'bottom-right',
-      autoClose: 4000
-    });
+    showError('Une erreur est survenue lors de l\'enregistrement des données.');
   };
 
   const triggerCsvSimulation = () => {
-    toast.info('📦 [PUSH CSV] BACK_OFFICE a importé un nouveau fichier CSV !', {
-      position: 'top-center',
-      autoClose: 5000
-    });
+    showInfo('Import CSV : Un nouveau fichier CSV a été importé avec succès.');
     if (onSimulateImport) onSimulateImport();
   };
 
@@ -44,37 +31,37 @@ export default function NotificationTester({ onSimulateImport }) {
       <div className="notification-header">
         <Bell size={22} className="notification-icon" />
         <h3 className="notification-title">
-          Testeur de Notifications In-App (<span className="notification-title-pink">react-toastify</span>)
+          Testeur de Messages et Alertes (<span className="notification-title-pink">Bannières Discrètes</span>)
         </h3>
       </div>
       <p className="dashboard-desc" style={{ marginBottom: '1.25rem' }}>
-        Cliquez sur les boutons ci-dessous pour expérimenter les différents types de notifications In-App intégrées dans l'application :
+        Cliquez sur les boutons ci-dessous pour tester les notifications discrètes intégrées dans l'application :
       </p>
 
       <div className="notification-buttons-group">
         <button onClick={triggerSuccess} className="btn-secondary btn-success-toast">
           <CheckCircle2 size={16} />
-          <span>Toast Succès</span>
+          <span>Message Succès</span>
         </button>
 
         <button onClick={triggerInfo} className="btn-secondary btn-info-toast">
           <Info size={16} />
-          <span>Toast Information</span>
+          <span>Message Info</span>
         </button>
 
         <button onClick={triggerWarning} className="btn-secondary btn-warning-toast">
           <AlertTriangle size={16} />
-          <span>Toast Avertissement</span>
+          <span>Message Alerte</span>
         </button>
 
         <button onClick={triggerError} className="btn-secondary btn-error-toast">
           <XCircle size={16} />
-          <span>Toast Erreur</span>
+          <span>Message Erreur</span>
         </button>
 
         <button onClick={triggerCsvSimulation} className="btn-primary btn-pink-toast">
           <FileSpreadsheet size={16} />
-          <span>Simuler Import CSV (Back-Office)</span>
+          <span>Simuler Import CSV</span>
         </button>
       </div>
     </section>

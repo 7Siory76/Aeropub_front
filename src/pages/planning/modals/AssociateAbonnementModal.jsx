@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { X, AlertCircle, Loader2 } from 'lucide-react';
 import { abonnementsApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import SearchableClientSelect from '../components/SearchableClientSelect';
 
 export default function AssociateAbonnementModal({
@@ -13,10 +14,19 @@ export default function AssociateAbonnementModal({
     onClose,
     onSuccess
 }) {
+    const { navigateWithFeedback, scrollToTop } = useFeedback();
+
     // 1. États internes propres au formulaire
     const [referenceAbo, setReferenceAbo] = useState('');
     const [clientId, setClientId] = useState(clients[0]?.id || '');
     const [startDate, setStartDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
+    const [modalError, setModalError] = useState('');
+
+    useEffect(() => {
+        if (modalError) {
+            scrollToTop();
+        }
+    }, [modalError, scrollToTop]);
 
     // Date de fin par défaut (+1 an)
     const defaultEnd = () => {
@@ -73,10 +83,11 @@ export default function AssociateAbonnementModal({
     //2. Soumission du formulaire
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setModalError('');
         const cleanRef = referenceAbo.trim();
 
         if (!cleanRef || !clientId || !startDate || !endDate) {
-            toast.error("Veuillez renseigner la référence du contrat et tous les champs obligatoires.");
+            setModalError("Veuillez renseigner la référence du contrat et tous les champs obligatoires.");
             return;
         }
 
@@ -85,14 +96,15 @@ export default function AssociateAbonnementModal({
             (a) => String(a.reference || '').trim().toLowerCase() === cleanRef.toLowerCase()
         );
         if (isRefTaken) {
-            toast.error(`❌ La référence "${cleanRef}" existe déjà. Veuillez en choisir une autre.`);
+            setModalError(`La référence "${cleanRef}" existe déjà. Veuillez en choisir une autre.`);
             return;
         }
 
         setLoanding(true);
         try {
             if (new Date(startDate) > new Date(endDate)) {
-                toast.error('La date de fin doit etre posterieure a la date de debut.');
+                setModalError('La date de fin doit être postérieure à la date de début.');
+                setLoanding(false);
                 return;
             }
 
@@ -125,12 +137,13 @@ export default function AssociateAbonnementModal({
             });
 
             if (conflictAbo) {
-                const dDebut = new Date(conflictAbo.date_debut).toLocaleDateString('fr-Fr');
-                const dFin = new Date(conflictAbo.date_fin || conflictAbo.date_echeance).toLocaleDateString('fr-Fr');
+                const dDebut = new Date(conflictAbo.date_debut).toLocaleDateString('fr-FR');
+                const dFin = new Date(conflictAbo.date_fin || conflictAbo.date_echeance).toLocaleDateString('fr-FR');
                 const clientNom = conflictAbo.nom_client || conflictAbo.raison_sociale || 'un client';
-                toast.error(
-                    `❌ Conflit de période : cet emplacement est déjà réservé du ${dDebut} au ${dFin} par ${clientNom}.`
+                setModalError(
+                    `Conflit de période : cet emplacement est déjà réservé du ${dDebut} au ${dFin} par ${clientNom}.`
                 );
+                setLoanding(false);
                 return;
             }
 
@@ -151,13 +164,12 @@ export default function AssociateAbonnementModal({
                 statut: 'à valider'
             });
 
-            toast.success(`Nouvel abonnement "${cleanRef}" associé à ${targetEmp.reference} avec succès (statut : À valider) !`);
             onClose();
-            if (onSuccess) onSuccess(); // Rafraîchit les données du planning
+            if (onSuccess) onSuccess();
+            navigateWithFeedback('dashboard', 'abonnements', `Nouvel abonnement "${cleanRef}" associé à ${targetEmp.reference} avec succès.`);
         } catch (err) {
-            console.error(`Erreur association abonnement:`, err);
-            const msg = err.response?.data?.message || "Erreur lors de la creation de l'abonnement.";
-            toast.error(`${msg}`);
+            const userMsg = sanitizeUserError(err, "Erreur lors de la création de l'abonnement.");
+            setModalError(userMsg);
         } finally {
             setLoanding(false);
         }
@@ -165,7 +177,7 @@ export default function AssociateAbonnementModal({
     // 3. Téléportation dans le <body> avec createPortal
     return createPortal(
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content" style={{ maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
                 <button className="modal-close-btn" onClick={onClose} type="button">
                     <X size={20} />
                 </button>
@@ -175,6 +187,13 @@ export default function AssociateAbonnementModal({
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
                     Emplacement sélectionné : <strong style={{ color: '#6366f1' }}>{targetEmp.reference}</strong> ({targetEmp.nom_type_support || 'Support Standard'} - {targetEmp.ref_format || targetEmp.caracteristiques || 'Format N/A'})
                 </p>
+
+                {modalError && (
+                    <div className="modal-error-box" style={{ marginBottom: '1.25rem' }}>
+                        <AlertCircle size={16} />
+                        <span>{modalError}</span>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
                     {/* Référence de l'Abonnement */}
                     <div style={{ marginBottom: '1.25rem' }}>
@@ -297,8 +316,15 @@ export default function AssociateAbonnementModal({
                         <button type="button" onClick={onClose} className="btn-secondary" disabled={loading}>
                             Annuler
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Validation en cours...' : "Valider l'Abonnement"}
+                        <button type="submit" className="btn-primary" disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            {loading ? (
+                                <>
+                                    <Loader2 size={16} className="btn-spinner" />
+                                    <span>Validation en cours...</span>
+                                </>
+                            ) : (
+                                "Valider l'Abonnement"
+                            )}
                         </button>
                     </div>
                 </form>

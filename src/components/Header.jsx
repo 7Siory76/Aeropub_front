@@ -13,6 +13,7 @@ export default function Header({
   activeTab
 }) {
   const [showRoleGuide, setShowRoleGuide] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const tabLabels = {
     emplacements: 'Supports & Emplacements',
     abonnements: 'Abonnements & Contrats',
@@ -119,12 +120,21 @@ export default function Header({
           </button>
 
           <button
-            onClick={onRefresh}
+            onClick={async () => {
+              if (refreshing) return;
+              setRefreshing(true);
+              try {
+                if (onRefresh) await onRefresh();
+              } finally {
+                setTimeout(() => setRefreshing(false), 500);
+              }
+            }}
+            disabled={refreshing}
             className="btn-secondary btn-refresh"
             title="Rafraîchir les données API"
           >
-            <RefreshCw size={16} />
-            <span>Actualiser</span>
+            <RefreshCw size={16} className={refreshing ? 'btn-spinner' : ''} />
+            <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
           </button>
 
           {/* Bouton Guide des Rôles accessible à TOUS les utilisateurs */}

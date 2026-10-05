@@ -17,6 +17,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
     audit: 0
   });
   const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (initialTab) {
@@ -29,7 +30,10 @@ export default function ParametragePage({ initialTab = 'params' }) {
   };
 
   const handleRefresh = () => {
+    if (refreshing) return;
+    setRefreshing(true);
     setRefreshKey(prev => prev + 1);
+    setTimeout(() => setRefreshing(false), 500);
   };
 
   if (!hasRole(user, ['Admin'])) {
@@ -56,12 +60,13 @@ export default function ParametragePage({ initialTab = 'params' }) {
 
         <button
           onClick={handleRefresh}
+          disabled={refreshing}
           className="btn-secondary"
           style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
           title="Actualiser l'onglet actif"
         >
-          <RefreshCw size={16} />
-          <span>Actualiser</span>
+          <RefreshCw size={16} className={refreshing ? 'btn-spinner' : ''} />
+          <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
         </button>
       </div>
 

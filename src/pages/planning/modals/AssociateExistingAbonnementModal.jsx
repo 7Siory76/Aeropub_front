@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, CheckCircle2, AlertTriangle, Calendar, User, FileText } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { X, CheckCircle2, AlertTriangle, AlertCircle, Calendar, User, FileText, Loader2 } from 'lucide-react';
 import { abonnementsApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function AssociateExistingAbonnementModal({
     targetEmp,
@@ -11,7 +12,15 @@ export default function AssociateExistingAbonnementModal({
     onClose,
     onSuccess
 }) {
+    const { navigateWithFeedback, scrollToTop } = useFeedback();
     const [loading, setLoading] = useState(false);
+    const [modalError, setModalError] = useState('');
+
+    useEffect(() => {
+        if (modalError) {
+            scrollToTop();
+        }
+    }, [modalError, scrollToTop]);
 
     // 1. Filtrer les abonnements : Date comprise + Pas actif + Pas archivé
     const eligibleAbonnements = useMemo(() => {
@@ -53,8 +62,9 @@ export default function AssociateExistingAbonnementModal({
     // 2. Action : Lier l'emplacement au contrat sélectionné
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setModalError('');
         if (!selectedAboRef) {
-            toast.error('Veuillez sélectionner un abonnement dans la liste.');
+            setModalError('Veuillez sélectionner un abonnement dans la liste.');
             return;
         }
         setLoading(true);
@@ -63,15 +73,16 @@ export default function AssociateExistingAbonnementModal({
             await abonnementsApi.update(selectedAboRef, {
                 reference_support: targetEmp.reference
             });
-            toast.success(
-                `L'emplacement ${targetEmp.reference} a été associé avec succès à l'abonnement ${selectedAboRef} !`
-            );
             onClose();
             if (onSuccess) onSuccess(); // Rafraîchit les données du planning
+            navigateWithFeedback(
+                'dashboard',
+                'abonnements',
+                `L'emplacement ${targetEmp.reference} a été associé avec succès à l'abonnement ${selectedAboRef}.`
+            );
         } catch (err) {
-            console.error("Erreur lors de l'association :", err);
-            const msg = err.response?.data?.message || "Erreur lors de l'association de l'abonnement.";
-            toast.error(msg);
+            const msg = sanitizeUserError(err, "Erreur lors de l'association de l'abonnement.");
+            setModalError(msg);
         } finally {
             setLoading(false);
         }
@@ -85,7 +96,7 @@ export default function AssociateExistingAbonnementModal({
 
     return createPortal(
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '580px' }}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto' }}>
                 <button className="modal-close-btn" onClick={onClose} type="button">
                     <X size={20} />
                 </button>
@@ -95,6 +106,12 @@ export default function AssociateExistingAbonnementModal({
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
                     Emplacement cible : <strong style={{ color: '#6366f1' }}>{targetEmp?.reference}</strong> ({targetEmp?.nom_type_support || 'Support'}) — Date : <strong>{formatDateFr(selectedDate)}</strong>
                 </p>
+                {modalError && (
+                    <div className="modal-error-box" style={{ marginBottom: '1.25rem' }}>
+                        <AlertCircle size={16} />
+                        <span>{modalError}</span>
+                    </div>
+                )}
                 {eligibleAbonnements.length === 0 ? (
                     /* Cas où aucun abonnement ne correspond */
                     <div style={{
@@ -183,8 +200,15 @@ export default function AssociateExistingAbonnementModal({
                             <button type="button" onClick={onClose} className="btn-secondary" disabled={loading}>
                                 Annuler
                             </button>
-                            <button type="submit" className="btn-primary" disabled={loading}>
-                                {loading ? 'Association en cours...' : 'Associer ce support'}
+                            <button type="submit" className="btn-primary" disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {loading ? (
+                                    <>
+                                        <Loader2 size={16} className="btn-spinner" />
+                                        <span>Association en cours...</span>
+                                    </>
+                                ) : (
+                                    'Associer ce support'
+                                )}
                             </button>
                         </div>
                     </form>

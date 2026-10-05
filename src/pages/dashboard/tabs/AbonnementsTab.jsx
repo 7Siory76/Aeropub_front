@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Search, RotateCcw, Plus, Download } from 'lucide-react';
+import { User, Search, RotateCcw, Plus, Download, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
 import AddAbonnementModal from '../modals/AddAbonnementModal';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../../../context/FeedbackContext';
 
 export default function AbonnementsTab({
   abonnements = [],
@@ -19,6 +19,7 @@ export default function AbonnementsTab({
   onClearKpiFilter
 }) {
   const { user } = useAuth();
+  const { showSuccess, showInfo } = useFeedback();
 
   // Permissions RBAC
   const canCreateOrDuplicate = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
@@ -62,7 +63,9 @@ export default function AbonnementsTab({
   const [selectedProba, setSelectedProba] = useState('all');
   const [selectedYear, setSelectedYear] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState('date_debut');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [selectedAbonnement, setSelectedAbonnement] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -238,15 +241,86 @@ export default function AbonnementsTab({
     });
   }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs]);
 
+  const sortedAbonnements = useMemo(() => {
+    const list = [...filteredAbonnements];
+    if (!sortField) return list;
+    return list.sort((a, b) => {
+      let valA, valB;
+      switch (sortField) {
+        case 'reference':
+          valA = a.reference || a.id || '';
+          valB = b.reference || b.id || '';
+          break;
+        case 'client':
+          valA = a.raison_sociale || a.nom_client || '';
+          valB = b.raison_sociale || b.nom_client || '';
+          break;
+        case 'commercial':
+          valA = a.nom_commercial || '';
+          valB = b.nom_commercial || '';
+          break;
+        case 'supports':
+          valA = a.supports_associes || a.reference_emplacement || '';
+          valB = b.supports_associes || b.reference_emplacement || '';
+          break;
+        case 'tarif':
+          valA = parseFloat(a.tarif) || 0;
+          valB = parseFloat(b.tarif) || 0;
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'campagne':
+          valA = a.annonceur_campagne || '';
+          valB = b.annonceur_campagne || '';
+          break;
+        case 'date_debut':
+          valA = a.date_debut ? new Date(a.date_debut).getTime() : 0;
+          valB = b.date_debut ? new Date(b.date_debut).getTime() : 0;
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'probabilite':
+          valA = a.probabilite_renouvellement !== undefined && a.probabilite_renouvellement !== null ? Number(a.probabilite_renouvellement) : 80;
+          valB = b.probabilite_renouvellement !== undefined && b.probabilite_renouvellement !== null ? Number(b.probabilite_renouvellement) : 80;
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'statut':
+          valA = a.statut_abonnement || a.statut || '';
+          valB = b.statut_abonnement || b.statut || '';
+          break;
+        default:
+          valA = a[sortField] || '';
+          valB = b[sortField] || '';
+      }
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
+      return sortDirection === 'asc' ? strA.localeCompare(strB, 'fr') : strB.localeCompare(strA, 'fr');
+    });
+  }, [filteredAbonnements, sortField, sortDirection]);
+
   const paginatedAbonnements = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredAbonnements.slice(start, start + pageSize);
-  }, [filteredAbonnements, currentPage, pageSize]);
+    return sortedAbonnements.slice(start, start + pageSize);
+  }, [sortedAbonnements, currentPage, pageSize]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={12} className="table-head-sort-icon" style={{ opacity: 0.35 }} />;
+    }
+    return sortDirection === 'asc'
+      ? <ArrowUp size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />
+      : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />;
+  };
 
   // Fonction d'exportation Excel / CSV (Module 4)
   const handleExportCSV = () => {
     if (filteredAbonnements.length === 0) {
-      toast.info('Aucun contrat à exporter.');
+      showInfo('Aucun contrat à exporter.');
       return;
     }
     const headers = ['Reference', 'Client', 'Commercial', 'Supports', 'Tarif', 'Devise', 'Periodicite', 'Date_Debut', 'Date_Echeance', 'Statut'];
@@ -270,7 +344,7 @@ export default function AbonnementsTab({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('Exportation des contrats réussie !');
+    showSuccess('Exportation des contrats réussie !');
   };
 
   return (
@@ -462,15 +536,33 @@ export default function AbonnementsTab({
           <table className="aeropub-table">
             <thead>
               <tr className="table-head-row-emerald">
-                <th className="table-head-cell">Réf Contrat</th>
-                <th className="table-head-cell">Client</th>
-                <th className="table-head-cell">Commercial Attitré</th>
-                <th className="table-head-cell">Supports Associés</th>
-                <th className="table-head-cell">Tarif / Périodicité</th>
-                <th className="table-head-cell">Campagne / Annonceur</th>
-                <th className="table-head-cell">Période Contractuelle</th>
-                <th className="table-head-cell" style={{ textAlign: 'center' }}>Renouv. (%)</th>
-                <th className="table-head-cell" style={{ textAlign: 'center' }}>Statut</th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('reference')}>
+                  Réf Contrat {renderSortIcon('reference')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('client')}>
+                  Client {renderSortIcon('client')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('commercial')}>
+                  Commercial Attitré {renderSortIcon('commercial')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('supports')}>
+                  Supports Associés {renderSortIcon('supports')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('tarif')}>
+                  Tarif / Périodicité {renderSortIcon('tarif')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('campagne')}>
+                  Campagne / Annonceur {renderSortIcon('campagne')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('date_debut')}>
+                  Période Contractuelle {renderSortIcon('date_debut')}
+                </th>
+                <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('probabilite')}>
+                  Renouv. (%) {renderSortIcon('probabilite')}
+                </th>
+                <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('statut')}>
+                  Statut {renderSortIcon('statut')}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -578,7 +670,7 @@ export default function AbonnementsTab({
       {/* Pagination pour les abonnements */}
       <Pagination
         currentPage={currentPage}
-        totalItems={filteredAbonnements.length}
+        totalItems={sortedAbonnements.length}
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}

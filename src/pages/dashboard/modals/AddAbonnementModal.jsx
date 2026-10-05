@@ -2,13 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
     X, Plus, Copy, FileText, Layers, CheckCircle2,
-    AlertTriangle, Calendar, User, DollarSign, Sparkles
+    AlertTriangle, AlertCircle, Calendar, User, DollarSign, Sparkles, Loader2
 } from 'lucide-react';
 import {
     abonnementsApi, emplacementsApi, clientsApi,
     utilisateursApi, typeStatutAbonnementApi
 } from '../../../api';
-
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function AddAbonnementModal({
     onClose,
@@ -19,7 +20,15 @@ export default function AddAbonnementModal({
     utilisateurs = [],
     typeStatut = []
 }) {
+    const { navigateWithFeedback, scrollToTop } = useFeedback();
     const [loading, setLoading] = useState(false);
+    const [modalError, setModalError] = useState('');
+
+    useEffect(() => {
+        if (modalError) {
+            scrollToTop();
+        }
+    }, [modalError, scrollToTop]);
 
     // Les modes de création
     const [creationMode, setCreationMode] = useState('vierge');
@@ -287,11 +296,12 @@ export default function AddAbonnementModal({
         });
     }, [availableEmplacements, selectedSupports, formData.date_debut, formData.date_echeance, abonnementsList]);
     const handleAddSupport = () => {
+        setModalError('');
         if (!supportToAdd) return;
         const check = checkSupportAvailabilityOnDates(supportToAdd, formData.date_debut, formData.date_echeance);
         if (!check.available) {
             const c = check.conflictWith;
-            alert(`Le support "${supportToAdd}" est déjà réservé par le contrat ${c?.reference} sur cette période.`);
+            setModalError(`Le support "${supportToAdd}" est déjà réservé par le contrat ${c?.reference} sur cette période.`);
             return;
         }
         if (!selectedSupports.includes(supportToAdd)) {
@@ -306,19 +316,20 @@ export default function AddAbonnementModal({
     // Soumission et enregistrement du nouveau contrat
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setModalError('');
         if (!formData.id_client) {
-            alert('Veuillez sélectionner un client.');
+            setModalError('Veuillez sélectionner un client.');
             return;
         }
         if (new Date(formData.date_echeance) < new Date(formData.date_debut)) {
-            alert("La date d'échéance doit être postérieure à la date de début.");
+            setModalError("La date d'échéance doit être postérieure à la date de début.");
             return;
         }
         // Vérification finale des conflits sur tous les supports sélectionnés
         for (const supRef of selectedSupports) {
             const check = checkSupportAvailabilityOnDates(supRef, formData.date_debut, formData.date_echeance);
             if (!check.available) {
-                alert(`Impossible de créer le contrat : le support "${supRef}" est en conflit de dates.`);
+                setModalError(`Impossible de créer le contrat : le support "${supRef}" est en conflit de dates.`);
                 return;
             }
         }
@@ -342,12 +353,12 @@ export default function AddAbonnementModal({
                 statut: formData.statut || 'Brouillon',
                 supports: selectedSupports
             });
-            alert('✅ Nouveau contrat créé avec succès !');
             onClose();
             if (onRefresh) onRefresh();
+            navigateWithFeedback('dashboard', 'abonnements', `Nouveau contrat « ${formData.reference?.trim() || 'créé'} » enregistré avec succès !`);
         } catch (err) {
-            console.error('Erreur création contrat:', err);
-            alert(err.response?.data?.message || 'Erreur lors de la création du contrat.');
+            const msg = sanitizeUserError(err, 'Erreur lors de la création du contrat.');
+            setModalError(msg);
         } finally {
             setLoading(false);
         }
@@ -379,6 +390,13 @@ export default function AddAbonnementModal({
                         <X size={18} />
                     </button>
                 </div>
+
+                {modalError && (
+                    <div className="modal-error-box">
+                        <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                        <span>{modalError}</span>
+                    </div>
+                )}
                 {/* Onglets de sélection du mode : Fiche Vierge vs Dupliquer */}
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.1rem', marginBottom: '0.5rem' }}>
                     <button
@@ -651,7 +669,7 @@ export default function AddAbonnementModal({
                                 className="pill-btn active"
                                 style={{ padding: '0.55rem 1rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
                                 onClick={handleAddSupport}
-                                disabled={!supportToAdd}
+                                disabled={!supportToAdd || loading}
                             >
                                 + Ajouter
                             </button>
@@ -770,9 +788,10 @@ export default function AddAbonnementModal({
                             type="submit"
                             className="pill-btn active"
                             disabled={loading}
-                            style={{ padding: '0.65rem 1.6rem' }}
+                            style={{ padding: '0.65rem 1.6rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
                         >
-                            {loading ? 'Création en cours...' : '💾 Créer le contrat'}
+                            {loading && <Loader2 size={16} className="btn-spinner" />}
+                            <span>{loading ? 'Création en cours...' : '💾 Créer le contrat'}</span>
                         </button>
                     </div>
                 </form>

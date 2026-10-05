@@ -3,8 +3,8 @@ import {
   abonnementsApi, emplacementsApi, actionsCommercialesApi, clientsApi
 } from '../../api';
 import { useAuth } from '../../context/AuthContext';
+import { useFeedback } from '../../context/FeedbackContext';
 import { normalizeRole } from '../../utils/rbac';
-import { toast } from 'react-toastify';
 import AbonnementDetailsModal from '../dashboard/modals/AbonnementDetailsModal';
 
 // Widgets modulaires existants
@@ -22,6 +22,7 @@ import OccupationParZoneWidget from './components/OccupationParZoneWidget';
 
 export default function KpiStatsPage({ onNavigateToAbonnements }) {
   const { user } = useAuth();
+  const { showError } = useFeedback();
   const roleName = normalizeRole(user?.role);
   const isCommercialSimple = roleName === 'Commercial';
 
@@ -49,8 +50,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
       setActionsCommerciales(acts || []);
       setClients(cls || []);
     } catch (err) {
-      console.error('Erreur chargement KPIs:', err);
-      toast.error('Erreur lors du chargement des statistiques.');
+      showError(err, 'Impossible de charger certaines statistiques.');
     } finally {
       setLoading(false);
     }

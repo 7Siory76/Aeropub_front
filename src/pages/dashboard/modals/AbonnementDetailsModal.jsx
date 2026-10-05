@@ -2,14 +2,15 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X, Edit3, Trash2, Calendar, User, DollarSign, Layers, ShieldCheck,
-  Percent, FileText, AlertTriangle, Plus, Clock, History, CheckCircle2, Gift
+  Percent, FileText, AlertTriangle, AlertCircle, Plus, Clock, History, CheckCircle2, Gift, Loader2
 } from 'lucide-react';
 import {
   abonnementsApi, emplacementsApi, clientsApi, utilisateursApi, typeStatutAbonnementApi
 } from '../../../api';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function AbonnementDetailsModal({
   abonnement,
@@ -22,6 +23,7 @@ export default function AbonnementDetailsModal({
   utilisateurs = []
 }) {
   const { user } = useAuth();
+  const { showSuccess, showError, scrollToTop } = useFeedback();
 
   // Permissions RBAC (Module 1)
   const canEditDatesMontant = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
@@ -30,6 +32,13 @@ export default function AbonnementDetailsModal({
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
+
+  useEffect(() => {
+    if (modalError) {
+      scrollToTop();
+    }
+  }, [modalError, scrollToTop]);
   const [showRenewalModal, setShowRenewalModal] = useState(false);
   const [remisePercent, setRemisePercent] = useState(10);
   const [remiseMotif, setRemiseMotif] = useState('');
@@ -327,8 +336,9 @@ export default function AbonnementDetailsModal({
 
   // Retirer un support de la liste
   const handleRemoveSupport = (supRef) => {
+    setModalError('');
     if (isLockedForSupportEdit) {
-      alert("L'abonnement est déjà actif (ou archivé) : la suppression d'un support requiert une autorisation administrateur.");
+      setModalError("L'abonnement est déjà actif (ou archivé) : la suppression d'un support requiert une autorisation administrateur.");
       return;
     }
     setSelectedSupports(prev => prev.filter(s => s !== supRef));
@@ -336,8 +346,9 @@ export default function AbonnementDetailsModal({
 
   // Ajouter un support à la liste
   const handleAddSupport = () => {
+    setModalError('');
     if (isLockedForSupportEdit) {
-      alert("L'abonnement est déjà actif (ou archivé) : l'ajout d'un support requiert une autorisation administrateur.");
+      setModalError("L'abonnement est déjà actif (ou archivé) : l'ajout d'un support requiert une autorisation administrateur.");
       return;
     }
     if (!supportToAdd) return;
@@ -347,7 +358,7 @@ export default function AbonnementDetailsModal({
       const conflictAbo = check.conflictWith;
       const deb = check.conflictDebut ? new Date(check.conflictDebut).toLocaleDateString('fr-FR') : '';
       const fin = check.conflictFin ? new Date(check.conflictFin).toLocaleDateString('fr-FR') : '';
-      alert(
+      setModalError(
         `Le support "${supportToAdd}" n'est pas disponible sur la période sélectionnée : il est déjà réservé du ${deb} au ${fin} par le contrat ${conflictAbo?.reference} (${conflictAbo?.raison_sociale || 'Client'}).`
       );
       return;
@@ -362,14 +373,16 @@ export default function AbonnementDetailsModal({
   // Action rapide : Changer le statut directement depuis la vue détails
   const handleQuickStatutChange = async (newStatutNom) => {
     setLoading(true);
+    setModalError('');
     try {
       await abonnementsApi.update(abonnement.reference, { statut: newStatutNom });
-      alert(`Statut de l'abonnement mis à jour en "${newStatutNom}" !`);
+      showSuccess(`Statut de l'abonnement mis à jour en "${newStatutNom}" !`);
       setIsChangingStatut(false);
       if (onRefresh) onRefresh();
       onClose();
     } catch (err) {
-      alert(err.response?.data?.message || "Erreur lors du changement de statut.");
+      const msg = sanitizeUserError(err, "Erreur lors du changement de statut.");
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -378,8 +391,9 @@ export default function AbonnementDetailsModal({
   // Action : Sauvegarder les modifications complètes
   const handleSaveUpdate = async (e) => {
     e.preventDefault();
+    setModalError('');
     if (formData.date_debut && formData.date_echeance && new Date(formData.date_echeance) < new Date(formData.date_debut)) {
-      alert("La date d'échéance doit être postérieure ou égale à la date de début.");
+      setModalError("La date d'échéance doit être postérieure ou égale à la date de début.");
       return;
     }
     setLoading(true);
@@ -391,7 +405,7 @@ export default function AbonnementDetailsModal({
           const conflictAbo = check.conflictWith;
           const deb = check.conflictDebut ? new Date(check.conflictDebut).toLocaleDateString('fr-FR') : '';
           const fin = check.conflictFin ? new Date(check.conflictFin).toLocaleDateString('fr-FR') : '';
-          alert(
+          setModalError(
             `Impossible d'enregistrer : le support "${supRef}" n'est pas disponible du ${new Date(formData.date_debut).toLocaleDateString('fr-FR')} au ${new Date(formData.date_echeance).toLocaleDateString('fr-FR')} (déjà réservé du ${deb} au ${fin} par le contrat ${conflictAbo?.reference}).`
           );
           setLoading(false);
@@ -418,14 +432,13 @@ export default function AbonnementDetailsModal({
         supports: selectedSupports
       });
 
-      alert(`Abonnement "${abonnement.reference}" mis à jour avec succès !`);
+      showSuccess(`Abonnement "${abonnement.reference}" mis à jour avec succès !`);
       setIsEditing(false);
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error('Erreur lors de la mise à jour de l’abonnement:', err);
-      const msg = err.response?.data?.message || "Erreur lors de l'enregistrement de l'abonnement.";
-      alert(msg);
+      const msg = sanitizeUserError(err, "Erreur lors de l'enregistrement de l'abonnement.");
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -436,14 +449,15 @@ export default function AbonnementDetailsModal({
     const confirmed = window.confirm(`Êtes-vous sûr de vouloir supprimer le contrat "${abonnement.reference}" ?`);
     if (!confirmed) return;
     setLoading(true);
+    setModalError('');
     try {
       await abonnementsApi.delete(abonnement.reference);
-      alert(`Contrat "${abonnement.reference}" supprimé avec succès.`);
+      showSuccess(`Contrat "${abonnement.reference}" supprimé avec succès.`);
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error('Erreur de suppression:', err);
-      alert("Impossible de supprimer cet abonnement.");
+      const msg = sanitizeUserError(err, "Impossible de supprimer cet abonnement.");
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -482,13 +496,13 @@ export default function AbonnementDetailsModal({
         commentaire: `Renouvellement validé par ${user?.nom || 'Direction'} avec remise exceptionnelle de ${remisePercent}%. Motif: ${remiseMotif || 'Geste commercial'}.`
       });
 
-      toast.success(`🎉 Renouvellement validé avec ${remisePercent}% de remise (Nouveau tarif: ${newTarif.toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}) !`);
+      showSuccess(`Renouvellement validé avec ${remisePercent}% de remise (Nouveau tarif: ${newTarif.toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}).`);
       setShowRenewalModal(false);
       if (onRefresh) onRefresh();
       onClose();
     } catch (err) {
-      console.error('Erreur validation renouvellement:', err);
-      toast.error(err.response?.data?.message || 'Erreur lors de la validation du renouvellement.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la validation du renouvellement.');
+      showError(msg);
     } finally {
       setLoading(false);
     }
@@ -498,7 +512,7 @@ export default function AbonnementDetailsModal({
     <div className="modal-backdrop-portal" onClick={onClose}>
       <div
         className="glass-panel client-modal-box"
-        style={{ maxWidth: '840px', maxHeight: '90vh', display: 'flex', flexDirection: 'column', animation: 'scaleUp 0.25s ease' }}
+        style={{ maxWidth: '840px', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modale de validation de renouvellement avec remise exceptionnelle */}
@@ -584,11 +598,12 @@ export default function AbonnementDetailsModal({
                   <button
                     type="button"
                     className="pill-btn active"
-                    style={{ background: '#10b981', borderColor: '#10b981' }}
+                    style={{ background: '#10b981', borderColor: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
                     onClick={handleValidateRenewalWithDiscount}
                     disabled={loading}
                   >
-                    {loading ? 'Validation...' : 'Valider le renouvellement'}
+                    {loading && <Loader2 size={15} className="btn-spinner" />}
+                    <span>{loading ? 'Validation en cours...' : 'Valider le renouvellement'}</span>
                   </button>
                 </div>
               </div>
@@ -619,6 +634,13 @@ export default function AbonnementDetailsModal({
             <X size={18} />
           </button>
         </div>
+
+        {modalError && (
+          <div className="modal-error-box">
+            <AlertCircle size={18} style={{ flexShrink: 0 }} />
+            <span>{modalError}</span>
+          </div>
+        )}
 
         {/* CONTENU : Soit Formulaire d'édition, soit Affichage des détails */}
         {isEditing ? (
@@ -784,7 +806,7 @@ export default function AbonnementDetailsModal({
                       className="pill-btn active"
                       style={{ padding: '0.55rem 1rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
                       onClick={handleAddSupport}
-                      disabled={!supportToAdd}
+                      disabled={!supportToAdd || loading}
                     >
                       + Ajouter
                     </button>
@@ -1011,9 +1033,10 @@ export default function AbonnementDetailsModal({
                 type="submit"
                 className="pill-btn active"
                 disabled={loading}
-                style={{ padding: '0.65rem 1.4rem' }}
+                style={{ padding: '0.65rem 1.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
               >
-                {loading ? 'Enregistrement...' : '💾 Sauvegarder'}
+                {loading && <Loader2 size={15} className="btn-spinner" />}
+                <span>{loading ? 'Enregistrement...' : '💾 Sauvegarder'}</span>
               </button>
             </div>
           </form>
@@ -1127,6 +1150,7 @@ export default function AbonnementDetailsModal({
                   {isChangingStatut ? (
                     <select
                       autoFocus
+                      disabled={loading}
                       className="ts-filter-select"
                       style={{ width: '100%', padding: '0.4rem', fontSize: '0.85rem' }}
                       value={selectedNewStatut}
@@ -1282,8 +1306,8 @@ export default function AbonnementDetailsModal({
                   disabled={loading}
                   title="Supprimer définitivement ce contrat (Admin / Resp_Com)"
                 >
-                  <Trash2 size={15} />
-                  <span>Supprimer</span>
+                  {loading ? <Loader2 size={15} className="btn-spinner" /> : <Trash2 size={15} />}
+                  <span>{loading ? 'Suppression...' : 'Supprimer'}</span>
                 </button>
               ) : (
                 <div />

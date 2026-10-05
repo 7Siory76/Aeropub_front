@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, UserCheck, Lock, HelpCircle, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
+import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, UserCheck, Lock, HelpCircle, ChevronDown, ChevronUp, ShieldCheck, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import UserModal from '../modals/UserModal';
 import { utilisateursApi } from '../../../api';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import { useAuth } from '../../../context/AuthContext';
 import { ROLES_GUIDE, getRoleGuide } from '../../../utils/rbac';
 
@@ -12,12 +13,33 @@ export default function UtilisateursTab({
   initialSearchQuery = '',
   onRefresh
 }) {
+  const { showSuccess, showError, showInfo } = useFeedback();
   const { user: currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState('id');
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={13} className="table-head-sort-icon" style={{ opacity: 0.35, marginLeft: 4 }} />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp size={13} className="table-head-sort-icon" style={{ color: '#38bdf8', marginLeft: 4 }} />
+      : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: '#38bdf8', marginLeft: 4 }} />;
+  };
 
   // État du panneau d'aide des rôles & permissions
   const [showRoleGuide, setShowRoleGuide] = useState(false);
@@ -26,6 +48,7 @@ export default function UtilisateursTab({
   // Modales d'ajout et d'édition d'utilisateur
   const [showAddModal, setShowAddModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -85,15 +108,47 @@ export default function UtilisateursTab({
     });
   }, [utilisateurs, searchTerm, selectedRole, selectedStatus]);
 
+  const sortedUtilisateurs = useMemo(() => {
+    if (!sortField) return filteredUtilisateurs;
+    return [...filteredUtilisateurs].sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      if (sortField === 'nom') {
+        valA = (a.nom || '').toLowerCase();
+        valB = (b.nom || '').toLowerCase();
+      } else if (sortField === 'email') {
+        valA = (a.email || '').toLowerCase();
+        valB = (b.email || '').toLowerCase();
+      } else if (sortField === 'nom_role') {
+        valA = (a.nom_role || '').toLowerCase();
+        valB = (b.nom_role || '').toLowerCase();
+      } else if (sortField === 'actif') {
+        valA = a.actif ? 1 : 0;
+        valB = b.actif ? 1 : 0;
+      } else if (sortField === 'id') {
+        valA = Number(a.id) || 0;
+        valB = Number(b.id) || 0;
+      }
+
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+
+      const compare = typeof valA === 'string' ? valA.localeCompare(valB, 'fr') : (valA > valB ? 1 : -1);
+      return sortDirection === 'asc' ? compare : -compare;
+    });
+  }, [filteredUtilisateurs, sortField, sortDirection]);
+
   const paginatedUtilisateurs = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredUtilisateurs.slice(start, start + pageSize);
-  }, [filteredUtilisateurs, currentPage, pageSize]);
+    return sortedUtilisateurs.slice(start, start + pageSize);
+  }, [sortedUtilisateurs, currentPage, pageSize]);
 
   // Supprimer un utilisateur
   const handleDeleteUser = async (u) => {
     if (currentUser && currentUser.id === u.id) {
-      toast.warning('Vous ne pouvez pas supprimer votre propre compte administrateur actuellement connecté.');
+      showInfo('Vous ne pouvez pas supprimer votre propre compte administrateur actuellement connecté.');
       return;
     }
 
@@ -102,12 +157,15 @@ export default function UtilisateursTab({
     }
 
     try {
+      setDeletingId(u.id);
       await utilisateursApi.delete(u.id);
-      toast.success(`Utilisateur « ${u.nom} » supprimé avec succès.`);
+      showSuccess(`Utilisateur « ${u.nom} » supprimé avec succès.`);
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error('Erreur suppression utilisateur:', err);
-      toast.error(err.response?.data?.message || 'Erreur lors de la suppression de l\'utilisateur.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la suppression de l\'utilisateur.');
+      showError(msg);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -313,11 +371,21 @@ export default function UtilisateursTab({
           <table className="aeropub-table">
             <thead>
               <tr className="table-head-row-indigo">
-                <th className="table-head-cell">ID</th>
-                <th className="table-head-cell">Nom de l'Utilisateur</th>
-                <th className="table-head-cell">Email</th>
-                <th className="table-head-cell">Rôle & Droits</th>
-                <th className="table-head-cell" style={{ textAlign: 'center' }}>Statut</th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('id')} style={{ cursor: 'pointer' }}>
+                  ID {renderSortIcon('id')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('nom')} style={{ cursor: 'pointer' }}>
+                  Nom de l'Utilisateur {renderSortIcon('nom')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
+                  Email {renderSortIcon('email')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('nom_role')} style={{ cursor: 'pointer' }}>
+                  Rôle & Droits {renderSortIcon('nom_role')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('actif')} style={{ textAlign: 'center', cursor: 'pointer' }}>
+                  Statut {renderSortIcon('actif')}
+                </th>
                 <th className="table-head-cell" style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
@@ -410,11 +478,11 @@ export default function UtilisateursTab({
                           type="button"
                           className="client-action-btn btn-delete"
                           title="Supprimer cet utilisateur"
-                          disabled={isCurrent}
-                          style={isCurrent ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+                          disabled={isCurrent || deletingId === u.id}
+                          style={isCurrent || deletingId === u.id ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
                           onClick={() => handleDeleteUser(u)}
                         >
-                          <Trash2 size={14} />
+                          {deletingId === u.id ? <Loader2 size={14} className="btn-spinner" /> : <Trash2 size={14} />}
                         </button>
                       </div>
                     </td>
@@ -429,7 +497,7 @@ export default function UtilisateursTab({
       {/* Pagination pour les utilisateurs */}
       <Pagination
         currentPage={currentPage}
-        totalItems={filteredUtilisateurs.length}
+        totalItems={sortedUtilisateurs.length}
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}

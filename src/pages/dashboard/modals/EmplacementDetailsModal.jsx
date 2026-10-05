@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Edit3, Trash2, MapPin, Layers, Monitor, Info, CheckCircle2, AlertCircle, History, Clock } from 'lucide-react';
+import { X, Edit3, Trash2, MapPin, Layers, Monitor, Info, CheckCircle2, AlertCircle, History, Clock, Loader2 } from 'lucide-react';
 import { emplacementsApi, typeSupportsApi, categoriesApi, zonesApi, typeEtatSupportApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function EmplacementDetailsModal({
   emplacement,
@@ -11,8 +13,16 @@ export default function EmplacementDetailsModal({
   categories = [],
   zones = []
 }) {
+  const { showSuccess, showError, scrollToTop } = useFeedback();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
+
+  useEffect(() => {
+    if (modalError) {
+      scrollToTop();
+    }
+  }, [modalError, scrollToTop]);
 
   // Listes déroulantes avec chargement dynamique si non fournies
   const [typesList, setTypesList] = useState(typeSupports);
@@ -84,14 +94,15 @@ export default function EmplacementDetailsModal({
     const confirmed = window.confirm(`Êtes-vous sûr de supprimer le support "${emplacement.reference}" ?`);
     if (!confirmed) return;
     setLoading(true);
+    setModalError('');
     try {
       await emplacementsApi.delete(emplacement.reference);
-      alert(`Support "${emplacement.reference}" supprimé avec succès.`);
+      showSuccess(`Support "${emplacement.reference}" supprimé avec succès.`);
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error('Erreur de suppression:', err);
-      alert(`Impossible de supprimer le support "${emplacement.reference}".`);
+      const msg = sanitizeUserError(err, `Impossible de supprimer le support "${emplacement.reference}".`);
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -101,6 +112,7 @@ export default function EmplacementDetailsModal({
   const handleSaveUpdate = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setModalError('');
     try {
       await emplacementsApi.update(emplacement.reference, {
         id_type: formData.id_type ? parseInt(formData.id_type, 10) : undefined,
@@ -112,13 +124,13 @@ export default function EmplacementDetailsModal({
         caracteristiques: formData.caracteristiques,
         observation: formData.observation
       });
-      alert(`Support "${emplacement.reference}" mis à jour avec succès !`);
+      showSuccess(`Support "${emplacement.reference}" mis à jour avec succès !`);
       setIsEditing(false);
       onClose();
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error('Erreur de mise à jour:', err);
-      alert('Erreur lors de la mise à jour du support.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la mise à jour du support.');
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -162,6 +174,13 @@ export default function EmplacementDetailsModal({
             <X size={18} />
           </button>
         </div>
+
+        {modalError && (
+          <div className="modal-error-box">
+            <AlertCircle size={16} />
+            <span>{modalError}</span>
+          </div>
+        )}
 
         {/* Période d'état active si présente */}
         {(emplacement.date_debut_etat || emplacement.date_etat) && (
@@ -306,9 +325,10 @@ export default function EmplacementDetailsModal({
                 type="submit"
                 className="pill-btn active"
                 disabled={loading}
-                style={{ padding: '0.65rem 1.4rem' }}
+                style={{ padding: '0.65rem 1.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
               >
-                {loading ? 'Enregistrement...' : '💾 Sauvegarder'}
+                {loading && <Loader2 size={15} className="btn-spinner" />}
+                <span>{loading ? 'Enregistrement...' : '💾 Sauvegarder'}</span>
               </button>
             </div>
           </form>
@@ -440,8 +460,8 @@ export default function EmplacementDetailsModal({
                 onClick={handleDelete}
                 disabled={loading}
               >
-                <Trash2 size={15} />
-                <span>Supprimer</span>
+                {loading ? <Loader2 size={15} className="btn-spinner" /> : <Trash2 size={15} />}
+                <span>{loading ? 'Suppression...' : 'Supprimer'}</span>
               </button>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <button

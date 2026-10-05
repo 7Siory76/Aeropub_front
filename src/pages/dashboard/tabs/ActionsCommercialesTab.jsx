@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Bell, Calendar, User, Search, RotateCcw, Filter, Send, Settings, Mail, Check, X, Loader2 } from 'lucide-react';
+import { Bell, Calendar, User, Search, RotateCcw, Filter, Send, Settings, Mail, Check, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import { actionsCommercialesApi } from '../../../api/actionsCommercialesApi';
 import { modeleCourrielApi } from '../../../api/modeleCourrielApi';
 
@@ -14,6 +15,7 @@ export default function ActionsCommercialesTab({
   onRefresh
 }) {
   const { user } = useAuth();
+  const { showSuccess, showError, showInfo } = useFeedback();
 
   // Permissions RBAC (Module 3)
   const canSendManualEmail = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
@@ -25,8 +27,28 @@ export default function ActionsCommercialesTab({
   const [selectedEmailStatus, setSelectedEmailStatus] = useState('all');
   const [showOnlyJ30, setShowOnlyJ30] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState('date_action');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [sendingRef, setSendingRef] = useState(null);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={13} className="table-head-sort-icon" style={{ opacity: 0.35, marginLeft: 4 }} />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp size={13} className="table-head-sort-icon" style={{ color: '#38bdf8', marginLeft: 4 }} />
+      : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: '#38bdf8', marginLeft: 4 }} />;
+  };
 
   // État du modèle d'email par défaut (Table Modele_Courriel)
   const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -66,10 +88,11 @@ export default function ActionsCommercialesTab({
         sujet: emailTemplate.sujet,
         corps: emailTemplate.corps
       });
-      toast.success('Modèle de courriel mis à jour avec succès dans la base de données !');
+      showSuccess('Modèle de courriel mis à jour avec succès dans la base de données !');
       setShowTemplateModal(false);
     } catch (err) {
-      toast.error(`Erreur lors de la sauvegarde : ${err.response?.data?.message || err.message}`);
+      const msg = sanitizeUserError(err, 'Erreur lors de la sauvegarde du modèle.');
+      showError(msg);
     } finally {
       setSavingTemplate(false);
     }
@@ -80,13 +103,13 @@ export default function ActionsCommercialesTab({
     const client = targetInfo.nom_client || targetInfo.raison_sociale || 'Client';
 
     if (!ref) {
-      toast.warning("Impossible d'envoyer la relance : aucun contrat n'est associé à cette action.");
+      showInfo("Impossible d'envoyer la relance : aucun contrat n'est associé à cette action.");
       return;
     }
 
     // 1. Alerte de confirmation préalable avant envoi
     const confirmation = window.confirm(
-      `⚠️ Confirmation d'envoi de relance\n\nÊtes-vous sûr de vouloir envoyer un courriel de relance pour le contrat "${ref}" au client "${client}" ?`
+      `Confirmation d'envoi de relance\n\nÊtes-vous sûr de vouloir envoyer un courriel de relance pour le contrat "${ref}" au client "${client}" ?`
     );
 
     if (!confirmation) {
@@ -94,15 +117,14 @@ export default function ActionsCommercialesTab({
     }
 
     setSendingRef(ref);
-    const toastId = toast.loading(`Envoi du courriel de relance pour ${ref} en cours...`);
 
     try {
       const res = await actionsCommercialesApi.envoyerRelanceManuelle(ref, user?.id);
-      toast.success(res?.message || `✉️ Courriel de relance envoyé avec succès pour ${ref} (${client}) !`, { id: toastId });
+      showSuccess(res?.message || `Courriel de relance envoyé avec succès pour ${ref} (${client}).`);
       if (onRefresh) onRefresh();
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || "Erreur lors de l'envoi du courriel.";
-      toast.error(`❌ Échec de l'envoi : ${errorMsg}`, { id: toastId });
+      const errorMsg = sanitizeUserError(err, "Erreur lors de l'envoi du courriel.");
+      showError(`Échec de l'envoi : ${errorMsg}`);
     } finally {
       setSendingRef(null);
     }
@@ -231,10 +253,45 @@ export default function ActionsCommercialesTab({
     });
   }, [actions, alertJ30Abos, searchTerm, selectedTypeAction, selectedCommercial, selectedEmailStatus, showOnlyJ30]);
 
+  const sortedActions = useMemo(() => {
+    if (!sortField) return filteredActions;
+    return [...filteredActions].sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      if (sortField === 'date_action') {
+        valA = a.date_action ? new Date(a.date_action).getTime() : 0;
+        valB = b.date_action ? new Date(b.date_action).getTime() : 0;
+      } else if (sortField === 'type_action') {
+        valA = (a.type_action || '').toLowerCase();
+        valB = (b.type_action || '').toLowerCase();
+      } else if (sortField === 'nom_client') {
+        valA = (a.nom_client || '').toLowerCase();
+        valB = (b.nom_client || '').toLowerCase();
+      } else if (sortField === 'nom_commercial') {
+        valA = (a.nom_commercial || '').toLowerCase();
+        valB = (b.nom_commercial || '').toLowerCase();
+      } else if (sortField === 'description') {
+        valA = (a.description || '').toLowerCase();
+        valB = (b.description || '').toLowerCase();
+      } else if (sortField === 'statut_envoi_email') {
+        valA = (a.statut_envoi_email || '').toLowerCase();
+        valB = (b.statut_envoi_email || '').toLowerCase();
+      }
+
+      if (valA === valB) return 0;
+      if (valA === null || valA === undefined) return 1;
+      if (valB === null || valB === undefined) return -1;
+
+      const compare = typeof valA === 'string' ? valA.localeCompare(valB, 'fr') : (valA > valB ? 1 : -1);
+      return sortDirection === 'asc' ? compare : -compare;
+    });
+  }, [filteredActions, sortField, sortDirection]);
+
   const paginatedActions = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredActions.slice(start, start + pageSize);
-  }, [filteredActions, currentPage, pageSize]);
+    return sortedActions.slice(start, start + pageSize);
+  }, [sortedActions, currentPage, pageSize]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -312,7 +369,7 @@ export default function ActionsCommercialesTab({
                     disabled={sendingRef === abo.reference}
                     title="Envoyer l'e-mail de relance manuel au client"
                   >
-                    {sendingRef === abo.reference ? <Loader2 size={11} className="spin" /> : <Send size={11} />}
+                    {sendingRef === abo.reference ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
                     <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer relance manuelle'}</span>
                   </button>
                 )}
@@ -414,12 +471,24 @@ export default function ActionsCommercialesTab({
             <table className="aeropub-table">
               <thead>
                 <tr className="table-head-row-indigo">
-                  <th className="table-head-cell">Date</th>
-                  <th className="table-head-cell">Type d'Action</th>
-                  <th className="table-head-cell">Client & Contrat</th>
-                  <th className="table-head-cell">Commercial</th>
-                  <th className="table-head-cell">Description</th>
-                  <th className="table-head-cell" style={{ textAlign: 'center' }}>Statut Email</th>
+                  <th className="table-head-cell sortable" onClick={() => handleSort('date_action')} style={{ cursor: 'pointer' }}>
+                    Date {renderSortIcon('date_action')}
+                  </th>
+                  <th className="table-head-cell sortable" onClick={() => handleSort('type_action')} style={{ cursor: 'pointer' }}>
+                    Type d'Action {renderSortIcon('type_action')}
+                  </th>
+                  <th className="table-head-cell sortable" onClick={() => handleSort('nom_client')} style={{ cursor: 'pointer' }}>
+                    Client & Contrat {renderSortIcon('nom_client')}
+                  </th>
+                  <th className="table-head-cell sortable" onClick={() => handleSort('nom_commercial')} style={{ cursor: 'pointer' }}>
+                    Commercial {renderSortIcon('nom_commercial')}
+                  </th>
+                  <th className="table-head-cell sortable" onClick={() => handleSort('description')} style={{ cursor: 'pointer' }}>
+                    Description {renderSortIcon('description')}
+                  </th>
+                  <th className="table-head-cell sortable" onClick={() => handleSort('statut_envoi_email')} style={{ textAlign: 'center', cursor: 'pointer' }}>
+                    Statut Email {renderSortIcon('statut_envoi_email')}
+                  </th>
                   {canSendManualEmail && <th className="table-head-cell" style={{ textAlign: 'center' }}>Action</th>}
                 </tr>
               </thead>
@@ -478,8 +547,8 @@ export default function ActionsCommercialesTab({
                           disabled={(!act.id_abonnement && !act.reference) || sendingRef === (act.id_abonnement || act.reference)}
                           title={(!act.id_abonnement && !act.reference) ? "Aucun contrat associé à cette action" : "Renvoyer l'e-mail de relance manuel"}
                         >
-                          {sendingRef === (act.id_abonnement || act.reference) ? <Loader2 size={11} className="spin" /> : <Send size={11} />}
-                          <span>Renvoyer</span>
+                          {sendingRef === (act.id_abonnement || act.reference) ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
+                          <span>{sendingRef === (act.id_abonnement || act.reference) ? 'Envoi...' : 'Renvoyer'}</span>
                         </button>
                       </td>
                     )}
@@ -493,7 +562,7 @@ export default function ActionsCommercialesTab({
         {/* Pagination pour les actions commerciales */}
         <Pagination
           currentPage={currentPage}
-          totalItems={filteredActions.length}
+          totalItems={sortedActions.length}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
           onPageSizeChange={setPageSize}
@@ -640,7 +709,7 @@ export default function ActionsCommercialesTab({
                   disabled={savingTemplate}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
                 >
-                  {savingTemplate ? <Loader2 size={14} className="spin" /> : <Check size={14} />}
+                  {savingTemplate ? <Loader2 size={14} className="btn-spinner" /> : <Check size={14} />}
                   <span>{savingTemplate ? 'Enregistrement...' : 'Enregistrer le modèle'}</span>
                 </button>
               </div>

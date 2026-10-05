@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ExternalLink, Mail, MapPin, Building2, Search, RotateCcw, Plus, Edit3, Trash2 } from 'lucide-react';
+import { ExternalLink, Mail, MapPin, Building2, Search, RotateCcw, Plus, Edit3, Trash2, Loader2, ArrowUpDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import AddClientModal from '../modals/AddClientModal';
 import EditClientModal from '../modals/EditClientModal';
 import { clientsApi } from '../../../api';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
 
@@ -15,6 +16,7 @@ export default function ClientsTab({
   onSelectClient,
   onRefresh
 }) {
+  const { showSuccess, showError } = useFeedback();
   const { user } = useAuth();
 
   // Permissions RBAC (Module 2)
@@ -25,12 +27,14 @@ export default function ClientsTab({
   const [selectedEtat, setSelectedEtat] = useState('all');
   const [selectedSecteur, setSelectedSecteur] = useState('all');
   const [selectedAboStatus, setSelectedAboStatus] = useState('all');
+  const [sortBy, setSortBy] = useState('nom_asc');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
 
   // États pour les modales d'ajout et de modification
   const [showAddModal, setShowAddModal] = useState(false);
   const [clientToEdit, setClientToEdit] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -116,10 +120,38 @@ export default function ClientsTab({
     });
   }, [clients, abonnements, searchTerm, selectedEtat, selectedSecteur, selectedAboStatus]);
 
+  const sortedClients = useMemo(() => {
+    return [...filteredClients].sort((a, b) => {
+      const nameA = (a.raison_sociale || a.nom_client || '').toLowerCase();
+      const nameB = (b.raison_sociale || b.nom_client || '').toLowerCase();
+      const countA = getClientAboCount(a);
+      const countB = getClientAboCount(b);
+      const idA = Number(a.id) || 0;
+      const idB = Number(b.id) || 0;
+
+      switch (sortBy) {
+        case 'nom_asc':
+          return nameA.localeCompare(nameB, 'fr');
+        case 'nom_desc':
+          return nameB.localeCompare(nameA, 'fr');
+        case 'abos_desc':
+          return countB - countA;
+        case 'abos_asc':
+          return countA - countB;
+        case 'id_desc':
+          return idB - idA;
+        case 'id_asc':
+          return idA - idB;
+        default:
+          return 0;
+      }
+    });
+  }, [filteredClients, sortBy, abonnements]);
+
   const paginatedClients = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredClients.slice(start, start + pageSize);
-  }, [filteredClients, currentPage, pageSize]);
+    return sortedClients.slice(start, start + pageSize);
+  }, [sortedClients, currentPage, pageSize]);
 
   // Suppression d'un client avec confirmation
   const handleDeleteClient = async (cli) => {
@@ -128,13 +160,16 @@ export default function ClientsTab({
       return;
     }
 
+    setDeletingId(cli.id);
     try {
       await clientsApi.delete(cli.id);
-      toast.success(`Client « ${clientName} » supprimé avec succès.`);
+      showSuccess(`Client « ${clientName} » supprimé avec succès.`);
       if (onRefresh) onRefresh();
     } catch (err) {
-      console.error('Erreur suppression client:', err);
-      toast.error(err.response?.data?.message || 'Erreur lors de la suppression du client.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la suppression du client.');
+      showError(msg);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -199,6 +234,23 @@ export default function ClientsTab({
           </select>
         </div>
 
+        <div className="ts-filter-group">
+          <ArrowUpDown size={14} style={{ color: 'var(--text-muted)' }} />
+          <span>Tri :</span>
+          <select
+            className="ts-filter-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="nom_asc">Nom (A → Z)</option>
+            <option value="nom_desc">Nom (Z → A)</option>
+            <option value="abos_desc">Contrats (Plus → Moins)</option>
+            <option value="abos_asc">Contrats (Moins → Plus)</option>
+            <option value="id_desc">Plus récents</option>
+            <option value="id_asc">Plus anciens</option>
+          </select>
+        </div>
+
         {hasActiveFilters && (
           <button
             type="button"
@@ -212,7 +264,7 @@ export default function ClientsTab({
         )}
 
         <div className="ts-filter-badge-count">
-          {filteredClients.length} / {clients.length} client{clients.length > 1 ? 's' : ''}
+          {sortedClients.length} / {clients.length} client{clients.length > 1 ? 's' : ''}
         </div>
       </div>
 
@@ -293,12 +345,13 @@ export default function ClientsTab({
                         type="button"
                         className="client-action-btn btn-delete"
                         title="Supprimer ce client (Admin / Resp_Com)"
+                        disabled={deletingId === cli.id}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteClient(cli);
                         }}
                       >
-                        <Trash2 size={13} />
+                        {deletingId === cli.id ? <Loader2 size={13} className="btn-spinner" /> : <Trash2 size={13} />}
                       </button>
                     )}
                   </div>
@@ -325,10 +378,10 @@ export default function ClientsTab({
         )}
       </div>
 
-      {filteredClients.length > 0 && (
+      {sortedClients.length > 0 && (
         <Pagination
           currentPage={currentPage}
-          totalItems={filteredClients.length}
+          totalItems={sortedClients.length}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
           onPageSizeChange={setPageSize}

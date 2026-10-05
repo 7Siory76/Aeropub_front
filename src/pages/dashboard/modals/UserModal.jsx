@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Shield, User, Mail, Lock, Check } from 'lucide-react';
+import { X, Shield, User, Mail, Lock, Check, Loader2 } from 'lucide-react';
 import { utilisateursApi } from '../../../api';
-import { toast } from 'react-toastify';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import { getRoleGuide } from '../../../utils/rbac';
 
 export default function UserModal({ userToEdit, onClose, onRefresh }) {
+  const { showSuccess, navigateWithFeedback, scrollToTop } = useFeedback();
   const isEditing = Boolean(userToEdit);
   const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
   const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    if (modalError) {
+      scrollToTop();
+    }
+  }, [modalError, scrollToTop]);
   const [formData, setFormData] = useState({
     nom: '',
     email: '',
@@ -50,14 +59,15 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setModalError('');
 
     if (!formData.nom.trim() || !formData.email.trim()) {
-      toast.warning('Le nom et l\'adresse email sont obligatoires.');
+      setModalError('Le nom et l\'adresse email sont obligatoires.');
       return;
     }
 
     if (!isEditing && !formData.mot_de_passe) {
-      toast.warning('Veuillez définir un mot de passe initial pour ce nouvel utilisateur.');
+      setModalError('Veuillez définir un mot de passe initial pour ce nouvel utilisateur.');
       return;
     }
 
@@ -76,7 +86,8 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
         }
 
         await utilisateursApi.update(userToEdit.id, payload);
-        toast.success(`Utilisateur « ${formData.nom} » mis à jour avec succès (mot de passe haché) !`);
+        if (onRefresh) onRefresh();
+        showSuccess(`Utilisateur « ${formData.nom} » mis à jour avec succès !`);
       } else {
         await utilisateursApi.create({
           nom: formData.nom.trim(),
@@ -85,14 +96,14 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
           mot_de_passe: formData.mot_de_passe.trim(),
           actif: formData.actif
         });
-        toast.success(`Utilisateur « ${formData.nom} » créé avec succès !`);
+        if (onRefresh) onRefresh();
+        navigateWithFeedback('dashboard', 'utilisateurs', `Utilisateur « ${formData.nom} » créé avec succès !`);
       }
 
-      if (onRefresh) onRefresh();
       onClose();
     } catch (err) {
-      console.error('Erreur enregistrement utilisateur:', err);
-      toast.error(err.response?.data?.message || 'Erreur lors de l\'enregistrement de l\'utilisateur.');
+      const friendlyMsg = sanitizeUserError(err, 'Impossible d\'enregistrer cet utilisateur.');
+      setModalError(friendlyMsg);
     } finally {
       setLoading(false);
     }
@@ -109,7 +120,7 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
     <div className="modal-backdrop-portal" onClick={onClose}>
       <div
         className="glass-panel client-modal-box"
-        style={{ maxWidth: '560px', animation: 'scaleUp 0.25s ease' }}
+        style={{ maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -126,6 +137,12 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
             <X size={18} />
           </button>
         </div>
+
+        {modalError && (
+          <div className="modal-error-box">
+            <span>⚠️ {modalError}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', marginTop: '1.25rem' }}>
           {/* Nom complet */}
@@ -273,8 +290,17 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
               disabled={loading}
               style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              <Check size={16} />
-              <span>{loading ? 'Traitement...' : isEditing ? 'Mettre à jour' : 'Créer l\'utilisateur'}</span>
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="btn-spinner" />
+                  <span>{isEditing ? 'Mise à jour en cours...' : 'Création en cours...'}</span>
+                </>
+              ) : (
+                <>
+                  <Check size={16} />
+                  <span>{isEditing ? 'Mettre à jour' : "Créer l'utilisateur"}</span>
+                </>
+              )}
             </button>
           </div>
         </form>

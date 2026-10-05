@@ -57,8 +57,8 @@ export default function KpiHeroHeader({
             disabled={loading}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem' }}
           >
-            <RefreshCw size={15} className={loading ? 'spinner-icon' : ''} />
-            <span>Actualiser</span>
+            <RefreshCw size={15} className={loading ? 'btn-spinner' : ''} />
+            <span>{loading ? 'Actualisation...' : 'Actualiser'}</span>
           </button>
         )}
 

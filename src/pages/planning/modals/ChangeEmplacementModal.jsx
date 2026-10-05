@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { ChevronLeft, ChevronRight, ArrowLeftRight, Loader2 } from 'lucide-react';
 import { emplacementsApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 import './ChangeEmplacementModal.css';
 
 const PAGE_SIZE = 5;
@@ -14,6 +15,15 @@ export default function ChangeEmplacementModal({
   onClose,
   onSuccess
 }) {
+  const { showSuccess, showError, scrollToTop } = useFeedback();
+  const [modalFeedback, setModalFeedback] = useState(null);
+
+  useEffect(() => {
+    if (modalFeedback) {
+      scrollToTop();
+    }
+  }, [modalFeedback, scrollToTop]);
+
   // 1. Colonne de Gauche (Source)
   const [sourceAeroIndex, setSourceAeroIndex] = useState(0);
   const [sourceZoneIndex, setSourceZoneIndex] = useState(0);
@@ -173,7 +183,7 @@ export default function ChangeEmplacementModal({
     if (!ref) return;
 
     if (!targetZone) {
-      toast.error('❌ Veuillez sélectionner une zone cible à droite.');
+      setModalFeedback({ type: 'error', text: 'Veuillez sélectionner une zone cible à droite.' });
       return;
     }
 
@@ -217,7 +227,7 @@ export default function ChangeEmplacementModal({
     if (!ref) return;
 
     if (!sourceZone) {
-      toast.error('❌ Veuillez sélectionner une zone cible à gauche.');
+      setModalFeedback({ type: 'error', text: 'Veuillez sélectionner une zone cible à gauche.' });
       return;
     }
 
@@ -249,19 +259,21 @@ export default function ChangeEmplacementModal({
   const handleConfirmTransfer = async () => {
     if (!pendingTransfer || !pendingTransfer.toZone?.id) return;
     setLoading(true);
+    setModalFeedback(null);
 
     try {
       await emplacementsApi.update(pendingTransfer.reference, {
         id_zone: parseInt(pendingTransfer.toZone.id, 10)
       });
 
-      toast.success(`🎉 Support « ${pendingTransfer.reference} » déplacé vers « ${pendingTransfer.toZone.nom_zone} » !`);
+      const successMsg = `Support « ${pendingTransfer.reference} » déplacé vers « ${pendingTransfer.toZone.nom_zone} » avec succès !`;
+      showSuccess(successMsg);
+      setModalFeedback({ type: 'success', text: successMsg });
       setPendingTransfer(null);
       if (onSuccess) onSuccess();
     } catch (err) {
-      console.error('Erreur lors du déplacement du support:', err);
-      const msg = err.response?.data?.message || 'Erreur lors du changement d\'emplacement.';
-      toast.error(`❌ ${msg}`);
+      const msg = sanitizeUserError(err, 'Erreur lors du changement d\'emplacement.');
+      setModalFeedback({ type: 'error', text: msg });
     } finally {
       setLoading(false);
     }
@@ -288,6 +300,27 @@ export default function ChangeEmplacementModal({
             Annuler
           </button>
         </div>
+
+        {modalFeedback && (
+          <div
+            className={modalFeedback.type === 'error' ? 'modal-error-box' : ''}
+            style={{
+              margin: '0.75rem 1.5rem 0',
+              padding: '0.65rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.875rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: modalFeedback.type === 'error' ? undefined : 'rgba(16, 185, 129, 0.12)',
+              border: modalFeedback.type === 'error' ? undefined : '1px solid rgba(16, 185, 129, 0.25)',
+              color: modalFeedback.type === 'error' ? undefined : '#10b981'
+            }}
+          >
+            <span>{modalFeedback.text}</span>
+            <button type="button" onClick={() => setModalFeedback(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontWeight: 'bold' }}>✕</button>
+          </div>
+        )}
 
         {/* GRILLE 2 COLONNES KANBAN */}
         <div className="kanban-transfer-grid">
@@ -563,8 +596,16 @@ export default function ChangeEmplacementModal({
                   className="btn-confirm-yes"
                   onClick={handleConfirmTransfer}
                   disabled={loading}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'center' }}
                 >
-                  {loading ? 'Enregistrement...' : 'OUI'}
+                  {loading ? (
+                    <>
+                      <Loader2 size={16} className="btn-spinner" />
+                      <span>Enregistrement...</span>
+                    </>
+                  ) : (
+                    'OUI'
+                  )}
                 </button>
               </div>
             </div>

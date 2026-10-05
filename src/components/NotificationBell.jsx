@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Bell, CheckCheck, PlusCircle, Edit, Trash2,
-    RefreshCw, Layers, FileText, Check
+    RefreshCw, Layers, FileText, Check, Loader2
 } from 'lucide-react';
 import { journalNotificationApi } from '../api';
 import './NotificationBell.css';
@@ -22,6 +22,8 @@ export default function NotificationBell() {
     const [unreadCount, setUnreadCount] = useState(0);
     const [selectedCategory, setSelectedCategory] = useState('TOUTES');
     const [loading, setLoading] = useState(false);
+    const [markingAll, setMarkingAll] = useState(false);
+    const [markingId, setMarkingId] = useState(null);
     const dropdownRef = useRef(null);
 
     // Charger les notifications
@@ -59,21 +61,27 @@ export default function NotificationBell() {
     const handleMarkAsRead = async (id, e) => {
         e.stopPropagation();
         try {
+            setMarkingId(id);
             await journalNotificationApi.markAsRead(id);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, lu_par_admin: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (err) {
             console.error(err);
+        } finally {
+            setMarkingId(null);
         }
     };
 
     const handleMarkAllAsRead = async () => {
         try {
+            setMarkingAll(true);
             await journalNotificationApi.markAllAsRead();
             setNotifications(prev => prev.map(n => ({ ...n, lu_par_admin: true })));
             setUnreadCount(0);
         } catch (err) {
             console.error(err);
+        } finally {
+            setMarkingAll(false);
         }
     };
 
@@ -139,10 +147,11 @@ export default function NotificationBell() {
                                 type="button"
                                 className="btn-mark-all"
                                 onClick={handleMarkAllAsRead}
+                                disabled={markingAll}
                                 title="Tout marquer comme lu"
                             >
-                                <CheckCheck size={14} />
-                                <span>Tout marquer lu</span>
+                                {markingAll ? <Loader2 size={13} className="btn-spinner" /> : <CheckCheck size={14} />}
+                                <span>{markingAll ? 'Traitement...' : 'Tout marquer lu'}</span>
                             </button>
                         )}
                     </div>
@@ -193,9 +202,10 @@ export default function NotificationBell() {
                                             type="button"
                                             className="btn-mark-one"
                                             title="Marquer comme lu"
+                                            disabled={markingId === n.id}
                                             onClick={(e) => handleMarkAsRead(n.id, e)}
                                         >
-                                            <Check size={13} />
+                                            {markingId === n.id ? <Loader2 size={13} className="btn-spinner" /> : <Check size={13} />}
                                         </button>
                                     )}
                                 </div>

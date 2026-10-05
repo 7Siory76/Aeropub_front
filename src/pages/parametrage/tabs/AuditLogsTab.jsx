@@ -1,15 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { journalNotificationApi } from '../../../api';
-import { ScrollText, RefreshCw, CheckCheck, Search, Clock, Eye } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { ScrollText, RefreshCw, CheckCheck, Search, Clock, Eye, Loader2, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
+import Pagination from '../../../components/Pagination';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function AuditLogsTab({ onCountChange }) {
+  const { showSuccess, showError } = useFeedback();
   const [auditLogs, setAuditLogs] = useState([]);
   const [loadingAudit, setLoadingAudit] = useState(false);
   const [auditCategory, setAuditCategory] = useState('TOUTES');
   const [auditSearch, setAuditSearch] = useState('');
   const [auditNonLu, setAuditNonLu] = useState(false);
   const [expandedLogId, setExpandedLogId] = useState(null);
+  const [markingAll, setMarkingAll] = useState(false);
+  const [markingId, setMarkingId] = useState(null);
+
+  // Pagination et Tri (par défaut 10 éléments par page)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState('date_action');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const fetchAuditLogs = async () => {
     setLoadingAudit(true);
@@ -19,8 +30,8 @@ export default function AuditLogsTab({ onCountChange }) {
       setAuditLogs(logs);
       if (onCountChange) onCountChange(logs.length);
     } catch (err) {
-      console.error('Erreur chargement journal audit:', err);
-      toast.error('❌ Impossible de charger le journal technique.');
+      const msg = sanitizeUserError(err, 'Impossible de charger le journal technique.');
+      showError(msg);
       setAuditLogs([]);
     } finally {
       setLoadingAudit(false);
@@ -32,24 +43,30 @@ export default function AuditLogsTab({ onCountChange }) {
   }, [auditCategory, auditNonLu]);
 
   const handleMarkAsRead = async (id) => {
+    setMarkingId(id);
     try {
       await journalNotificationApi.markAsRead(id);
       setAuditLogs(prev => prev.map(l => l.id === id ? { ...l, lu_par_admin: true } : l));
-      toast.success('Action marquée comme lue.');
+      showSuccess('Action marquée comme lue.');
     } catch (err) {
-      console.error(err);
-      toast.error('Erreur lors de la mise à jour.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la mise à jour.');
+      showError(msg);
+    } finally {
+      setMarkingId(null);
     }
   };
 
   const handleMarkAllAsRead = async () => {
+    setMarkingAll(true);
     try {
       await journalNotificationApi.markAllAsRead();
       setAuditLogs(prev => prev.map(l => ({ ...l, lu_par_admin: true })));
-      toast.success('Toutes les actions ont été marquées comme lues.');
+      showSuccess('Toutes les actions ont été marquées comme lues.');
     } catch (err) {
-      console.error(err);
-      toast.error('Erreur lors de la mise à jour.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la mise à jour.');
+      showError(msg);
+    } finally {
+      setMarkingAll(false);
     }
   };
 
@@ -57,16 +74,82 @@ export default function AuditLogsTab({ onCountChange }) {
     const list = Array.isArray(auditLogs) ? auditLogs : [];
     const q = auditSearch.trim().toLowerCase();
     return list.filter(log => {
-      if (!q) return true;
-      return (
-        (log.message_notification || '').toLowerCase().includes(q) ||
-        (log.nom_utilisateur || '').toLowerCase().includes(q) ||
-        (log.reference_entite || '').toLowerCase().includes(q) ||
-        (log.entite_concernee || '').toLowerCase().includes(q) ||
-        (log.categorie_action || '').toLowerCase().includes(q)
-      );
+      if (q) {
+        const match =
+          (log.message_notification || '').toLowerCase().includes(q) ||
+          (log.nom_utilisateur || '').toLowerCase().includes(q) ||
+          (log.reference_entite || '').toLowerCase().includes(q) ||
+          (log.entite_concernee || '').toLowerCase().includes(q) ||
+          (log.categorie_action || '').toLowerCase().includes(q);
+        if (!match) return false;
+      }
+
+      if (auditCategory && auditCategory !== 'TOUTES' && auditCategory !== 'all') {
+        if ((log.categorie_action || '').toUpperCase() !== auditCategory.toUpperCase()) {
+          return false;
+        }
+      }
+
+      if (auditNonLu) {
+        if (log.lu_par_admin) return false;
+      }
+
+      return true;
     });
-  }, [auditLogs, auditSearch]);
+  }, [auditLogs, auditSearch, auditCategory, auditNonLu]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [auditCategory, auditSearch, auditNonLu]);
+
+  const sortedAuditLogs = useMemo(() => {
+    const list = [...filteredAuditLogs];
+    if (!sortField) return list;
+    return list.sort((a, b) => {
+      let valA = a[sortField];
+      let valB = b[sortField];
+
+      if (sortField === 'date_action') {
+        const timeA = valA ? new Date(valA).getTime() : 0;
+        const timeB = valB ? new Date(valB).getTime() : 0;
+        return sortDirection === 'asc' ? timeA - timeB : timeB - timeA;
+      }
+
+      if (sortField === 'lu_par_admin') {
+        const numA = valA ? 1 : 0;
+        const numB = valB ? 1 : 0;
+        return sortDirection === 'asc' ? numA - numB : numB - numA;
+      }
+
+      const strA = String(valA || '').toLowerCase();
+      const strB = String(valB || '').toLowerCase();
+      return sortDirection === 'asc' ? strA.localeCompare(strB, 'fr') : strB.localeCompare(strA, 'fr');
+    });
+  }, [filteredAuditLogs, sortField, sortDirection]);
+
+  const paginatedAuditLogs = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return sortedAuditLogs.slice(startIndex, startIndex + pageSize);
+  }, [sortedAuditLogs, currentPage, pageSize]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={12} className="table-head-sort-icon" style={{ opacity: 0.35 }} />;
+    }
+    return sortDirection === 'asc'
+      ? <ArrowUp size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />
+      : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />;
+  };
 
   const getAuditCategoryBadge = (cat) => {
     const c = String(cat || '').toUpperCase();
@@ -107,10 +190,11 @@ export default function AuditLogsTab({ onCountChange }) {
               type="button"
               className="btn-secondary"
               onClick={handleMarkAllAsRead}
+              disabled={markingAll}
               style={{ fontSize: '0.82rem', padding: '0.45rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              <CheckCheck size={15} />
-              <span>Tout marquer comme lu</span>
+              {markingAll ? <Loader2 size={15} className="btn-spinner" /> : <CheckCheck size={15} />}
+              <span>{markingAll ? 'Traitement...' : 'Tout marquer comme lu'}</span>
             </button>
           </div>
         </div>
@@ -144,6 +228,7 @@ export default function AuditLogsTab({ onCountChange }) {
               <option value="RENOUVELLEMENT">Renouvellement</option>
               <option value="ECHEANCE">Alerte Échéance</option>
               <option value="EMAIL_ECHEANCE">Email Échéance</option>
+              <option value="EMAIL_MANUEL_RELANCE">Email Manuel Relance</option>
               <option value="IMPORT">Importation</option>
             </select>
           </div>
@@ -157,6 +242,23 @@ export default function AuditLogsTab({ onCountChange }) {
             />
             <span>Non lues uniquement</span>
           </label>
+
+          {(auditSearch.trim() !== '' || auditCategory !== 'TOUTES' || auditNonLu) && (
+            <button
+              type="button"
+              className="ts-reset-btn"
+              onClick={() => {
+                setAuditSearch('');
+                setAuditCategory('TOUTES');
+                setAuditNonLu(false);
+                setCurrentPage(1);
+              }}
+              title="Réinitialiser tous les filtres"
+            >
+              <RotateCcw size={13} />
+              <span>Réinitialiser</span>
+            </button>
+          )}
 
           <div className="ts-filter-badge-count" style={{ marginLeft: 'auto' }}>
             {filteredAuditLogs.length} entrée{filteredAuditLogs.length > 1 ? 's' : ''}
@@ -173,21 +275,34 @@ export default function AuditLogsTab({ onCountChange }) {
       ) : filteredAuditLogs.length === 0 ? (
         <div className="empty-msg">Aucune entrée d'audit enregistrée correspondant à ces critères.</div>
       ) : (
+        <>
         <div className="aeropub-table-wrapper">
           <table className="aeropub-table">
             <thead>
               <tr className="table-head-row-indigo">
-                <th className="table-head-cell" style={{ width: '130px' }}>Date & Heure</th>
-                <th className="table-head-cell" style={{ width: '120px' }}>Catégorie</th>
-                <th className="table-head-cell">Entité / Réf</th>
-                <th className="table-head-cell">Auteur</th>
-                <th className="table-head-cell">Message d'audit</th>
+                <th className="table-head-cell sortable" style={{ width: '145px' }} onClick={() => handleSort('date_action')}>
+                  Date & Heure {renderSortIcon('date_action')}
+                </th>
+                <th className="table-head-cell sortable" style={{ width: '130px' }} onClick={() => handleSort('categorie_action')}>
+                  Catégorie {renderSortIcon('categorie_action')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('entite_concernee')}>
+                  Entité / Réf {renderSortIcon('entite_concernee')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('nom_utilisateur')}>
+                  Auteur {renderSortIcon('nom_utilisateur')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('message_notification')}>
+                  Message d'audit {renderSortIcon('message_notification')}
+                </th>
                 <th className="table-head-cell" style={{ textAlign: 'center', width: '90px' }}>Détails</th>
-                <th className="table-head-cell" style={{ textAlign: 'center', width: '110px' }}>Statut</th>
+                <th className="table-head-cell sortable" style={{ textAlign: 'center', width: '110px' }} onClick={() => handleSort('lu_par_admin')}>
+                  Statut {renderSortIcon('lu_par_admin')}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {filteredAuditLogs.map((log) => {
+              {paginatedAuditLogs.map((log) => {
                 const badgeStyle = getAuditCategoryBadge(log.categorie_action);
                 const isExpanded = expandedLogId === log.id;
                 return (
@@ -250,11 +365,13 @@ export default function AuditLogsTab({ onCountChange }) {
                           <button
                             type="button"
                             className="pill-btn active"
-                            style={{ fontSize: '0.72rem', padding: '0.2rem 0.55rem' }}
+                            style={{ fontSize: '0.72rem', padding: '0.2rem 0.55rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                             onClick={() => handleMarkAsRead(log.id)}
+                            disabled={markingId === log.id}
                             title="Marquer comme lu"
                           >
-                            Marquer lu
+                            {markingId === log.id && <Loader2 size={11} className="btn-spinner" />}
+                            <span>{markingId === log.id ? 'En cours...' : 'Marquer lu'}</span>
                           </button>
                         )}
                       </td>
@@ -289,6 +406,14 @@ export default function AuditLogsTab({ onCountChange }) {
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalItems={sortedAuditLogs.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+        />
+        </>
       )}
     </>
   );

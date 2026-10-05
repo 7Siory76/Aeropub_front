@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, PlusCircle, Check } from 'lucide-react';
+import { X, Plus, PlusCircle, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { emplacementsApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function AddEmplacementModal({
   onClose,
@@ -10,7 +12,15 @@ export default function AddEmplacementModal({
   categories = [],
   zones = []
 }) {
+  const { navigateWithFeedback, scrollToTop } = useFeedback();
   const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
+
+  useEffect(() => {
+    if (modalError) {
+      scrollToTop();
+    }
+  }, [modalError, scrollToTop]);
   const [formData, setFormData] = useState({
     reference: '',
     id_type: typeSupports[0]?.id || 1,
@@ -23,15 +33,17 @@ export default function AddEmplacementModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.reference.trim()) {
-      alert('Veuillez saisir une référence unique (ex: 4A3, NLB2, A2...).');
+    setModalError('');
+    const cleanRef = formData.reference.trim();
+    if (!cleanRef) {
+      setModalError('Veuillez saisir une référence unique (ex: 4A3, NLB2, A2...).');
       return;
     }
 
     setLoading(true);
     try {
       await emplacementsApi.create({
-        reference: formData.reference.trim().toUpperCase(),
+        reference: cleanRef.toUpperCase(),
         id_type: parseInt(formData.id_type, 10),
         id_categorie: parseInt(formData.id_categorie, 10),
         id_zone: parseInt(formData.id_zone, 10),
@@ -41,12 +53,12 @@ export default function AddEmplacementModal({
         observation: formData.observation.trim() || null
       });
 
-      alert(`✅ Support "${formData.reference}" créé avec succès !`);
       onClose();
       if (onRefresh) onRefresh();
+      navigateWithFeedback('dashboard', 'emplacements', `Support "${cleanRef.toUpperCase()}" créé avec succès !`);
     } catch (err) {
-      console.error('Erreur lors de la création du support:', err);
-      alert('❌ Erreur lors de la création du support. La référence existe peut-être déjà.');
+      const msg = sanitizeUserError(err, 'Erreur lors de la création du support. La référence existe peut-être déjà.');
+      setModalError(msg);
     } finally {
       setLoading(false);
     }
@@ -56,7 +68,7 @@ export default function AddEmplacementModal({
     <div className="modal-backdrop-portal" onClick={onClose}>
       <div
         className="glass-panel client-modal-box"
-        style={{ maxWidth: '620px', animation: 'scaleUp 0.25s ease' }}
+        style={{ maxWidth: '620px', maxHeight: '90vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* En-tête de la Modale */}
@@ -74,6 +86,13 @@ export default function AddEmplacementModal({
             <X size={18} />
           </button>
         </div>
+
+        {modalError && (
+          <div className="modal-error-box">
+            <AlertCircle size={16} />
+            <span>{modalError}</span>
+          </div>
+        )}
 
         {/* Formulaire de création */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1.25rem' }}>
@@ -196,7 +215,12 @@ export default function AddEmplacementModal({
               disabled={loading}
               style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', padding: '0.65rem 1.4rem' }}
             >
-              {loading ? 'Création en cours...' : (
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="btn-spinner" />
+                  <span>Création en cours...</span>
+                </>
+              ) : (
                 <>
                   <Check size={16} />
                   <span>Enregistrer le Support</span>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Search, RotateCcw } from 'lucide-react';
+import { Plus, Search, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 
 export default function EmplacementsTab({
@@ -19,7 +19,9 @@ export default function EmplacementsTab({
   const [selectedZone, setSelectedZone] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState('reference');
+  const [sortDirection, setSortDirection] = useState('asc');
 
   // Synchronisation avec la recherche globale
   useEffect(() => {
@@ -152,11 +154,71 @@ export default function EmplacementsTab({
     });
   }, [emplacements, searchTerm, selectedType, selectedCategory, selectedAeroport, selectedZone, selectedStatus]);
 
+  // Tri des emplacements
+  const sortedEmplacements = useMemo(() => {
+    const list = [...filteredEmplacements];
+    if (!sortField) return list;
+    return list.sort((a, b) => {
+      let valA, valB;
+      switch (sortField) {
+        case 'reference':
+          valA = a.reference || '';
+          valB = b.reference || '';
+          break;
+        case 'type':
+          valA = a.nom_type_support || a.nom_type || '';
+          valB = b.nom_type_support || b.nom_type || '';
+          break;
+        case 'categorie':
+          valA = a.nom_categorie || '';
+          valB = b.nom_categorie || '';
+          break;
+        case 'zone':
+          valA = a.nom_zone || a.nom_lieu || '';
+          valB = b.nom_zone || b.nom_lieu || '';
+          break;
+        case 'caracteristiques':
+          valA = a.caracteristiques || '';
+          valB = b.caracteristiques || '';
+          break;
+        case 'statut':
+          valA = getStatusSupport(a);
+          valB = getStatusSupport(b);
+          break;
+        default:
+          valA = a[sortField] || '';
+          valB = b[sortField] || '';
+      }
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
+      return sortDirection === 'asc' ? strA.localeCompare(strB, 'fr') : strB.localeCompare(strA, 'fr');
+    });
+  }, [filteredEmplacements, sortField, sortDirection]);
+
   // Découpage par pagination
   const paginatedEmplacements = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
-    return filteredEmplacements.slice(start, start + pageSize);
-  }, [filteredEmplacements, currentPage, pageSize]);
+    return sortedEmplacements.slice(start, start + pageSize);
+  }, [sortedEmplacements, currentPage, pageSize]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={12} className="table-head-sort-icon" style={{ opacity: 0.35 }} />;
+    }
+    return sortDirection === 'asc'
+      ? <ArrowUp size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />
+      : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />;
+  };
 
   return (
     <div>
@@ -286,12 +348,24 @@ export default function EmplacementsTab({
           <table className="aeropub-table">
             <thead>
               <tr className="table-head-row-indigo">
-                <th className="table-head-cell">Référence</th>
-                <th className="table-head-cell">Type de Support</th>
-                <th className="table-head-cell">Catégorie</th>
-                <th className="table-head-cell">Zone & Aéroport</th>
-                <th className="table-head-cell">Caractéristiques</th>
-                <th className="table-head-cell" style={{ textAlign: 'center' }}>État / Statut</th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('reference')}>
+                  Référence {renderSortIcon('reference')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('type')}>
+                  Type de Support {renderSortIcon('type')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('categorie')}>
+                  Catégorie {renderSortIcon('categorie')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('zone')}>
+                  Zone & Aéroport {renderSortIcon('zone')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('caracteristiques')}>
+                  Caractéristiques {renderSortIcon('caracteristiques')}
+                </th>
+                <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('statut')}>
+                  État / Statut {renderSortIcon('statut')}
+                </th>
                 <th className="table-head-cell">Observation</th>
               </tr>
             </thead>
@@ -339,7 +413,7 @@ export default function EmplacementsTab({
       {/* Pagination pour les supports */}
       <Pagination
         currentPage={currentPage}
-        totalItems={filteredEmplacements.length}
+        totalItems={sortedEmplacements.length}
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}

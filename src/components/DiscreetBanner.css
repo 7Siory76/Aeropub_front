@@ -1,0 +1,92 @@
+/* Bannière d'alerte et de feedback discrète (remplace les popups envahissants) */
+.discreet-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: discreetSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 1rem;
+  z-index: 1000;
+}
+
+@keyframes discreetSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.discreet-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.discreet-banner-icon {
+  flex-shrink: 0;
+}
+
+.discreet-banner-text {
+  line-height: 1.4;
+}
+
+.discreet-banner-success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+.discreet-banner-success .discreet-banner-icon {
+  color: #10b981;
+}
+
+.discreet-banner-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+.discreet-banner-error .discreet-banner-icon {
+  color: #ef4444;
+}
+
+.discreet-banner-info {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+}
+.discreet-banner-info .discreet-banner-icon {
+  color: #38bdf8;
+}
+
+.discreet-banner-close {
+  background: transparent;
+  border: none;
+  color: currentColor;
+  opacity: 0.65;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: opacity 0.2s, background 0.2s;
+  margin-left: 0.75rem;
+}
+
+.discreet-banner-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+}
