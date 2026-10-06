@@ -6,6 +6,7 @@ import api from './client';
 export const clientsApi = {
   getAll: () => api.get('/clients').then(res => res.data.data),
   getById: (id) => api.get(`/clients/${id}`).then(res => res.data.data),
+  getContacts: (id) => api.get(`/clients/${id}/contacts`).then(res => res.data.data),
   create: (data) => api.post('/clients', data).then(res => res.data.data),
   update: (id, data) => api.put(`/clients/${id}`, data).then(res => res.data.data),
   delete: (id) => api.delete(`/clients/${id}`).then(res => res.data.data),

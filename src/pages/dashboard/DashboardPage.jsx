@@ -11,7 +11,8 @@ import {
   typeSupportsApi,
   utilisateursApi,
   actionsCommercialesApi,
-  typeStatutAbonnementApi
+  typeStatutAbonnementApi,
+  typeEtatSupportApi
 } from '../../api';
 import {
   Loader2
@@ -58,6 +59,7 @@ export default function DashboardPage({
   const [typeSupports, setTypeSupports] = useState([]);
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [actionsCommerciales, setActionsCommerciales] = useState([]);
+  const [typeEtatsSupport, setTypeEtatsSupport] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [selectedClientModal, setSelectedClientModal] = useState(null);
@@ -82,7 +84,8 @@ export default function DashboardPage({
         fmts,
         ts,
         users,
-        acts
+        acts,
+        etats
       ] = await Promise.all([
         emplacementsApi.getAll().catch(() => []),
         abonnementsApi.getAll().catch(() => []),
@@ -95,7 +98,8 @@ export default function DashboardPage({
         formatsApi.getAll().catch(() => []),
         typeSupportsApi.getAll().catch(() => []),
         utilisateursApi.getAll().catch(() => []),
-        actionsCommercialesApi.getAll().catch(() => [])
+        actionsCommercialesApi.getAll().catch(() => []),
+        typeEtatSupportApi.getAll().catch(() => [])
       ]);
 
       setEmplacements(emps || []);
@@ -110,6 +114,7 @@ export default function DashboardPage({
       setTypeSupports(ts || []);
       setUtilisateurs(users || []);
       setActionsCommerciales(acts || []);
+      setTypeEtatsSupport(etats || []);
 
       if (onCountsLoaded) {
         onCountsLoaded({
@@ -139,12 +144,7 @@ export default function DashboardPage({
 
   return (
     <>
-      {setSearchQuery && (
-        <HeroBanner
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
-      )}
+      <HeroBanner activeTab={activeTab} />
 
       <section className="glass-panel dashboard-panel">
 
@@ -163,6 +163,7 @@ export default function DashboardPage({
                 categories={categories}
                 zones={zones}
                 aeroports={aeroports}
+                typeEtats={typeEtatsSupport}
                 initialSearchQuery={searchQuery}
                 onSelectEmplacement={(emp) => setSelectedEmplacementModal(emp)}
                 onAddEmplacementClick={() => setShowAddEmplacementModal(true)}
@@ -263,6 +264,7 @@ export default function DashboardPage({
             typeSupports={typeSupports}
             categories={categories}
             zones={zones}
+            typeEtats={typeEtatsSupport}
           />
         )}
 
@@ -274,6 +276,7 @@ export default function DashboardPage({
             typeSupports={typeSupports}
             categories={categories}
             zones={zones}
+            typeEtats={typeEtatsSupport}
           />
         )}
       </section>

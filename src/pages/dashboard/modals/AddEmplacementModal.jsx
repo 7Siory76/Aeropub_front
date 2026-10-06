@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Plus, PlusCircle, Check, AlertCircle, Loader2 } from 'lucide-react';
-import { emplacementsApi } from '../../../api';
+import { emplacementsApi, typeEtatSupportApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 
@@ -10,24 +10,45 @@ export default function AddEmplacementModal({
   onRefresh,
   typeSupports = [],
   categories = [],
-  zones = []
+  zones = [],
+  typeEtats = []
 }) {
   const { navigateWithFeedback, scrollToTop } = useFeedback();
   const [loading, setLoading] = useState(false);
   const [modalError, setModalError] = useState('');
+  const [etatsList, setEtatsList] = useState(typeEtats);
 
   useEffect(() => {
     if (modalError) {
       scrollToTop();
     }
   }, [modalError, scrollToTop]);
+
+  useEffect(() => {
+    if (typeEtats && typeEtats.length > 0) {
+      setEtatsList(typeEtats);
+    } else {
+      typeEtatSupportApi.getAll()
+        .then((data) => {
+          if (data && data.length > 0) {
+            setEtatsList(data);
+            const dispo = data.find(e => (e.nom_etat || '').toLowerCase().includes('dispo'));
+            if (dispo) {
+              setFormData(prev => ({ ...prev, etat: dispo.nom_etat }));
+            }
+          }
+        })
+        .catch(err => console.error('Erreur chargement états supports:', err));
+    }
+  }, [typeEtats]);
+
   const [formData, setFormData] = useState({
     reference: '',
     id_type: typeSupports[0]?.id || 1,
     id_categorie: categories[0]?.id || 1,
     id_zone: zones[0]?.id || 1,
     caracteristiques: '',
-    etat: 'Disponible',
+    etat: 'disponible',
     observation: ''
   });
 
@@ -182,9 +203,22 @@ export default function AddEmplacementModal({
                 value={formData.etat}
                 onChange={(e) => setFormData({ ...formData, etat: e.target.value })}
               >
-                <option value="Disponible">Disponible</option>
-                <option value="Occupé">Occupé</option>
-                <option value="En maintenance">En maintenance</option>
+                {etatsList && etatsList.length > 0 ? (
+                  etatsList.map((et) => (
+                    <option key={et.id} value={et.nom_etat}>
+                      {et.nom_etat.charAt(0).toUpperCase() + et.nom_etat.slice(1)}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="disponible">Disponible</option>
+                    <option value="réservé">Réservé</option>
+                    <option value="occupé">Occupé</option>
+                    <option value="en maintenance">En maintenance</option>
+                    <option value="indisponible">Indisponible</option>
+                    <option value="archivé">Archivé</option>
+                  </>
+                )}
               </select>
             </div>
             <div className="modal-form-group">

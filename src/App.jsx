@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 import { hasRole } from './utils/rbac';
 
 export default function App() {
+  const { user } = useAuth();
   const { feedback, clearFeedback, registerNavigationHandler, showInfo } = useFeedback();
   const [isBackendOnline, setIsBackendOnline] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,6 +42,40 @@ export default function App() {
     localStorage.setItem('aeropub_theme', theme);
   }, [theme]);
 
+  // Mise à jour dynamique du titre du document (<title>) pour chaque page et recherche
+  useEffect(() => {
+    if (!user) {
+      document.title = "AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — Connexion Sécurisée";
+      return;
+    }
+
+    const tabTitles = {
+      emplacements: 'Supports & Emplacements Publicitaires',
+      abonnements: 'Abonnements & Contrats Publicitaires',
+      clients: 'Clients Partenaires & Annonceurs',
+      typesupports: 'Types de Supports Publicitaires',
+      zones: "Aéroports & Zones d'Affichage",
+      formats: "Catégories & Formats d'Affichage",
+      utilisateurs: 'Gestion des Utilisateurs & Rôles',
+      actions: 'Actions Commerciales & Alertes J-30'
+    };
+
+    let pageTitle = '';
+    if (activePage === 'kpis') {
+      pageTitle = 'KPI & Statistiques de Pilotage';
+    } else if (activePage === 'planning') {
+      pageTitle = 'Planning & Disponibilités des Supports';
+    } else if (activePage === 'settings') {
+      pageTitle = 'Paramétrage & Configuration Système';
+    } else if (activePage === 'audit') {
+      pageTitle = "Journal d'Audit & Sécurité";
+    } else if (activePage === 'dashboard') {
+      pageTitle = tabTitles[activeTab] || 'Référentiel';
+    }
+
+    document.title = `AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — ${pageTitle}`;
+  }, [user, activePage, activeTab]);
+
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
@@ -64,7 +99,6 @@ export default function App() {
     setRefreshKey(prev => prev + 1);
   };
 
-  const { user } = useAuth();
   if (!user) {
     return <LoginPage />;
   }

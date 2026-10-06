@@ -8,6 +8,7 @@ export default function EmplacementsTab({
   categories = [],
   zones = [],
   aeroports = [],
+  typeEtats = [],
   initialSearchQuery = '',
   onSelectEmplacement,
   onAddEmplacementClick
@@ -62,6 +63,14 @@ export default function EmplacementsTab({
     const names = [...new Set(baseZones.map(z => z.nom_zone || z.nom_lieu || z.type_zone).filter(Boolean))];
     return names.map((n, i) => ({ id: i + 1, nom: n }));
   }, [zones, emplacements, selectedAeroport]);
+
+  const etatOptions = useMemo(() => {
+    if (typeEtats && typeEtats.length > 0) {
+      return typeEtats;
+    }
+    const names = [...new Set(emplacements.map(e => getStatusSupport(e)).filter(Boolean))];
+    return names.map((n, i) => ({ id: i + 1, nom_etat: n }));
+  }, [typeEtats, emplacements]);
 
   const hasActiveFilters =
     searchTerm.trim() !== '' ||
@@ -136,17 +145,12 @@ export default function EmplacementsTab({
         }
       }
 
-      // 6. Statut (Disponible / Occupé / Réservé / En maintenance)
+      // 6. Statut
       if (selectedStatus !== 'all') {
         const stateDisplay = getStatusSupport(emp).toLowerCase();
-        if (selectedStatus.toLowerCase() === 'disponible') {
-          if (stateDisplay.includes('occup') || stateDisplay.includes('maint') || stateDisplay.includes('indispo') || stateDisplay.includes('archiv')) {
-            return false;
-          }
-        } else if (selectedStatus.toLowerCase() === 'occupé') {
-          if (!stateDisplay.includes('occup')) return false;
-        } else {
-          if (!stateDisplay.includes(selectedStatus.toLowerCase())) return false;
+        const targetState = selectedStatus.toLowerCase();
+        if (stateDisplay !== targetState && !stateDisplay.includes(targetState) && !targetState.includes(stateDisplay)) {
+          return false;
         }
       }
 
@@ -317,10 +321,14 @@ export default function EmplacementsTab({
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
             <option value="all">Tous les statuts</option>
-            <option value="Disponible">🟢 Disponible</option>
-            <option value="Occupé">🔴 Occupé</option>
-            <option value="Réservé">🟡 Réservé</option>
-            <option value="En maintenance">🟠 En maintenance</option>
+            {etatOptions.map((et) => {
+              const name = et.nom_etat || et.nom;
+              return (
+                <option key={et.id || name} value={name}>
+                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                </option>
+              );
+            })}
           </select>
         </div>
 

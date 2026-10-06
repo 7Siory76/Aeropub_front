@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sliders, Tag, FileText, ScrollText, RefreshCw } from 'lucide-react';
+import { Sliders, Tag, FileText, ScrollText, RefreshCw, Plane } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { hasRole } from '../../utils/rbac';
 import ParametragesTab from './tabs/ParametragesTab';
@@ -25,6 +25,17 @@ export default function ParametragePage({ initialTab = 'params' }) {
     }
   }, [initialTab]);
 
+  useEffect(() => {
+    const tabNames = {
+      params: 'Paramètres Généraux',
+      etats: 'États des Supports',
+      statuts: 'Statuts des Contrats',
+      audit: 'Journal d\'Audit & Sécurité'
+    };
+    const tabName = tabNames[activeTab] || 'Administration';
+    document.title = `AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — ${tabName}`;
+  }, [activeTab]);
+
   const updateCount = (key, count) => {
     setCounts(prev => ({ ...prev, [key]: count }));
   };
@@ -47,14 +58,26 @@ export default function ParametragePage({ initialTab = 'params' }) {
 
   return (
     <section className="glass-panel dashboard-panel">
-      {/* En-tête de la page */}
+      {/* Badge Super-Titre Plateforme */}
+      <div className="hero-badge-platform" style={{ marginBottom: '0.65rem' }}>
+        <Plane size={14} className="hero-badge-icon" />
+        <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
+      </div>
+
+      {/* En-tête de la page avec H1 */}
       <div className="dashboard-header-box" style={{ marginBottom: '1.25rem' }}>
         <div>
-          <h2 className="dashboard-title">
-            ⚙️ Paramétrage du <span className="gradient-text">Système AeroPub</span>
-          </h2>
+          <h1 className="dashboard-title" style={{ fontSize: '1.85rem' }}>
+            {activeTab === 'audit' 
+              ? <>📜 Journal Technique d'Audit &amp; <span className="gradient-text">Sécurité</span></>
+              : <>⚙️ Configuration &amp; Paramétrage du <span className="gradient-text">Système AeroPub</span></>
+            }
+          </h1>
           <p className="dashboard-desc">
-            Administrez les paramètres globaux, les états des supports et les statuts des abonnements.
+            {activeTab === 'audit'
+              ? "Journal des opérations critiques, notifications système et traçabilité réglementaire."
+              : "Administrez les paramètres globaux, les états des supports et les statuts des abonnements."
+            }
           </p>
         </div>
 

@@ -12,6 +12,10 @@ export default function LoginPage() {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
+        document.title = "AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — Connexion Sécurisée";
+    }, []);
+
+    useEffect(() => {
         if (errorMessage) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -46,11 +50,17 @@ export default function LoginPage() {
         <div className="login-container">
             <div className="login-glass-card">
                 <div className="login-brand">
-                    <div className="login-logo">
-                        <Plane size={36} color="#3b82f6" />
+                    <div className="hero-badge-platform" style={{ marginBottom: '0.85rem' }}>
+                        <Plane size={14} className="hero-badge-icon" />
+                        <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
                     </div>
-                    <h1 className="login-title">AeroPub</h1>
-                    <p className="login-subtitle">Gestion d'Affichage & Régie Publicitaire</p>
+                    <div className="login-logo">
+                        <Plane size={36} color="#06b6d4" />
+                    </div>
+                    <h1 className="login-title">
+                        AeroPub <span className="gradient-text">Connexion</span>
+                    </h1>
+                    <p className="login-subtitle">Portail d'Authentification Professionnelle &amp; Régie Publicitaire</p>
                 </div>
 
                 {errorMessage && (

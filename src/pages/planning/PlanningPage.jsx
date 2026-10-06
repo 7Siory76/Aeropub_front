@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { emplacementsApi, abonnementsApi, zonesApi, aeroportsApi, clientsApi } from '../../api';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, PlusCircle, User, Clock, CheckCircle2, XCircle, X, RotateCw, Tag, Monitor, Layers, Plane, MapPin, ArrowLeftRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, PlusCircle, User, Clock, CheckCircle2, XCircle, X, RotateCw, Tag, Monitor, Layers, Plane, MapPin, ArrowLeftRight, Search } from 'lucide-react';
 import AssociateAbonnementModal from './modals/AssociateAbonnementModal';
 import ChangeEmplacementModal from './modals/ChangeEmplacementModal';
 import AssociateExistingAbonnementModal from './modals/AssociateExistingAbonnementModal';
-
-
 
 export default function PlanningPage() {
   // 1. Date (Date du jour au format YYYY-MM-DD d'office)
@@ -220,11 +218,25 @@ export default function PlanningPage() {
     return targetTime >= startTime && targetTime <= endTime;
   });
 
-
-
-
   return (
-    <section className="glass-panel planning-container">
+    <>
+      {/* En-tête Héroïque Multi-Pages avec Titre Précis */}
+      <section className="hero-container planning-hero-banner">
+        <div className="hero-badge-platform">
+          <Plane size={14} className="hero-badge-icon" />
+          <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
+        </div>
+
+        <h1 className="hero-title">
+          <span className="hero-title-main">Planning d'Occupation &amp; Disponibilité des Supports</span>
+        </h1>
+
+        <p className="hero-subtitle">
+          Visualisez l'état d'occupation des espaces d'affichage, réservez des contrats et réaffectez les supports entre zones aéroportuaires.
+        </p>
+      </section>
+
+      <section className="glass-panel planning-container">
       {/* 1. BARRE SUPÉRIEURE : DATE ET BOUTON GLOBAL CHANGER LES EMPLACEMENTS */}
       <div className="planning-header-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div className="planning-header-center" style={{ margin: 0 }}>
@@ -482,5 +494,6 @@ export default function PlanningPage() {
         />
       )}
     </section>
+  </>
   );
 }
