@@ -1,6 +1,22 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Search, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  RotateCcw,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Filter,
+  X,
+  MapPin,
+  Maximize2,
+  Tag,
+  Tv,
+  Layers,
+  FileText
+} from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import styles from './EmplacementsTab.module.css';
 
 export default function EmplacementsTab({
   emplacements = [],
@@ -23,6 +39,7 @@ export default function EmplacementsTab({
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('reference');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Synchronisation avec la recherche globale
   useEffect(() => {
@@ -64,6 +81,9 @@ export default function EmplacementsTab({
     return names.map((n, i) => ({ id: i + 1, nom: n }));
   }, [zones, emplacements, selectedAeroport]);
 
+  // État actuel du support (issu de la dernière saisie enregistrée)
+  const getStatusSupport = (emp) => emp.etat || emp.statut || 'disponible';
+
   const etatOptions = useMemo(() => {
     if (typeEtats && typeEtats.length > 0) {
       return typeEtats;
@@ -80,6 +100,16 @@ export default function EmplacementsTab({
     selectedZone !== 'all' ||
     selectedStatus !== 'all';
 
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (selectedType !== 'all') count++;
+    if (selectedCategory !== 'all') count++;
+    if (selectedAeroport !== 'all') count++;
+    if (selectedZone !== 'all') count++;
+    if (selectedStatus !== 'all') count++;
+    return count;
+  }, [selectedType, selectedCategory, selectedAeroport, selectedZone, selectedStatus]);
+
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedType('all');
@@ -89,10 +119,6 @@ export default function EmplacementsTab({
     setSelectedStatus('all');
     setCurrentPage(1);
   };
-
-
-  // État actuel du support (issu de la dernière saisie enregistrée)
-  const getStatusSupport = (emp) => emp.etat || emp.statut || 'disponible';
 
   // Filtrage multicritère combiné
   const filteredEmplacements = useMemo(() => {
@@ -225,14 +251,14 @@ export default function EmplacementsTab({
   };
 
   return (
-    <div>
-      {/* Barre de Filtres Multicritères */}
-      <div className="ts-filters-bar">
-        <div className="ts-filter-group">
+    <div className={styles.container}>
+      {/* 1. BARRE DE FILTRES DESKTOP (Écrans > 768px) */}
+      <div className={`ts-filters-bar ${styles.desktopFiltersBar}`}>
+        <div className={styles.filterGroup}>
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
-            className="ts-filter-input"
+            className={styles.filterInput}
             placeholder="Rechercher (Réf, dimensions...)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -240,10 +266,10 @@ export default function EmplacementsTab({
           />
         </div>
 
-        <div className="ts-filter-group">
+        <div className={styles.filterGroup}>
           <span>Type :</span>
           <select
-            className="ts-filter-select"
+            className={styles.filterSelect}
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
           >
@@ -259,10 +285,10 @@ export default function EmplacementsTab({
           </select>
         </div>
 
-        <div className="ts-filter-group">
+        <div className={styles.filterGroup}>
           <span>Catégorie :</span>
           <select
-            className="ts-filter-select"
+            className={styles.filterSelect}
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -278,10 +304,10 @@ export default function EmplacementsTab({
           </select>
         </div>
 
-        <div className="ts-filter-group">
+        <div className={styles.filterGroup}>
           <span>Aéroport :</span>
           <select
-            className="ts-filter-select"
+            className={styles.filterSelect}
             value={selectedAeroport}
             onChange={(e) => {
               setSelectedAeroport(e.target.value);
@@ -297,10 +323,10 @@ export default function EmplacementsTab({
           </select>
         </div>
 
-        <div className="ts-filter-group">
+        <div className={styles.filterGroup}>
           <span>Zone :</span>
           <select
-            className="ts-filter-select"
+            className={styles.filterSelect}
             value={selectedZone}
             onChange={(e) => setSelectedZone(e.target.value)}
           >
@@ -313,10 +339,10 @@ export default function EmplacementsTab({
           </select>
         </div>
 
-        <div className="ts-filter-group">
+        <div className={styles.filterGroup}>
           <span>Statut :</span>
           <select
-            className="ts-filter-select"
+            className={styles.filterSelect}
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
@@ -335,7 +361,7 @@ export default function EmplacementsTab({
         {hasActiveFilters && (
           <button
             type="button"
-            className="ts-reset-btn"
+            className={styles.resetBtn}
             onClick={resetFilters}
             title="Réinitialiser tous les filtres"
           >
@@ -344,12 +370,238 @@ export default function EmplacementsTab({
           </button>
         )}
 
-        <div className="ts-filter-badge-count">
+        <div className={styles.filterCountBadge}>
           {filteredEmplacements.length} / {emplacements.length} support{emplacements.length > 1 ? 's' : ''}
         </div>
       </div>
 
-      <div className="aeropub-table-wrapper">
+      {/* 2. BARRE D'OUTILS MOBILE ERGONOMIQUE (< 768px) */}
+      <div className={styles.mobileToolbar}>
+        <div className={styles.mobileSearchRow}>
+          <div className={styles.mobileSearchInputWrapper}>
+            <Search size={18} className={styles.mobileSearchIcon} />
+            <input
+              type="text"
+              className={styles.mobileSearchInput}
+              placeholder="Rechercher un support publicitaire..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="button"
+            className={styles.mobileFilterBtn}
+            onClick={() => setIsMobileFilterOpen(true)}
+            aria-label="Filtrer les supports"
+          >
+            <Filter size={18} />
+            <span>Filtres</span>
+            {activeFilterCount > 0 && <span className={styles.mobileFilterActiveDot} />}
+          </button>
+        </div>
+
+        {/* Chips de filtres actifs avec suppression 1-clic */}
+        {activeFilterCount > 0 && (
+          <div className={styles.mobileActiveFiltersChips}>
+            {selectedType !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Type: {selectedType}
+                <button
+                  type="button"
+                  className={styles.mobileFilterChipClear}
+                  onClick={() => setSelectedType('all')}
+                  aria-label="Retirer ce filtre"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {selectedCategory !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Cat: {selectedCategory}
+                <button
+                  type="button"
+                  className={styles.mobileFilterChipClear}
+                  onClick={() => setSelectedCategory('all')}
+                  aria-label="Retirer ce filtre"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {selectedAeroport !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Aéroport: {selectedAeroport}
+                <button
+                  type="button"
+                  className={styles.mobileFilterChipClear}
+                  onClick={() => {
+                    setSelectedAeroport('all');
+                    setSelectedZone('all');
+                  }}
+                  aria-label="Retirer ce filtre"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {selectedZone !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Zone: {selectedZone}
+                <button
+                  type="button"
+                  className={styles.mobileFilterChipClear}
+                  onClick={() => setSelectedZone('all')}
+                  aria-label="Retirer ce filtre"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+            {selectedStatus !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Statut: {selectedStatus}
+                <button
+                  type="button"
+                  className={styles.mobileFilterChipClear}
+                  onClick={() => setSelectedStatus('all')}
+                  aria-label="Retirer ce filtre"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 3. MODALE PLEINE PAGE DES FILTRES MOBILE (< 768px) */}
+      {isMobileFilterOpen && (
+        <div className={styles.mobileFilterModalOverlay} onClick={() => setIsMobileFilterOpen(false)}>
+          <div className={styles.mobileFilterModalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.mobileFilterModalHeader}>
+              <div className={styles.mobileFilterModalTitle}>
+                <Filter size={20} style={{ color: 'var(--accent-primary, #2563eb)' }} />
+                <span>Filtrer les supports</span>
+              </div>
+              <button
+                type="button"
+                className={styles.mobileFilterCloseBtn}
+                onClick={() => setIsMobileFilterOpen(false)}
+                aria-label="Fermer les filtres"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Type de Support</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+              >
+                <option value="all">Tous les types 🏷️</option>
+                {typeOptions.map((t) => {
+                  const name = t.nom || t.nom_type;
+                  return <option key={t.id || name} value={name}>{name}</option>;
+                })}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Catégorie</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="all">Toutes les catégories 📁</option>
+                {catOptions.map((c) => {
+                  const name = c.nom || c.nom_categorie;
+                  return <option key={c.id || name} value={name}>{name}</option>;
+                })}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Aéroport</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedAeroport}
+                onChange={(e) => {
+                  setSelectedAeroport(e.target.value);
+                  setSelectedZone('all');
+                }}
+              >
+                <option value="all">Tous les aéroports ✈️</option>
+                {aeroOptions.map((a) => (
+                  <option key={a.id || a.nom} value={a.nom}>{a.nom}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Zone d'Affichage</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedZone}
+                onChange={(e) => setSelectedZone(e.target.value)}
+              >
+                <option value="all">Toutes les zones 📍</option>
+                {zoneOptions.map((z) => (
+                  <option key={z.id || z.nom} value={z.nom}>{z.nom}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>État / Disponibilité</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                <option value="all">Tous les statuts</option>
+                {etatOptions.map((et) => {
+                  const name = et.nom_etat || et.nom;
+                  return (
+                    <option key={et.id || name} value={name}>
+                      {name.charAt(0).toUpperCase() + name.slice(1)}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterModalFooter}>
+              <button
+                type="button"
+                className={styles.mobileFilterApplyBtn}
+                onClick={() => setIsMobileFilterOpen(false)}
+              >
+                Afficher les résultats ({filteredEmplacements.length})
+              </button>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className={styles.mobileFilterResetBtn}
+                  onClick={() => {
+                    resetFilters();
+                    setIsMobileFilterOpen(false);
+                  }}
+                >
+                  Réinitialiser tous les filtres
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. VUE DESKTOP : TABLEAU COMPLET (> 768px) */}
+      <div className={`aeropub-table-wrapper ${styles.desktopTableWrapper}`}>
         {filteredEmplacements.length === 0 ? (
           <p className="empty-msg">Aucun support ou emplacement ne correspond à ces critères.</p>
         ) : (
@@ -418,7 +670,108 @@ export default function EmplacementsTab({
         )}
       </div>
 
-      {/* Pagination pour les supports */}
+      {/* 5. VUE MOBILE : FLUX DE CARTES EMPILÉES STYLE FACEBOOK (< 768px) */}
+      <div className={styles.mobileCardsContainer}>
+        {filteredEmplacements.length === 0 ? (
+          <p className="empty-msg">Aucun support ne correspond à ces critères.</p>
+        ) : (
+          paginatedEmplacements.map((emp) => {
+            const zoneDisplay = emp.nom_zone || emp.nom_lieu || 'Zone non définie';
+            const aeroDisplay = emp.nom_aeroport ? ` - ${emp.nom_aeroport}` : (emp.type_zone ? ` (${emp.type_zone})` : '');
+            const stateDisplay = getStatusSupport(emp);
+            const stLower = stateDisplay.toLowerCase();
+            const isOccupied = stLower.includes('occup');
+            const isWarning = stLower.includes('maint') || stLower.includes('réserv') || stLower.includes('reserv');
+
+            const borderClass = isOccupied
+              ? styles.borderOccupied
+              : isWarning
+              ? styles.borderWarning
+              : styles.borderAvailable;
+
+            const statusBadgeClass = isOccupied
+              ? styles.empStatusOccupied
+              : isWarning
+              ? styles.empStatusWarning
+              : styles.empStatusAvailable;
+
+            return (
+              <div
+                key={emp.reference}
+                className={`${styles.empCard} ${borderClass}`}
+                onClick={() => onSelectEmplacement && onSelectEmplacement(emp)}
+              >
+                {/* En-tête : Référence + Type + Badge statut */}
+                <div className={styles.empCardHeader}>
+                  <div className={styles.empCardHeaderLeft}>
+                    <div className={styles.empRefTitle}>
+                      <Tv size={18} style={{ color: 'var(--accent-primary, #2563eb)' }} />
+                      <span>{emp.reference}</span>
+                    </div>
+                    <span className={styles.empTypeBadge}>
+                      <Tag size={12} />
+                      {emp.nom_type_support || emp.nom_type || 'Support'}
+                    </span>
+                  </div>
+
+                  <span className={`${styles.empStatusBadge} ${statusBadgeClass}`}>
+                    {stateDisplay}
+                  </span>
+                </div>
+
+                {/* Détails techniques : Zone, Caractéristiques, Catégorie */}
+                <div className={styles.empCardBody}>
+                  <div className={styles.empDetailRow}>
+                    <MapPin size={15} className={styles.empDetailIcon} />
+                    <div>
+                      <span className={styles.empDetailLabel}>Emplacement:</span>
+                      <strong>{zoneDisplay}</strong>
+                      <span style={{ color: 'var(--text-muted)' }}>{aeroDisplay}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.empDetailRow}>
+                    <Maximize2 size={15} className={styles.empDetailIcon} />
+                    <div>
+                      <span className={styles.empDetailLabel}>Dimensions:</span>
+                      <span>{emp.caracteristiques || emp.ref_format || 'Format standard'}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.empDetailRow}>
+                    <Layers size={15} className={styles.empDetailIcon} />
+                    <div>
+                      <span className={styles.empDetailLabel}>Catégorie:</span>
+                      <span>{emp.nom_categorie || 'Général'}</span>
+                    </div>
+                  </div>
+
+                  {emp.observation && (
+                    <div className={styles.empObservationBox}>
+                      « {emp.observation} »
+                    </div>
+                  )}
+                </div>
+
+                {/* Bouton d'action tactile 100% largeur */}
+                <button
+                  type="button"
+                  className={styles.empCardActionBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onSelectEmplacement) onSelectEmplacement(emp);
+                  }}
+                >
+                  <FileText size={16} />
+                  <span>Détails &amp; Historique du Support</span>
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* 6. PAGINATION POUR LES SUPPORTS */}
       <Pagination
         currentPage={currentPage}
         totalItems={sortedEmplacements.length}
@@ -427,12 +780,12 @@ export default function EmplacementsTab({
         onPageSizeChange={setPageSize}
       />
 
-      {/* Bouton d'ajout de support publicitaire (CSS corrigé et stylé) */}
-      <div className="add-support-bar">
+      {/* 7. BOUTON D'AJOUT DE SUPPORT (Mobile-First 100% largeur & Desktop) */}
+      <div className={`add-support-bar ${styles.addSupportBar}`}>
         <button
           type="button"
           onClick={onAddEmplacementClick}
-          className="btn-add-support"
+          className={`btn-add-support ${styles.addSupportBtnFull}`}
         >
           <Plus size={20} strokeWidth={2.6} />
           <span>Ajouter un support publicitaire</span>

@@ -4,7 +4,7 @@ import { X, AlertCircle, Loader2 } from 'lucide-react';
 import { abonnementsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
-import SearchableClientSelect from '../components/SearchableClientSelect';
+import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function AssociateAbonnementModal({
     targetEmp,
@@ -216,10 +216,16 @@ export default function AssociateAbonnementModal({
                         <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
                             Sélectionner un Client : <span style={{ color: '#ef4444' }}>*</span>
                         </label>
-                        <SearchableClientSelect
-                            clients={clients}
-                            selectedClientId={clientId}
+                        <SearchableSelect
+                            options={clients}
+                            value={clientId}
                             onChange={(val) => setClientId(val)}
+                            placeholder="-- Sélectionner un client --"
+                            searchPlaceholder="Rechercher un client (nom, secteur)..."
+                            getOptionValue={(c) => c.id}
+                            getOptionLabel={(c) => c.raison_sociale || c.nom_client}
+                            getOptionSublabel={(c) => c.secteur_activite ? `Secteur : ${c.secteur_activite}` : (c.contact || null)}
+                            getOptionBadge={(c) => c.etat_client || null}
                         />
                     </div>
                     {/* Durée & Périodicité */}

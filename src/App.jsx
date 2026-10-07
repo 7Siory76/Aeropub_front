@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Menu } from 'lucide-react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import NotificationTester from './components/NotificationTester';
@@ -13,15 +14,31 @@ import LoginPage from './pages/LoginPage';
 import { hasRole } from './utils/rbac';
 
 export default function App() {
+  const parseHash = () => {
+    const hash = window.location.hash.replace(/^#\/?/, '');
+    const [page, tab] = hash.split('/');
+    return { page, tab };
+  };
+
+  const initialNav = parseHash();
+
   const { user } = useAuth();
   const { feedback, clearFeedback, registerNavigationHandler, showInfo } = useFeedback();
   const [isBackendOnline, setIsBackendOnline] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
-  const [activePage, setActivePage] = useState('kpis'); // 'kpis', 'planning', 'dashboard', 'settings' ou 'audit'
-  const [activeTab, setActiveTab] = useState('emplacements'); // sous-compartiment CRUD sélectionné
+
+  const [activePage, setActivePage] = useState(() => {
+    return initialNav.page || localStorage.getItem('aeropub_last_page') || 'kpis';
+  });
+
+  const [activeTab, setActiveTab] = useState(() => {
+    return initialNav.tab || localStorage.getItem('aeropub_last_tab') || 'emplacements';
+  });
+
   const [counts, setCounts] = useState({});
   const [kpiFilter, setKpiFilter] = useState(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Enregistrer le gestionnaire de navigation pour les redirections logiques
   useEffect(() => {
@@ -99,6 +116,37 @@ export default function App() {
     setRefreshKey(prev => prev + 1);
   };
 
+  // Pour enregistrer ou l utilisateur est
+  useEffect(() => {
+    if (!activePage) return;
+
+    // 1. Sauvegarder dans localStorage
+    localStorage.setItem('aeropub_last_page', activePage);
+    if (activeTab) localStorage.setItem('aeropub_last_tab', activeTab);
+
+    // 2. Mettre à jour l'URL sans recharger la page
+    const newHash = activePage === 'dashboard'
+      ? `#/dashboard/${activeTab}`
+      : `#/${activePage}`;
+
+    if (window.location.hash !== newHash) {
+      window.history.replaceState(null, '', newHash);
+    }
+  }, [activePage, activeTab]);
+
+  // quand on fait precedant et suivant dans l url
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { page, tab } = parseHash();
+      if (page) setActivePage(page);
+      if (tab) setActiveTab(tab);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+
   if (!user) {
     return <LoginPage />;
   }
@@ -108,15 +156,45 @@ export default function App() {
       {/* 1. Navbar latérale gauche avec poche accordéon pour les tables CRUD */}
       <Sidebar
         activePage={activePage}
-        setActivePage={setActivePage}
+        setActivePage={(page) => {
+          setActivePage(page);
+          setIsMobileSidebarOpen(false);
+        }}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab) => {
+          setActiveTab(tab);
+          setIsMobileSidebarOpen(false);
+        }}
         isBackendOnline={isBackendOnline}
         theme={theme}
         toggleTheme={toggleTheme}
         onRefresh={handleRefresh}
         counts={counts}
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
+
+      {/* Arrière-plan flou sombre sur mobile quand la Sidebar est ouverte (comme Facebook) */}
+      {isMobileSidebarOpen && (
+        <div
+          className="sidebar-mobile-backdrop"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Bouton Flottant d'accès immédiat à la Sidebar sur Smartphone */}
+      {!isMobileSidebarOpen && (
+        <button
+          type="button"
+          className="mobile-fab-sidebar-btn"
+          onClick={() => setIsMobileSidebarOpen(true)}
+          aria-label="Ouvrir le menu de navigation"
+          title="Menu de navigation"
+        >
+          <Menu size={20} />
+          <span>Menu</span>
+        </button>
+      )}
 
       {/* 2. Zone Principale (Header supérieur + Contenu de page + Footer) */}
       <div className="app-main-wrapper">
@@ -127,6 +205,7 @@ export default function App() {
           toggleTheme={toggleTheme}
           activePage={activePage}
           activeTab={activeTab}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
         />
 
         <main className="main-content">

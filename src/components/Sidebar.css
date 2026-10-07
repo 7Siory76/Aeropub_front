@@ -301,15 +301,16 @@
 }
 
 .sidebar-sub-item.active {
-  background: rgba(59, 130, 246, 0.15);
-  color: #38bdf8;
-  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(37, 99, 235, 0.18);
+  color: #ffffff;
+  border-color: rgba(37, 99, 235, 0.45);
   font-weight: 700;
 }
 
 .sidebar-sub-item.active .sidebar-sub-badge {
-  background: #38bdf8;
+  background: var(--accent-secondary, #facc15);
   color: #0f172a;
+  box-shadow: 0 2px 8px rgba(250, 204, 21, 0.35);
 }
 
 /* Mode replié : boutons d'icônes CRUD */
@@ -474,3 +475,103 @@
 [data-theme="light"] .sidebar-footer {
   background: rgba(15, 23, 42, 0.02);
 }
+
+/* ==========================================================================
+   BOUTON DE FERMETURE MOBILE ET RESPONSIVE DRAWER (< 768px)
+   Comportement hors-champ fluide comme Facebook / Applications Modernes
+   ========================================================================== */
+.sidebar-mobile-close-btn {
+  display: none;
+}
+
+.sidebar-mobile-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* La Sidebar devient un tiroir coulissant (Off-Canvas) */
+  .app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    width: 290px !important;
+    max-width: 85vw !important;
+    min-width: 0 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 99999 !important;
+    box-shadow: none !important;
+    border-right: 1px solid var(--border-glass) !important;
+  }
+
+  /* Quand la classe .mobile-open est active, le tiroir s'affiche */
+  .app-sidebar.mobile-open {
+    transform: translateX(0) !important;
+    box-shadow: 14px 0 40px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  /* On masque le bouton de repli desktop */
+  .sidebar-collapse-btn {
+    display: none !important;
+  }
+
+  /* Bouton X de fermeture tactile (>= 44x44px) */
+  .sidebar-mobile-close-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: var(--radius-sm, 10px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-glass);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-mobile-close-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+
+  [data-theme="light"] .sidebar-mobile-close-btn {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #0f172a;
+  }
+
+  /* Arrière-plan sombre avec flou d'atténuation */
+  .sidebar-mobile-backdrop {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(10, 17, 40, 0.75) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: 99990 !important;
+    animation: sidebarBackdropFade 0.25s ease-out;
+  }
+
+  @keyframes sidebarBackdropFade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Liens de navigation avec touch target confortable */
+  .sidebar-nav-item,
+  .sidebar-pocket-header,
+  .sidebar-sub-item {
+    min-height: 44px;
+  }
+}
+

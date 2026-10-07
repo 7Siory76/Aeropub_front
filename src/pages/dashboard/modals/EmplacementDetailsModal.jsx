@@ -4,6 +4,7 @@ import { X, Edit3, Trash2, MapPin, Layers, Monitor, Info, CheckCircle2, AlertCir
 import { emplacementsApi, typeSupportsApi, categoriesApi, zonesApi, typeEtatSupportApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
+import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function EmplacementDetailsModal({
   emplacement,
@@ -238,18 +239,15 @@ export default function EmplacementDetailsModal({
 
               <div className="modal-form-group">
                 <label className="modal-label">Type de Support :</label>
-                <select
-                  className="modal-select"
+                <SearchableSelect
+                  options={typesList}
                   value={formData.id_type}
-                  onChange={(e) => setFormData({ ...formData, id_type: e.target.value })}
-                >
-                  <option value="">-- Sélectionner un type --</option>
-                  {typesList.map(ts => (
-                    <option key={ts.id} value={ts.id}>
-                      {ts.nom}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormData(prev => ({ ...prev, id_type: val }))}
+                  placeholder="-- Sélectionner un type --"
+                  searchPlaceholder="Rechercher un type..."
+                  getOptionValue={(ts) => ts.id}
+                  getOptionLabel={(ts) => ts.nom}
+                />
               </div>
             </div>
 
@@ -257,34 +255,29 @@ export default function EmplacementDetailsModal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="modal-form-group">
                 <label className="modal-label">Catégorie :</label>
-                <select
-                  className="modal-select"
+                <SearchableSelect
+                  options={catsList}
                   value={formData.id_categorie}
-                  onChange={(e) => setFormData({ ...formData, id_categorie: e.target.value })}
-                >
-                  <option value="">-- Sélectionner une catégorie --</option>
-                  {catsList.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.nom}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormData(prev => ({ ...prev, id_categorie: val }))}
+                  placeholder="-- Sélectionner une catégorie --"
+                  searchPlaceholder="Rechercher une catégorie..."
+                  getOptionValue={(cat) => cat.id}
+                  getOptionLabel={(cat) => cat.nom}
+                />
               </div>
 
               <div className="modal-form-group">
                 <label className="modal-label">Zone Terminale :</label>
-                <select
-                  className="modal-select"
+                <SearchableSelect
+                  options={zonesList}
                   value={formData.id_zone}
-                  onChange={(e) => setFormData({ ...formData, id_zone: e.target.value })}
-                >
-                  <option value="">-- Sélectionner une zone --</option>
-                  {zonesList.map(zn => (
-                    <option key={zn.id} value={zn.id}>
-                      {zn.nom_zone} {zn.nom_aeroport ? `(${zn.nom_aeroport})` : ''}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormData(prev => ({ ...prev, id_zone: val }))}
+                  placeholder="-- Sélectionner une zone --"
+                  searchPlaceholder="Rechercher une zone, un aéroport..."
+                  getOptionValue={(zn) => zn.id}
+                  getOptionLabel={(zn) => zn.nom_zone}
+                  getOptionSublabel={(zn) => zn.nom_aeroport ? `Aéroport : ${zn.nom_aeroport}` : null}
+                />
               </div>
             </div>
 

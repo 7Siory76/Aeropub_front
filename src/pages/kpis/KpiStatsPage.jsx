@@ -147,7 +147,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
   };
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '1600px', margin: '0 auto' }}>
+    <div className="kpi-page-container" style={{ maxWidth: '1600px', margin: '0 auto' }}>
       {/* 1. En-tête Dynamique avec Adaptabilité de Rôle */}
       <KpiHeroHeader
         user={user}
@@ -165,12 +165,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
       />
 
       {/* 3. Grille des Indicateurs Opérationnels (Échéances, Alertes, Taux d'occupation global) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '1.5rem'
-      }}>
+      <div className="kpi-operations-grid" style={{ marginBottom: '1.5rem' }}>
         <EcheancesContratsWidget
           userContracts={userContracts}
           renewedParentRefs={renewedParentRefs}
@@ -191,21 +186,18 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
       </div>
 
       {/* 4. NOUVELLE GRILLE ANALYTIQUE : Graphiques & Diagrammes en Bâtons */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem'
-      }}>
+      <div className="kpi-analytics-grid" style={{ marginBottom: '2rem' }}>
         {/* Graphique Donut : Répartition par Catégorie de Support */}
         <RepartitionCategoriesWidget
           emplacements={emplacements}
+          onSelectCategory={(cat) => handleFilterClick(`categorie_${cat}`)}
         />
 
         {/* Diagramme en bâton : Taux d'Occupation par Zone & Popularité */}
         <OccupationParZoneWidget
           emplacements={emplacements}
           userContracts={userContracts}
+          onSelectZone={(zone) => handleFilterClick(`zone_${zone}`)}
         />
       </div>
 

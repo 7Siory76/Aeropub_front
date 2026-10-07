@@ -6,6 +6,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 import { hasRole } from '../../../utils/rbac';
+import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function EditClientModal({ client, onClose, onRefresh }) {
   const { user } = useAuth();
@@ -407,18 +408,16 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
               </label>
               {canAssignCommercial ? (
                 /* Assignation : Changer le commercial responsable d'un client (Admin & Resp_Com) */
-                <select
-                  className="modal-select"
+                <SearchableSelect
+                  options={commercials}
                   value={formData.id_commercial}
-                  onChange={(e) => setFormData({ ...formData, id_commercial: e.target.value })}
-                >
-                  <option value="">-- Aucun commercial attitré --</option>
-                  {commercials.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nom} ({c.nom_role || 'Commercial'})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setFormData(prev => ({ ...prev, id_commercial: val }))}
+                  placeholder="-- Aucun commercial attitré --"
+                  searchPlaceholder="Rechercher un commercial..."
+                  getOptionValue={(c) => c.id}
+                  getOptionLabel={(c) => c.nom}
+                  getOptionBadge={(c) => c.nom_role || 'Commercial'}
+                />
               ) : (
                 /* Commercial simple : affichage en lecture seule */
                 <div style={{ padding: '0.55rem 0.75rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', border: '1px solid var(--border-glass)', fontSize: '0.88rem', color: 'var(--text-muted)' }}>

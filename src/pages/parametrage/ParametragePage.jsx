@@ -9,7 +9,9 @@ import AuditLogsTab from './tabs/AuditLogsTab';
 
 export default function ParametragePage({ initialTab = 'params' }) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState(initialTab); // 'params' | 'etats' | 'statuts' | 'audit'
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('aeropub_last_param_tab') || initialTab || 'params';
+  });
   const [counts, setCounts] = useState({
     params: 0,
     etats: 0,
@@ -34,7 +36,11 @@ export default function ParametragePage({ initialTab = 'params' }) {
     };
     const tabName = tabNames[activeTab] || 'Administration';
     document.title = `AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — ${tabName}`;
+    if (activeTab) {
+      localStorage.setItem('aeropub_last_param_tab', activeTab);
+    }
   }, [activeTab]);
+
 
   const updateCount = (key, count) => {
     setCounts(prev => ({ ...prev, [key]: count }));
@@ -68,7 +74,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
       <div className="dashboard-header-box" style={{ marginBottom: '1.25rem' }}>
         <div>
           <h1 className="dashboard-title" style={{ fontSize: '1.85rem' }}>
-            {activeTab === 'audit' 
+            {activeTab === 'audit'
               ? <>📜 Journal Technique d'Audit &amp; <span className="gradient-text">Sécurité</span></>
               : <>⚙️ Configuration &amp; Paramétrage du <span className="gradient-text">Système AeroPub</span></>
             }

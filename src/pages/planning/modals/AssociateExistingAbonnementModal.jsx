@@ -4,6 +4,7 @@ import { X, CheckCircle2, AlertTriangle, AlertCircle, Calendar, User, FileText, 
 import { abonnementsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
+import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function AssociateExistingAbonnementModal({
     targetEmp,
@@ -145,22 +146,16 @@ export default function AssociateExistingAbonnementModal({
                             <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.88rem', marginBottom: '0.4rem' }}>
                                 Choisir l'abonnement ({eligibleAbonnements.length} disponible{eligibleAbonnements.length > 1 ? 's' : ''}) :
                             </label>
-                            <select
-                                className="search-input"
-                                style={{ borderRadius: '10px', padding: '0.75rem', width: '100%' }}
+                            <SearchableSelect
+                                options={eligibleAbonnements}
                                 value={selectedAboRef}
-                                onChange={(e) => setSelectedAboRef(e.target.value)}
-                            >
-                                {eligibleAbonnements.map((abo) => {
-                                    const clientNom = abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`;
-                                    const statutAbo = abo.statut_abonnement || abo.statut || 'En attente';
-                                    return (
-                                        <option key={abo.reference} value={abo.reference}>
-                                            {abo.reference} — {clientNom} ({statutAbo})
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                                onChange={(val) => setSelectedAboRef(val)}
+                                placeholder="-- Choisir un contrat d'abonnement --"
+                                searchPlaceholder="Rechercher par référence, client..."
+                                getOptionValue={(abo) => abo.reference}
+                                getOptionLabel={(abo) => `${abo.reference} — ${abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}`}
+                                getOptionBadge={(abo) => abo.statut_abonnement || abo.statut || 'En attente'}
+                            />
                         </div>
                         {/* Fiche récapitulative de l'abonnement sélectionné */}
                         {currentSelectedAbo && (

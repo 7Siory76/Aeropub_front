@@ -521,46 +521,63 @@
   }
 
 
-  /* Titre et filtre */
-  .ts-panel-box h3 {
-    font-size: 1rem !important;
-    /* Réduire la taille du titre */
-    margin-bottom: 0.4rem !important;
-    line-height: 1.2 !important;
+  /* Modale sur mobile : dimensions adaptées avec défilement interne */
+  .client-modal-box {
+    padding: 1.25rem 1rem !important;
+    border-radius: 14px !important;
+    max-height: 90vh !important;
+    max-height: 90dvh !important;
+    overflow-y: auto !important;
+    width: 95% !important;
+    box-sizing: border-box !important;
   }
 
+  /* Titre et filtre */
+  .ts-panel-box h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Barre de filtres compacte sur mobile : 2 colonnes fluides (évite d'envahir l'écran) */
   .ts-filters-bar {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    /* Aligner les filtres côte à côte */
-    gap: 0.35rem 0.6rem !important;
-    padding: 0.45rem 0.6rem !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    padding: 0.6rem !important;
     margin-bottom: 0.75rem !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .ts-filters-bar > div:has(input),
+  .ts-filters-bar > .ts-filter-group:first-child {
+    grid-column: 1 / -1 !important;
   }
 
   .ts-filter-group {
     display: flex !important;
     align-items: center !important;
-    font-size: 0.75rem !important;
-    gap: 0.25rem !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .ts-filter-group span {
-    font-size: 0.75rem !important;
-    font-weight: 600 !important;
+    display: none !important; /* Libère l'espace horizontal sur smartphone */
   }
 
-  .ts-filter-select {
-    padding: 0.2rem 0.4rem !important;
-    font-size: 0.75rem !important;
-    height: 28px !important;
-    border-radius: 6px !important;
+  .ts-filter-select,
+  .ts-filter-input {
+    width: 100% !important;
+    padding: 0.45rem 0.65rem !important;
+    font-size: 16px !important; /* Règle stricte : 16px min anti-zoom forcé Safari iOS */
+    min-height: 44px !important; /* Règle 1 : Touch target >= 44px */
+    border-radius: 8px !important;
+    flex: 1 !important;
+    box-sizing: border-box !important;
   }
 
   .ts-panel-box {
     padding: 0.85rem !important;
   }
-
 }

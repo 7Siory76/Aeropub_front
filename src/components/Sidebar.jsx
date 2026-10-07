@@ -21,7 +21,8 @@ import {
   Upload,
   Loader2,
   ScrollText,
-  BarChart3
+  BarChart3,
+  X
 } from 'lucide-react';
 import { csvApi } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -40,7 +41,9 @@ export default function Sidebar({
   theme,
   toggleTheme,
   onRefresh,
-  counts = {}
+  counts = {},
+  isMobileOpen = false,
+  onCloseMobile
 }) {
   const { user } = useAuth();
   const { showSuccess, showError } = useFeedback();
@@ -70,9 +73,15 @@ export default function Sidebar({
 
   const crudItems = allCrudItems.filter(item => !item.adminOnly || isAdmin);
 
+  const handleNavigate = (page) => {
+    setActivePage(page);
+    if (onCloseMobile) onCloseMobile();
+  };
+
   const handleSelectCrudTab = (tabKey) => {
     setActivePage('dashboard');
     setActiveTab(tabKey);
+    if (onCloseMobile) onCloseMobile();
   };
 
   const handleTogglePocket = (e) => {
@@ -101,10 +110,10 @@ export default function Sidebar({
   };
 
   return (
-    <aside className={`app-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-      {/* En-tête de la Sidebar avec Logo et bouton de repli */}
+    <aside className={`app-sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
+      {/* En-tête de la Sidebar avec Logo et boutons */}
       <div className="sidebar-header">
-        <div className="sidebar-brand" onClick={() => setActivePage('planning')}>
+        <div className="sidebar-brand" onClick={() => handleNavigate('planning')}>
           <div className="sidebar-brand-icon">
             <Radio size={22} />
           </div>
@@ -116,6 +125,7 @@ export default function Sidebar({
           )}
         </div>
 
+        {/* Bouton de repli pour desktop */}
         <button
           type="button"
           className="sidebar-collapse-btn"
@@ -123,6 +133,17 @@ export default function Sidebar({
           title={isCollapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale'}
         >
           {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
+
+        {/* Bouton de fermeture sur mobile (style Facebook / tiroir) */}
+        <button
+          type="button"
+          className="sidebar-mobile-close-btn"
+          onClick={onCloseMobile}
+          aria-label="Fermer le menu"
+          title="Fermer le menu"
+        >
+          <X size={20} />
         </button>
       </div>
 
@@ -135,7 +156,7 @@ export default function Sidebar({
           <button
             type="button"
             className={`sidebar-nav-item ${activePage === 'kpis' ? 'active' : ''}`}
-            onClick={() => setActivePage('kpis')}
+            onClick={() => handleNavigate('kpis')}
             title="KPI & Statistiques de pilotage"
           >
             <BarChart3 size={18} className="sidebar-item-icon" style={{ color: '#06b6d4' }} />
@@ -145,7 +166,7 @@ export default function Sidebar({
           <button
             type="button"
             className={`sidebar-nav-item ${activePage === 'planning' ? 'active' : ''}`}
-            onClick={() => setActivePage('planning')}
+            onClick={() => handleNavigate('planning')}
             title="Planning & Zones d'affichage"
           >
             <MapPin size={18} className="sidebar-item-icon" />
@@ -278,7 +299,7 @@ export default function Sidebar({
             <button
               type="button"
               className={`sidebar-nav-item ${activePage === 'settings' ? 'active' : ''}`}
-              onClick={() => setActivePage('settings')}
+              onClick={() => handleNavigate('settings')}
               title="Paramètres / Configuration (Réservé Admin)"
             >
               <Settings size={18} className="sidebar-item-icon" />
@@ -289,7 +310,7 @@ export default function Sidebar({
             <button
               type="button"
               className={`sidebar-nav-item ${activePage === 'audit' ? 'active' : ''}`}
-              onClick={() => setActivePage('audit')}
+              onClick={() => handleNavigate('audit')}
               title="Journal technique & Audit Log (Réservé Admin)"
             >
               <ScrollText size={18} className="sidebar-item-icon" />

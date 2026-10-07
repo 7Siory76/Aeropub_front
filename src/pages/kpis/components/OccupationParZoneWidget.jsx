@@ -1,9 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { MapPin, Flame } from 'lucide-react';
 
+// Nettoie les encodages mal convertis (ex: 'arriv‚e' -> 'arrivée')
+const sanitizeText = (txt) => {
+    if (!txt) return '';
+    return String(txt).replace(/‚/g, 'é').replace(/Ext‚rieur/g, 'Extérieur');
+};
+
 export default function OccupationParZoneWidget({
     emplacements = [],
-    userContracts = []
+    userContracts = [],
+    onSelectZone
 }) {
     const [vueOnglet, setVueOnglet] = useState('occupation'); // 'occupation' | 'popularite'
 
@@ -12,7 +19,8 @@ export default function OccupationParZoneWidget({
         const map = {};
 
         emplacements.forEach((s) => {
-            const zone = s.nom_zone || s.nom_lieu || 'Zone Générale';
+            const rawZone = s.nom_zone || s.nom_lieu || s.type_zone || 'Zone Générale';
+            const zone = sanitizeText(rawZone);
             if (!map[zone]) {
                 map[zone] = { total: 0, occupes: 0, disponibles: 0 };
             }
@@ -30,7 +38,7 @@ export default function OccupationParZoneWidget({
             total: d.total,
             occupes: d.occupes,
             disponibles: d.disponibles,
-            taux: Math.round((d.occupes / d.total) * 100)
+            taux: d.total > 0 ? Math.round((d.occupes / d.total) * 100) : 0
         })).sort((a, b) => b.taux - a.taux);
     }, [emplacements]);
 
@@ -52,7 +60,8 @@ export default function OccupationParZoneWidget({
 
             allRefs.forEach((ref) => {
                 const emp = emplacements.find((e) => e.reference === ref);
-                const zone = emp?.nom_zone || emp?.nom_lieu || 'Zone Principale';
+                const rawZone = emp?.nom_zone || emp?.nom_lieu || emp?.type_zone || 'Zone Principale';
+                const zone = sanitizeText(rawZone);
                 map[zone] = (map[zone] || 0) + 1;
             });
         });
@@ -68,20 +77,29 @@ export default function OccupationParZoneWidget({
     }, [emplacements, userContracts]);
 
     return (
-        <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border-glass)' }}>
-            {/* En-tête et Bascule d'affichage */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        <div
+            className="glass-panel"
+            style={{
+                padding: '1rem',
+                borderRadius: '16px',
+                border: '1px solid var(--border-glass, rgba(255, 255, 255, 0.1))',
+                width: '100%',
+                boxSizing: 'border-box'
+            }}
+        >
+            {/* En-tête et Bascule d'affichage responsive */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: '1 1 200px' }}>
                     {vueOnglet === 'occupation' ? (
-                        <MapPin size={20} style={{ color: '#10b981' }} />
+                        <MapPin size={20} style={{ color: '#10b981', flexShrink: 0 }} />
                     ) : (
-                        <Flame size={20} style={{ color: '#f59e0b' }} />
+                        <Flame size={20} style={{ color: '#f59e0b', flexShrink: 0 }} />
                     )}
                     <div>
-                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-main)', lineHeight: 1.3 }}>
                             {vueOnglet === 'occupation' ? "Taux d'Occupation par Zone" : "Indice de Popularité des Zones"}
                         </h3>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, display: 'block' }}>
                             {vueOnglet === 'occupation'
                                 ? "Rapport des supports occupés sur la capacité de chaque zone"
                                 : "Zones les plus demandées par les annonceurs"}
@@ -89,20 +107,33 @@ export default function OccupationParZoneWidget({
                     </div>
                 </div>
 
-                {/* Boutons d'onglets */}
-                <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '10px', padding: '3px' }}>
+                {/* Boutons d'onglets tactiles (>= 44px hauteur, espacement >= 8px) */}
+                <div style={{
+                    display: 'flex',
+                    background: 'var(--bg-glass, rgba(148, 163, 184, 0.12))',
+                    borderRadius: '10px',
+                    padding: '4px',
+                    gap: '4px',
+                    flexShrink: 0,
+                    border: '1px solid var(--border-glass, rgba(148, 163, 184, 0.2))'
+                }}>
                     <button
                         type="button"
                         onClick={() => setVueOnglet('occupation')}
                         style={{
-                            background: vueOnglet === 'occupation' ? 'var(--accent-primary, #06b6d4)' : 'transparent',
-                            color: vueOnglet === 'occupation' ? '#fff' : 'var(--text-muted)',
+                            background: vueOnglet === 'occupation' ? 'var(--accent-primary, #2563eb)' : 'transparent',
+                            color: vueOnglet === 'occupation' ? '#ffffff' : 'var(--text-muted)',
                             border: 'none',
-                            borderRadius: '7px',
-                            fontSize: '0.75rem',
+                            borderRadius: '8px',
+                            fontSize: '0.82rem',
                             fontWeight: 700,
-                            padding: '0.3rem 0.75rem',
-                            cursor: 'pointer'
+                            padding: '0.5rem 0.95rem',
+                            minHeight: '44px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}
                     >
                         Occupation
@@ -112,13 +143,18 @@ export default function OccupationParZoneWidget({
                         onClick={() => setVueOnglet('popularite')}
                         style={{
                             background: vueOnglet === 'popularite' ? '#f59e0b' : 'transparent',
-                            color: vueOnglet === 'popularite' ? '#000' : 'var(--text-muted)',
+                            color: vueOnglet === 'popularite' ? '#0f172a' : 'var(--text-muted)',
                             border: 'none',
-                            borderRadius: '7px',
-                            fontSize: '0.75rem',
+                            borderRadius: '8px',
+                            fontSize: '0.82rem',
                             fontWeight: 700,
-                            padding: '0.3rem 0.75rem',
-                            cursor: 'pointer'
+                            padding: '0.5rem 0.95rem',
+                            minHeight: '44px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}
                     >
                         Popularité 🔥
@@ -128,62 +164,112 @@ export default function OccupationParZoneWidget({
 
             {/* Vue 1 : Taux d'Occupation par Zone (Diagramme en bâtons) */}
             {vueOnglet === 'occupation' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                    {statsParZone.map((z) => {
-                        const color = z.taux >= 70 ? '#10b981' : z.taux >= 40 ? '#06b6d4' : '#ef4444';
-                        return (
-                            <div key={z.zone} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
-                                    <span style={{ fontWeight: 600, color: '#f8fafc' }}>{z.zone}</span>
-                                    <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.78rem' }}>
-                                        <span style={{ color: 'var(--text-muted)' }}>
-                                            Occupés : <strong style={{ color: '#fff' }}>{z.occupes}</strong>/{z.total}
-                                        </span>
-                                        <strong style={{ color }}>{z.taux}%</strong>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%' }}>
+                    {statsParZone.length === 0 ? (
+                        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                            Aucune zone répertoriée pour le moment.
+                        </div>
+                    ) : (
+                        statsParZone.map((z) => {
+                            const color = z.taux >= 70 ? '#10b981' : z.taux >= 40 ? '#06b6d4' : '#ef4444';
+                            return (
+                                <div
+                                    key={z.zone}
+                                    onClick={() => onSelectZone && onSelectZone(z.zone)}
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '0.35rem',
+                                        width: '100%',
+                                        cursor: onSelectZone ? 'pointer' : 'default',
+                                        padding: '0.15rem 0'
+                                    }}
+                                    title={onSelectZone ? `Filtrer par zone ${z.zone}` : undefined}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.84rem', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                        <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{z.zone}</span>
+                                        <div style={{ display: 'flex', gap: '0.6rem', fontSize: '0.8rem', alignItems: 'center' }}>
+                                            <span style={{ color: 'var(--text-muted)' }}>
+                                                Occupés : <strong style={{ color: 'var(--text-main)' }}>{z.occupes}</strong>/{z.total}
+                                            </span>
+                                            <strong style={{ color, fontSize: '0.85rem' }}>{z.taux}%</strong>
+                                        </div>
+                                    </div>
+
+                                    {/* Barre de progression avec contraste Dark & Light */}
+                                    <div style={{
+                                        width: '100%',
+                                        height: '8px',
+                                        background: 'var(--border-glass, rgba(148, 163, 184, 0.2))',
+                                        borderRadius: '999px',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div style={{
+                                            width: `${z.taux}%`,
+                                            height: '100%',
+                                            background: color,
+                                            borderRadius: '999px',
+                                            transition: 'width 0.5s ease'
+                                        }} />
                                     </div>
                                 </div>
-
-                                <div style={{ width: '100%', height: '10px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '999px', overflow: 'hidden' }}>
-                                    <div style={{
-                                        width: `${z.taux}%`,
-                                        height: '100%',
-                                        background: color,
-                                        borderRadius: '999px',
-                                        transition: 'width 0.5s ease'
-                                    }} />
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })
+                    )}
                 </div>
             )}
 
             {/* Vue 2 : Popularité des Zones (Volume de contrats) */}
             {vueOnglet === 'popularite' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                    {populariteZones.map((z, idx) => (
-                        <div key={z.zone} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: '#f8fafc' }}>
-                                    <span style={{ color: '#f59e0b', fontSize: '0.85rem' }}>#{idx + 1}</span>
-                                    {z.zone}
-                                </span>
-                                <span style={{ color: '#f59e0b', fontWeight: 700, fontSize: '0.8rem' }}>
-                                    {z.count} contrat{z.count > 1 ? 's' : ''}
-                                </span>
-                            </div>
-
-                            <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '999px', overflow: 'hidden' }}>
-                                <div style={{
-                                    width: `${z.pourcentageRelatif}%`,
-                                    height: '100%',
-                                    background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
-                                    borderRadius: '999px',
-                                    transition: 'width 0.5s ease'
-                                }} />
-                            </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%' }}>
+                    {populariteZones.length === 0 ? (
+                        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                            Aucun contrat associé à une zone pour le moment.
                         </div>
-                    ))}
+                    ) : (
+                        populariteZones.map((z, idx) => (
+                            <div
+                                key={z.zone}
+                                onClick={() => onSelectZone && onSelectZone(z.zone)}
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '0.35rem',
+                                    width: '100%',
+                                    cursor: onSelectZone ? 'pointer' : 'default',
+                                    padding: '0.15rem 0'
+                                }}
+                                title={onSelectZone ? `Filtrer par zone ${z.zone}` : undefined}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.84rem', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                                        <span style={{ color: '#f59e0b', fontSize: '0.84rem' }}>#{idx + 1}</span>
+                                        <span>{z.zone}</span>
+                                    </span>
+                                    <span style={{ color: '#f59e0b', fontWeight: 700, fontSize: '0.82rem' }}>
+                                        {z.count} contrat{z.count > 1 ? 's' : ''}
+                                    </span>
+                                </div>
+
+                                {/* Barre de progression avec contraste Dark & Light */}
+                                <div style={{
+                                    width: '100%',
+                                    height: '8px',
+                                    background: 'var(--border-glass, rgba(148, 163, 184, 0.2))',
+                                    borderRadius: '999px',
+                                    overflow: 'hidden'
+                                }}>
+                                    <div style={{
+                                        width: `${z.pourcentageRelatif}%`,
+                                        height: '100%',
+                                        background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
+                                        borderRadius: '999px',
+                                        transition: 'width 0.5s ease'
+                                    }} />
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             )}
         </div>

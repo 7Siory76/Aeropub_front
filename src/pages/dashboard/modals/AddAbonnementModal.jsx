@@ -10,6 +10,7 @@ import {
 } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
+import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function AddAbonnementModal({
     onClose,
@@ -432,18 +433,16 @@ export default function AddAbonnementModal({
                             <Sparkles size={16} />
                             <span>Choisir le contrat modèle à dupliquer :</span>
                         </label>
-                        <select
-                            className="modal-select"
+                        <SearchableSelect
+                            options={abonnementsList}
                             value={selectedDuplicateRef}
-                            onChange={(e) => handleSelectContractToDuplicate(e.target.value)}
-                        >
-                            <option value="">-- Sélectionner un contrat source --</option>
-                            {abonnementsList.map(a => (
-                                <option key={a.reference} value={a.reference}>
-                                    {a.reference} — {a.raison_sociale || a.nom_client || 'Client'} ({a.annonceur_campagne || 'Campagne standard'})
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(val) => handleSelectContractToDuplicate(val)}
+                            placeholder="-- Sélectionner un contrat source --"
+                            searchPlaceholder="Rechercher par référence, client, campagne..."
+                            getOptionValue={(a) => a.reference}
+                            getOptionLabel={(a) => `${a.reference} — ${a.raison_sociale || a.nom_client || 'Client'}`}
+                            getOptionSublabel={(a) => a.annonceur_campagne ? `Campagne : ${a.annonceur_campagne}` : null}
+                        />
                         <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
                             ℹ️ Les informations de ce contrat (client, commercial, tarifs, supports, etc.) seront automatiquement injectées dans le formulaire.
                         </p>
@@ -516,34 +515,31 @@ export default function AddAbonnementModal({
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                         <div className="modal-form-group">
                             <label className="modal-label">Client (Raison Sociale) * :</label>
-                            <select
+                            <SearchableSelect
                                 required
-                                className="modal-select"
+                                options={clientsList}
                                 value={formData.id_client}
-                                onChange={(e) => setFormData({ ...formData, id_client: e.target.value })}
-                            >
-                                <option value="">-- Sélectionner un client --</option>
-                                {clientsList.map(c => (
-                                    <option key={c.id} value={c.id}>
-                                        {c.raison_sociale} {c.etat_client ? `(${c.etat_client})` : ''}
-                                    </option>
-                                ))}
-                            </select>
+                                onChange={(val) => setFormData(prev => ({ ...prev, id_client: val }))}
+                                placeholder="-- Sélectionner un client --"
+                                searchPlaceholder="Rechercher un client (nom, secteur)..."
+                                getOptionValue={(c) => c.id}
+                                getOptionLabel={(c) => c.raison_sociale || c.nom_client}
+                                getOptionSublabel={(c) => c.secteur_activite ? `Secteur : ${c.secteur_activite}` : (c.contact || null)}
+                                getOptionBadge={(c) => c.etat_client || null}
+                            />
                         </div>
                         <div className="modal-form-group">
                             <label className="modal-label">Commercial Attitré :</label>
-                            <select
-                                className="modal-select"
+                            <SearchableSelect
+                                options={commercialsList}
                                 value={formData.id_commercial}
-                                onChange={(e) => setFormData({ ...formData, id_commercial: e.target.value })}
-                            >
-                                <option value="">-- Sélectionner un commercial --</option>
-                                {commercialsList.map(u => (
-                                    <option key={u.id} value={u.id}>
-                                        {u.nom} {u.role ? `(${u.role})` : ''}
-                                    </option>
-                                ))}
-                            </select>
+                                onChange={(val) => setFormData(prev => ({ ...prev, id_commercial: val }))}
+                                placeholder="-- Sélectionner un commercial --"
+                                searchPlaceholder="Rechercher un commercial..."
+                                getOptionValue={(u) => u.id}
+                                getOptionLabel={(u) => u.nom}
+                                getOptionBadge={(u) => u.role || null}
+                            />
                         </div>
                     </div>
                     {/* Durée du contrat & Dates */}
@@ -646,28 +642,26 @@ export default function AddAbonnementModal({
                             )}
                         </div>
                         {/* Ajout d'un support disponible */}
-                        <div style={{ display: 'flex', gap: '0.6rem' }}>
-                            <select
-                                className="modal-select"
-                                style={{ flex: 1 }}
-                                value={supportToAdd}
-                                onChange={(e) => setSupportToAdd(e.target.value)}
-                            >
-                                <option value="">
-                                    {filteredAvailableEmplacements.length > 0
+                        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                            <div style={{ flex: 1 }}>
+                                <SearchableSelect
+                                    options={filteredAvailableEmplacements}
+                                    value={supportToAdd}
+                                    onChange={(val) => setSupportToAdd(val)}
+                                    placeholder={filteredAvailableEmplacements.length > 0
                                         ? `-- Choisir un support libre (${filteredAvailableEmplacements.length} disponibles) --`
                                         : `-- Aucun support disponible sur ces dates --`}
-                                </option>
-                                {filteredAvailableEmplacements.map(emp => (
-                                    <option key={emp.reference} value={emp.reference}>
-                                        {emp.reference} — {emp.nom_type_support || emp.nom_type || 'Support'} ({emp.nom_zone || 'Zone'})
-                                    </option>
-                                ))}
-                            </select>
+                                    searchPlaceholder="Rechercher par référence, type, zone..."
+                                    disabled={filteredAvailableEmplacements.length === 0}
+                                    getOptionValue={(emp) => emp.reference}
+                                    getOptionLabel={(emp) => `${emp.reference} — ${emp.nom_type_support || emp.nom_type || 'Support'}`}
+                                    getOptionSublabel={(emp) => emp.nom_zone ? `Zone : ${emp.nom_zone}` : null}
+                                />
+                            </div>
                             <button
                                 type="button"
                                 className="pill-btn active"
-                                style={{ padding: '0.55rem 1rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}
+                                style={{ padding: '0.55rem 1rem', fontSize: '0.85rem', whiteSpace: 'nowrap', height: '44px' }}
                                 onClick={handleAddSupport}
                                 disabled={!supportToAdd || loading}
                             >

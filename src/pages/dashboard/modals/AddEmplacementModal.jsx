@@ -4,6 +4,7 @@ import { X, Plus, PlusCircle, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { emplacementsApi, typeEtatSupportApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
+import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function AddEmplacementModal({
   onClose,
@@ -134,17 +135,15 @@ export default function AddEmplacementModal({
             {/* Type de Support */}
             <div className="modal-form-group">
               <label className="modal-label">Type de Support :</label>
-              <select
-                className="modal-select"
+              <SearchableSelect
+                options={typeSupports}
                 value={formData.id_type}
-                onChange={(e) => setFormData({ ...formData, id_type: e.target.value })}
-              >
-                {typeSupports.map((ts) => (
-                  <option key={ts.id} value={ts.id}>
-                    {ts.nom || ts.nom_type}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormData(prev => ({ ...prev, id_type: val }))}
+                placeholder="-- Choisir un type de support --"
+                searchPlaceholder="Rechercher un type (Panneau, Caisson...)..."
+                getOptionValue={(ts) => ts.id}
+                getOptionLabel={(ts) => ts.nom || ts.nom_type}
+              />
             </div>
           </div>
 
@@ -152,33 +151,30 @@ export default function AddEmplacementModal({
             {/* Catégorie */}
             <div className="modal-form-group">
               <label className="modal-label">Catégorie :</label>
-              <select
-                className="modal-select"
+              <SearchableSelect
+                options={categories}
                 value={formData.id_categorie}
-                onChange={(e) => setFormData({ ...formData, id_categorie: e.target.value })}
-              >
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nom || c.nom_categorie}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormData(prev => ({ ...prev, id_categorie: val }))}
+                placeholder="-- Choisir une catégorie --"
+                searchPlaceholder="Rechercher une catégorie..."
+                getOptionValue={(c) => c.id}
+                getOptionLabel={(c) => c.nom || c.nom_categorie}
+              />
             </div>
 
             {/* Zone Terminale */}
             <div className="modal-form-group">
               <label className="modal-label">Zone Terminale :</label>
-              <select
-                className="modal-select"
+              <SearchableSelect
+                options={zones}
                 value={formData.id_zone}
-                onChange={(e) => setFormData({ ...formData, id_zone: e.target.value })}
-              >
-                {zones.map((z) => (
-                  <option key={z.id} value={z.id}>
-                    {z.nom_zone || z.nom_lieu || z.type_zone} {z.nom_aeroport ? `(${z.nom_aeroport})` : ''}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setFormData(prev => ({ ...prev, id_zone: val }))}
+                placeholder="-- Choisir une zone terminale --"
+                searchPlaceholder="Rechercher une zone, un aéroport..."
+                getOptionValue={(z) => z.id}
+                getOptionLabel={(z) => z.nom_zone || z.nom_lieu || z.type_zone}
+                getOptionSublabel={(z) => z.nom_aeroport ? `Aéroport : ${z.nom_aeroport}` : null}
+              />
             </div>
           </div>
 

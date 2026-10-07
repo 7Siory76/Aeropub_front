@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ScrollText, ChevronRight, ShieldCheck, LogOut, User as UserIcon, BarChart3 } from 'lucide-react';
+import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ScrollText, ChevronRight, ShieldCheck, LogOut, User as UserIcon, BarChart3, Menu } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import { useAuth } from '../context/AuthContext';
 import RoleGuideModal from './RoleGuideModal';
@@ -10,7 +10,8 @@ export default function Header({
   theme,
   toggleTheme,
   activePage,
-  activeTab
+  activeTab,
+  onToggleMobileSidebar
 }) {
   const [showRoleGuide, setShowRoleGuide] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -88,12 +89,26 @@ export default function Header({
   return (
     <header className="header-glass">
       <div className="header-inner">
-        {/* Fil d'ariane (Breadcrumb) dynamique */}
-        {getBreadcrumb()}
+        {/* Partie gauche : Hamburger mobile + Fil d'ariane dynamique */}
+        <div className="header-left">
+          {onToggleMobileSidebar && (
+            <button
+              type="button"
+              className="mobile-hamburger-btn"
+              onClick={onToggleMobileSidebar}
+              aria-label="Ouvrir le menu de navigation"
+              title="Menu de navigation"
+            >
+              <Menu size={20} />
+              <span className="mobile-menu-text">Menu</span>
+            </button>
+          )}
+          {getBreadcrumb()}
+        </div>
 
         {/* API Status Badge, Theme Toggle & Refresh */}
         <div className="header-actions">
-          <div className="api-status-badge">
+          <div className="api-status-badge desktop-only-header-item">
             <span className={`status-dot ${isBackendOnline ? 'status-online' : 'status-offline'}`}></span>
             <span>{isBackendOnline ? 'API En Ligne' : 'API Hors Ligne'}</span>
           </div>
@@ -130,7 +145,7 @@ export default function Header({
               }
             }}
             disabled={refreshing}
-            className="btn-secondary btn-refresh"
+            className="btn-secondary btn-refresh desktop-only-header-item"
             title="Rafraîchir les données API"
           >
             <RefreshCw size={16} className={refreshing ? 'btn-spinner' : ''} />
@@ -141,7 +156,7 @@ export default function Header({
           <button
             type="button"
             onClick={() => setShowRoleGuide(true)}
-            className="btn-secondary"
+            className="btn-secondary desktop-only-header-item"
             title="Consulter le Guide des Rôles & Permissions (Qui peut faire quoi ?)"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem' }}
           >

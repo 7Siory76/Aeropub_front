@@ -1,11 +1,28 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Search, RotateCcw, Plus, Download, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import {
+  User,
+  Search,
+  RotateCcw,
+  Plus,
+  Download,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  SlidersHorizontal,
+  X,
+  Tv,
+  Clock,
+  AlertTriangle,
+  ArrowRight,
+  Check
+} from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
 import AddAbonnementModal from '../modals/AddAbonnementModal';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
 import { useFeedback } from '../../../context/FeedbackContext';
+import styles from './AbonnementsTab.module.css';
 
 export default function AbonnementsTab({
   abonnements = [],
@@ -68,6 +85,7 @@ export default function AbonnementsTab({
   const [sortDirection, setSortDirection] = useState('desc');
   const [selectedAbonnement, setSelectedAbonnement] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
 
   useEffect(() => {
@@ -348,45 +366,22 @@ export default function AbonnementsTab({
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       {/* Bannière d'état pour le filtre KPI interactif */}
       {kpiFilter && (
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.1))',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          borderRadius: '10px',
-          padding: '0.65rem 1rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '0.75rem',
-          flexWrap: 'wrap'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#06b6d4', fontSize: '0.88rem' }}>
-            <span style={{ fontSize: '1.2rem' }}>🎯</span>
+        <div className={styles.kpiBanner}>
+          <div className={styles.kpiBannerText}>
+            <span style={{ fontSize: '1.25rem' }}>🎯</span>
             <span>
-              Filtre KPI actif : <strong>{kpiFilterLabel}</strong> ({filteredAbonnements.length} contrat{filteredAbonnements.length > 1 ? 's' : ''} correspondant{filteredAbonnements.length > 1 ? 's' : ''})
+              Filtre KPI actif : <strong>{kpiFilterLabel}</strong> ({filteredAbonnements.length} contrat{filteredAbonnements.length > 1 ? 's' : ''})
             </span>
           </div>
           {onClearKpiFilter && (
             <button
               type="button"
               onClick={handleClearKpi}
-              style={{
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.35)',
-                color: '#ef4444',
-                borderRadius: '8px',
-                padding: '0.35rem 0.75rem',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                transition: 'all 0.2s ease'
-              }}
+              className={styles.kpiClearBtn}
+              title="Retirer le filtre KPI"
             >
               <span>✕ Retirer le filtre KPI</span>
             </button>
@@ -394,8 +389,8 @@ export default function AbonnementsTab({
         </div>
       )}
 
-      {/* Barre de filtres multicritères */}
-      <div className="ts-filters-bar">
+      {/* 1. BARRE DE FILTRES DESKTOP (Écran > 768px) */}
+      <div className={`ts-filters-bar ${styles.desktopFiltersBar}`}>
         <div className="ts-filter-group">
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input
@@ -421,7 +416,6 @@ export default function AbonnementsTab({
                 {av.charAt(0).toUpperCase() + av.slice(1)}
               </option>
             ))}
-
           </select>
         </div>
 
@@ -501,7 +495,7 @@ export default function AbonnementsTab({
         {hasActiveFilters && (
           <button
             type="button"
-            className="ts-reset-btn"
+            className={`ts-reset-btn ${styles.resetBtn}`}
             onClick={resetFilters}
             title="Réinitialiser tous les filtres"
           >
@@ -510,26 +504,227 @@ export default function AbonnementsTab({
           </button>
         )}
 
-        {/* Bouton Exporter en Excel / PDF (Module 4) */}
+        {/* Bouton Exporter en Excel / PDF */}
         {canExport && (
           <button
             type="button"
             className="btn-secondary"
             onClick={handleExportCSV}
             title="Exporter les contrats en fichier CSV / Excel"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', padding: '0.35rem 0.75rem' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', padding: '0.45rem 0.85rem', minHeight: '36px' }}
           >
             <Download size={14} />
             <span>Exporter (Excel / CSV)</span>
           </button>
         )}
 
-        <div className="ts-filter-badge-count">
+        <div className={styles.filterCountBadge}>
           {filteredAbonnements.length} / {abonnements.length} contrat{abonnements.length > 1 ? 's' : ''}
         </div>
       </div>
 
-      <div className="aeropub-table-wrapper">
+      {/* 2. BARRE D'OUTILS MOBILE ERGONOMIQUE (Écran <= 768px, Règle 1, 3 & 4) */}
+      <div className={styles.mobileToolbar}>
+        <div className={styles.mobileSearchRow}>
+          <div className={styles.mobileSearchInputWrapper}>
+            <Search size={18} className={styles.mobileSearchIcon} />
+            <input
+              type="text"
+              className={styles.mobileSearchInput}
+              placeholder="Rechercher contrat, client..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="button"
+            className={styles.mobileFilterBtn}
+            onClick={() => setIsMobileFilterOpen(true)}
+            aria-label="Ouvrir les filtres avancés"
+          >
+            <SlidersHorizontal size={18} />
+            <span>Filtres</span>
+            {hasActiveFilters && <span className={styles.mobileFilterActiveDot} />}
+          </button>
+        </div>
+
+        {/* Badges de filtres actifs sur mobile avec bouton de réinitialisation rapide */}
+        {hasActiveFilters && (
+          <div className={styles.mobileActiveFiltersChips}>
+            {selectedStatus !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Statut: {selectedStatus}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedStatus('all')}>✕</button>
+              </span>
+            )}
+            {selectedCommercial !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                👤 {selectedCommercial}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedCommercial('all')}>✕</button>
+              </span>
+            )}
+            {selectedPeriodicite !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                📅 {selectedPeriodicite}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedPeriodicite('all')}>✕</button>
+              </span>
+            )}
+            {selectedProba !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Proba: {selectedProba === 'high' ? '≥75%' : '<75%'}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedProba('all')}>✕</button>
+              </span>
+            )}
+            {selectedYear !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Année: {selectedYear}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedYear('all')}>✕</button>
+              </span>
+            )}
+            <button
+              type="button"
+              className={styles.mobileFilterChip}
+              onClick={resetFilters}
+              style={{ background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.35)', color: '#ef4444' }}
+            >
+              <RotateCcw size={12} />
+              <span>Tout effacer</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 3. MODALE PLEINE PAGE DES FILTRES SUR MOBILE (Règle 3) */}
+      {isMobileFilterOpen && (
+        <div className={styles.mobileFilterModalOverlay}>
+          <div className={styles.mobileFilterModalContent}>
+            <div className={styles.mobileFilterModalHeader}>
+              <div className={styles.mobileFilterModalTitle}>
+                <SlidersHorizontal size={20} style={{ color: 'var(--accent-primary)' }} />
+                <span>Filtres des Contrats</span>
+              </div>
+              <button
+                type="button"
+                className={styles.mobileFilterCloseBtn}
+                onClick={() => setIsMobileFilterOpen(false)}
+                aria-label="Fermer les filtres"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Statut du Contrat</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedStatus}
+                onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
+              >
+                <option value="all">Tous les statuts</option>
+                {availableStatuses.map((av) => (
+                  <option key={av} value={av}>
+                    {av.charAt(0).toUpperCase() + av.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {canViewGlobalFilter && (
+              <div className={styles.mobileFilterField}>
+                <label className={styles.mobileFilterLabel}>Commercial Attitré</label>
+                <select
+                  className={styles.mobileFilterSelect}
+                  value={selectedCommercial}
+                  onChange={(e) => setSelectedCommercial(e.target.value)}
+                >
+                  <option value="all">Tous les commerciaux 👤</option>
+                  {commercialOptions.map((com) => (
+                    <option key={com} value={com}>
+                      {com}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Périodicité</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedPeriodicite}
+                onChange={(e) => setSelectedPeriodicite(e.target.value)}
+              >
+                <option value="all">Toutes les périodicités 📅</option>
+                {periodiciteOptions.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Probabilité de Renouvellement</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedProba}
+                onChange={(e) => setSelectedProba(e.target.value)}
+              >
+                <option value="all">Toutes probabilités</option>
+                <option value="high">🟢 Élevé (≥ 75%)</option>
+                <option value="low">🟡 Modéré / Faible (&lt; 75%)</option>
+              </select>
+            </div>
+
+            {yearOptions.length > 0 && (
+              <div className={styles.mobileFilterField}>
+                <label className={styles.mobileFilterLabel}>Année Contractuelle</label>
+                <select
+                  className={styles.mobileFilterSelect}
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                >
+                  <option value="all">Toutes les années 📆</option>
+                  {yearOptions.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className={styles.mobileFilterModalFooter}>
+              <button
+                type="button"
+                className={styles.mobileFilterApplyBtn}
+                onClick={() => setIsMobileFilterOpen(false)}
+              >
+                <Check size={18} style={{ marginRight: '0.4rem' }} />
+                <span>Afficher les résultats ({filteredAbonnements.length})</span>
+              </button>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className={styles.mobileFilterResetBtn}
+                  onClick={() => {
+                    resetFilters();
+                    setIsMobileFilterOpen(false);
+                  }}
+                >
+                  <RotateCcw size={16} style={{ marginRight: '0.4rem' }} />
+                  <span>Réinitialiser les filtres</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. VUE DESKTOP : TABLEAU COMPLET CLASSIQUE (Masqué sur mobile, Règle 2) */}
+      <div className={`aeropub-table-wrapper ${styles.desktopTableWrapper}`}>
         {filteredAbonnements.length === 0 ? (
           <p className="empty-msg">Aucun contrat d'abonnement ne correspond à ces critères.</p>
         ) : (
@@ -581,7 +776,6 @@ export default function AbonnementsTab({
                     <td className="cell-indigo" style={{ fontWeight: 700 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                         <span>{abo.reference || `#${abo.id}`}</span>
-                        {/* Badge si ce contrat est issu d'un renouvellement (-R ou id_precedent) */}
                         {(abo.id_abonnement_precedent || /-R\d+$/i.test(abo.reference || '')) && (
                           <span
                             title={`Issu du renouvellement du contrat parent : ${abo.id_abonnement_precedent || 'origine'}`}
@@ -598,7 +792,6 @@ export default function AbonnementsTab({
                             {abo.reference?.match(/-R\d+$/i) ? abo.reference.match(/-R\d+$/i)[0] : '🔄 R'}
                           </span>
                         )}
-                        {/* Badge si ce contrat a déjà été renouvelé vers un successeur */}
                         {renewedParentRefs.has(String(abo.reference).trim()) && (
                           <span
                             title="Ce contrat a été reconduit vers un nouveau contrat successeur"
@@ -667,6 +860,164 @@ export default function AbonnementsTab({
         )}
       </div>
 
+      {/* 5. VUE MOBILE : CARTES EMPILÉES VERTICALEMENT (Règles 2, 4 & 5) */}
+      <div className={styles.mobileCardsContainer}>
+        {filteredAbonnements.length === 0 ? (
+          <p className="empty-msg">Aucun contrat d'abonnement ne correspond à ces critères.</p>
+        ) : (
+          paginatedAbonnements.map((abo) => {
+            const formattedTarif = abo.tarif
+              ? `${Number(abo.tarif).toLocaleString('fr-FR')} ${abo.devise || 'MGA'}`
+              : 'N/A';
+            const rawSupports = abo.supports_associes || abo.reference_emplacement || abo.reference || '';
+            const supportsList = rawSupports ? rawSupports.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
+            const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
+            const proba = abo.probabilite_renouvellement !== undefined && abo.probabilite_renouvellement !== null
+              ? `${abo.probabilite_renouvellement}%`
+              : '80%';
+
+            // Règle 5 : Calcul de l'urgence et bordure colorée gauche
+            const now = new Date();
+            const echeanceDate = new Date(abo.date_echeance || abo.date_fin);
+            const diffJours = Math.ceil((echeanceDate - now) / 86400000);
+            const isExpired = diffJours < 0;
+            const isUrgent = diffJours >= 0 && diffJours <= 30;
+            const isWarning = diffJours > 30 && diffJours <= 60;
+
+            let borderClass = styles.cardBorderNormal;
+            if (isExpired) borderClass = styles.cardBorderExpired;
+            else if (isUrgent) borderClass = styles.cardBorderUrgent;
+            else if (isWarning) borderClass = styles.cardBorderWarning;
+
+            return (
+              <div
+                key={abo.reference || abo.id}
+                className={`${styles.aboCard} ${borderClass}`}
+                onClick={() => setSelectedAbonnement(abo)}
+              >
+                {/* En-tête : Référence + Nom Client + Pastille d'alerte en haut à droite */}
+                <div className={styles.cardHeader}>
+                  <div className={styles.cardHeaderLeft}>
+                    <div className={styles.cardRefBadge}>
+                      <span>{abo.reference || `#${abo.id}`}</span>
+                      {(abo.id_abonnement_precedent || /-R\d+$/i.test(abo.reference || '')) && (
+                        <span style={{ fontSize: '0.72rem', color: '#38bdf8', background: 'rgba(6, 182, 212, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                          🔄 R
+                        </span>
+                      )}
+                      {renewedParentRefs.has(String(abo.reference).trim()) && (
+                        <span style={{ fontSize: '0.72rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                          ✓ Reconduit
+                        </span>
+                      )}
+                    </div>
+                    <div className={styles.cardClientName}>
+                      {abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}
+                    </div>
+                  </div>
+
+                  {/* Pastilles d'état & Alertes d'échéance (Règle 5) */}
+                  <div className={styles.cardBadgeTopRight}>
+                    {isExpired && (
+                      <span className={styles.badgeExpired}>
+                        <AlertTriangle size={12} />
+                        <span>Échu</span>
+                      </span>
+                    )}
+                    {isUrgent && (
+                      <span className={styles.badgeUrgentPulse}>
+                        <Clock size={12} />
+                        <span>J-{diffJours <= 0 ? 0 : diffJours}</span>
+                      </span>
+                    )}
+                    {isWarning && (
+                      <span style={{ fontSize: '0.74rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '9999px', background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.35)' }}>
+                        J-{diffJours}
+                      </span>
+                    )}
+                    <span className={styles.badgeStatutPill}>
+                      {statutStr}
+                    </span>
+                  </div>
+                </div>
+
+                {/* CONTRAINTE MÉTIER VISUELLE (Règle 2) : 
+                    Prix et identifiant commercial visuellement rattachés à l'en-tête de l'abonnement global */}
+                <div className={styles.cardGlobalHeaderInfo}>
+                  <div className={styles.globalInfoItem}>
+                    <span className={styles.globalInfoLabel}>Tarif & Périodicité</span>
+                    <div className={styles.globalInfoPriceValue}>{formattedTarif}</div>
+                    <span className={styles.globalInfoPricePeriod}>{abo.periodicite || 'Annuel'}</span>
+                  </div>
+                  <div className={styles.globalInfoItem}>
+                    <span className={styles.globalInfoLabel}>Commercial Attitré</span>
+                    <div className={styles.globalInfoCommercialValue}>
+                      <User size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                      <span>{abo.nom_commercial || 'Direction / Admin'}</span>
+                    </div>
+                    {abo.annonceur_campagne && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {abo.annonceur_campagne}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* CONTRAINTE MÉTIER VISUELLE (Règle 2) : 
+                    Clairement séparée de la liste des supports publicitaires individuels inclus */}
+                <div className={styles.cardSupportsSection}>
+                  <div className={styles.supportsSectionHeader}>
+                    <span>📍 Supports Publicitaires Inclus ({supportsList.length})</span>
+                  </div>
+                  <div className={styles.supportsChipsList}>
+                    {supportsList.length > 0 ? (
+                      supportsList.map((sup, idx) => (
+                        <span key={idx} className={styles.supportIndividualChip}>
+                          <Tv size={12} />
+                          <span>{sup}</span>
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Aucun support référencé</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Dates & Probabilité de renouvellement */}
+                <div className={styles.cardDatesRow}>
+                  <span>
+                    Du {abo.date_debut ? new Date(abo.date_debut).toLocaleDateString('fr-FR') : '-'} au {abo.date_echeance || abo.date_fin ? new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR') : '-'}
+                  </span>
+                  <span
+                    className={styles.cardProbaBadge}
+                    style={{
+                      background: parseInt(proba, 10) >= 75 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                      color: parseInt(proba, 10) >= 75 ? '#10b981' : '#f59e0b',
+                      border: parseInt(proba, 10) >= 75 ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)'
+                    }}
+                  >
+                    Renouv. {proba}
+                  </span>
+                </div>
+
+                {/* RÈGLE 3 : Bouton d'action principal Bleu large à 100% en bas de carte */}
+                <button
+                  type="button"
+                  className={styles.cardActionBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedAbonnement(abo);
+                  }}
+                >
+                  <span>Gérer & Renouveler le Contrat</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+
       {/* Pagination pour les abonnements */}
       <Pagination
         currentPage={currentPage}
@@ -676,20 +1027,19 @@ export default function AbonnementsTab({
         onPageSizeChange={setPageSize}
       />
 
-      {/* Bouton d'ajout / duplication de contrat (Module 1 : Admin, Resp_Com, Commercial) */}
+      {/* Bouton d'ajout / duplication de contrat (Règle 3 : Large à 100% sur mobile) */}
       {canCreateOrDuplicate && (
-        <div className="add-support-bar">
+        <div className={`add-support-bar ${styles.addContractBar}`}>
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="btn-add-support"
+            className={`btn-add-support ${styles.addContractBtnFull}`}
           >
             <Plus size={20} strokeWidth={2.6} />
             <span>+ Créer un contrat / Dupliquer</span>
           </button>
         </div>
       )}
-
 
       {/* Modale createPortal des détails de l'abonnement */}
       {selectedAbonnement && (
@@ -717,7 +1067,6 @@ export default function AbonnementsTab({
           typeStatut={typeStatut}
         />
       )}
-
     </div>
   );
 }

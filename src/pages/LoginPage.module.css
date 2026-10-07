@@ -1,0 +1,333 @@
+/* ==========================================================================
+   LOGIN PAGE - MODULE CSS (Charte Bleu Pro & Jaune Poussin Accent)
+   ========================================================================== */
+
+.loginContainer {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--bg-main, #0a1128);
+  background-image:
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.2) 0px, transparent 55%),
+    radial-gradient(at 100% 100%, rgba(250, 204, 21, 0.1) 0px, transparent 50%);
+  background-attachment: fixed;
+  position: relative;
+  overflow: hidden;
+}
+
+.loginGlassCard {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-card, rgba(15, 23, 42, 0.8));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-lg, 20px);
+  padding: 2.5rem 2.25rem;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  animation: cardFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 10;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="light"] .loginGlassCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.12);
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.loginBrand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.heroBadgePlatform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  color: var(--accent-primary, #3b82f6);
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.15);
+  transition: all 0.25s ease;
+}
+
+.heroBadgeIcon {
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.loginLogo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  border-radius: var(--radius-md, 14px);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(29, 78, 216, 0.35) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary, #3b82f6);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.loginLogo:hover {
+  transform: rotate(-6deg) scale(1.08);
+}
+
+.loginTitle {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-main, #f8fafc);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+[data-theme="light"] .loginTitle {
+  color: #0f172a;
+}
+
+.gradientText {
+  background: var(--gradient-primary, linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loginSubtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.45;
+}
+
+/* Alerte Erreur */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  animation: shake 0.35s ease-out;
+}
+
+[data-theme="light"] .errorMessage {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Alerte Expiration 24h (Jaune Poussin Lumineux avec pulsation subtile) */
+.expiredAlert {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(250, 204, 21, 0.15);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  color: #facc15;
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  animation: yellowAlertPulse 2.5s infinite ease-in-out;
+}
+
+[data-theme="light"] .expiredAlert {
+  background: rgba(250, 204, 21, 0.15);
+  border-color: rgba(234, 179, 8, 0.45);
+  color: #854d0e;
+}
+
+@keyframes yellowAlertPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(250, 204, 21, 0);
+    transform: scale(1.01);
+  }
+}
+
+/* Formulaire */
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.loginField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.loginLabel {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+}
+
+[data-theme="light"] .loginLabel {
+  color: #475569;
+}
+
+.loginInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.loginInputIcon {
+  position: absolute;
+  left: 0.95rem;
+  color: var(--text-dim, #64748b);
+  transition: color 0.2s ease;
+  pointer-events: none;
+}
+
+.loginInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.65rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12));
+  background: rgba(15, 23, 42, 0.6);
+  color: var(--text-main, #f8fafc);
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loginInput::placeholder {
+  color: var(--text-dim, #64748b);
+}
+
+.loginInput:focus {
+  outline: none;
+  border-color: var(--accent-primary, #3b82f6);
+  background: rgba(15, 23, 42, 0.85);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+.loginInput:focus + .loginInputIcon,
+.loginInputWrapper:focus-within .loginInputIcon {
+  color: var(--accent-primary, #3b82f6);
+}
+
+[data-theme="light"] .loginInput {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .loginInput:focus {
+  background: #ffffff;
+  border-color: var(--accent-primary, #3b82f6);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Bouton Soumettre (Bleu Professionnel Harmonisé) */
+.loginBtnSubmit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  margin-top: 0.5rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--gradient-primary, linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%));
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loginBtnSubmit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+  filter: brightness(1.1);
+}
+
+.loginBtnSubmit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.loginBtnSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btnSpinner {
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loginFooterHint {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.78rem;
+  color: var(--text-dim, #64748b);
+  letter-spacing: 0.02em;
+}
+
+/* Adaptation Mobile (< 480px) */
+@media (max-width: 480px) {
+  .loginGlassCard {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .loginTitle {
+    font-size: 1.6rem;
+  }
+
+  .loginInput {
+    font-size: 16px; /* Empêche le zoom auto iOS */
+  }
+}

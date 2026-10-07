@@ -3,6 +3,7 @@ import { Mail, Lock, LogIn, Plane, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { utilisateursApi } from '../api/utilisateursApi';
 import { sanitizeUserError } from '../utils/errorHandler';
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -10,6 +11,7 @@ export default function LoginPage() {
     const [motDePasse, setMotDePasse] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const isExpired = localStorage.getItem('aeropub_session_expired') === 'true';
 
     useEffect(() => {
         document.title = "AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — Connexion Sécurisée";
@@ -47,50 +49,45 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="login-container">
-            <div className="login-glass-card">
-                <div className="login-brand">
-                    <div className="hero-badge-platform" style={{ marginBottom: '0.85rem' }}>
-                        <Plane size={14} className="hero-badge-icon" />
+        <div className={styles.loginContainer}>
+            <div className={styles.loginGlassCard}>
+                <div className={styles.loginBrand}>
+                    <div className={styles.heroBadgePlatform}>
+                        <Plane size={14} className={styles.heroBadgeIcon} />
                         <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
                     </div>
-                    <div className="login-logo">
-                        <Plane size={36} color="#06b6d4" />
+                    <div className={styles.loginLogo}>
+                        <Plane size={36} color="var(--accent-primary, #3b82f6)" />
                     </div>
-                    <h1 className="login-title">
-                        AeroPub <span className="gradient-text">Connexion</span>
+                    <h1 className={styles.loginTitle}>
+                        AeroPub <span className={styles.gradientText}>Connexion</span>
                     </h1>
-                    <p className="login-subtitle">Portail d'Authentification Professionnelle &amp; Régie Publicitaire</p>
+                    <p className={styles.loginSubtitle}>Portail d'Authentification Professionnelle &amp; Régie Publicitaire</p>
                 </div>
 
                 {errorMessage && (
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.6rem',
-                        padding: '0.65rem 0.9rem',
-                        borderRadius: '8px',
-                        background: 'rgba(239, 68, 68, 0.15)',
-                        border: '1px solid rgba(239, 68, 68, 0.35)',
-                        color: '#f87171',
-                        fontSize: '0.85rem',
-                        marginBottom: '1rem'
-                    }}>
+                    <div className={styles.errorMessage}>
                         <AlertCircle size={16} style={{ flexShrink: 0 }} />
                         <span>{errorMessage}</span>
                     </div>
                 )}
 
+                {isExpired && (
+                    <div className={styles.expiredAlert}>
+                        <span>⏱️ Votre session a expiré après 24h d'inactivité. Veuillez vous reconnecter pour reprendre votre travail.</span>
+                    </div>
+                )}
+
                 {/* Formulaire de connexion */}
-                <form onSubmit={handleSubmit} className="login-form">
-                    <div className="login-field">
-                        <label className="login-label">Adresse Email Professionnelle</label>
-                        <div className="login-input-wrapper">
-                            <Mail size={18} className="login-input-icon" />
+                <form onSubmit={handleSubmit} className={styles.loginForm}>
+                    <div className={styles.loginField}>
+                        <label className={styles.loginLabel}>Adresse Email Professionnelle</label>
+                        <div className={styles.loginInputWrapper}>
+                            <Mail size={18} className={styles.loginInputIcon} />
                             <input
                                 type="email"
                                 required
-                                className="login-input"
+                                className={styles.loginInput}
                                 placeholder="ex: admin@aeropub.mg"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -98,14 +95,14 @@ export default function LoginPage() {
                             />
                         </div>
                     </div>
-                    <div className="login-field">
-                        <label className="login-label">Mot de Passe</label>
-                        <div className="login-input-wrapper">
-                            <Lock size={18} className="login-input-icon" />
+                    <div className={styles.loginField}>
+                        <label className={styles.loginLabel}>Mot de Passe</label>
+                        <div className={styles.loginInputWrapper}>
+                            <Lock size={18} className={styles.loginInputIcon} />
                             <input
                                 type="password"
                                 required
-                                className="login-input"
+                                className={styles.loginInput}
                                 placeholder="••••••••"
                                 value={motDePasse}
                                 onChange={(e) => setMotDePasse(e.target.value)}
@@ -116,12 +113,12 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        className="login-btn-submit"
+                        className={styles.loginBtnSubmit}
                         disabled={loading}
                     >
                         {loading ? (
                             <>
-                                <Loader2 size={18} className="btn-spinner" />
+                                <Loader2 size={18} className={styles.btnSpinner} />
                                 <span>Connexion en cours...</span>
                             </>
                         ) : (
@@ -133,10 +130,10 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className="login-footer-hint">
+                <div className={styles.loginFooterHint}>
                     Authentification sécurisée • Accès restreint
                 </div>
             </div>
         </div>
-    )
+    );
 }

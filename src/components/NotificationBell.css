@@ -21,9 +21,9 @@
 
 .notification-bell-btn:hover,
 .notification-bell-btn.active {
-    background: rgba(6, 182, 212, 0.15);
-    border-color: #06b6d4;
-    color: #06b6d4;
+    background: rgba(37, 99, 235, 0.15);
+    border-color: var(--accent-primary, #2563eb);
+    color: var(--accent-primary, #2563eb);
 }
 
 /* Badge de notifications non lues avec pulsation */
@@ -121,7 +121,7 @@
 .btn-mark-all {
     background: transparent;
     border: none;
-    color: #06b6d4;
+    color: var(--accent-primary, #2563eb);
     font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
@@ -130,10 +130,11 @@
     gap: 0.3rem;
     padding: 0.2rem 0.4rem;
     border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .btn-mark-all:hover {
-    background: rgba(6, 182, 212, 0.1);
+    background: rgba(37, 99, 235, 0.12);
 }
 
 /* Filtres par Catégorie */
@@ -159,9 +160,9 @@
 }
 
 .cat-pill.active {
-    background: rgba(6, 182, 212, 0.18);
-    border-color: rgba(6, 182, 212, 0.4);
-    color: #06b6d4;
+    background: rgba(37, 99, 235, 0.18);
+    border-color: rgba(37, 99, 235, 0.45);
+    color: #ffffff;
 }
 
 /* Liste des notifications */
