@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import {
     abonnementsApi, emplacementsApi, clientsApi,
-    utilisateursApi, typeStatutAbonnementApi
+    utilisateursApi, typeStatutAbonnementApi, documentsApi
 } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
@@ -24,6 +24,9 @@ export default function AddAbonnementModal({
     const { navigateWithFeedback, scrollToTop } = useFeedback();
     const [loading, setLoading] = useState(false);
     const [modalError, setModalError] = useState('');
+
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [fileType, setFileType] = useState('Contrat');
 
     useEffect(() => {
         if (modalError) {
@@ -336,7 +339,7 @@ export default function AddAbonnementModal({
         }
         setLoading(true);
         try {
-            await abonnementsApi.create({
+            const newAbo = await abonnementsApi.create({
                 reference: formData.reference.trim() || undefined, // Auto-généré si non spécifié
                 id_client: parseInt(formData.id_client, 10),
                 id_commercial: formData.id_commercial ? parseInt(formData.id_commercial, 10) : 1,
@@ -354,6 +357,14 @@ export default function AddAbonnementModal({
                 statut: formData.statut || 'Brouillon',
                 supports: selectedSupports
             });
+            const targetRef = newAbo?.reference || formData.reference.trim();
+            if (selectedFile && targetRef) {
+                const uploadFormData = new FormData();
+                uploadFormData.append('file', selectedFile);
+                uploadFormData.append('id_abonnement', targetRef);
+                uploadFormData.append('type_document', fileType);
+                await documentsApi.upload(uploadFormData);
+            }
             onClose();
             if (onRefresh) onRefresh();
             navigateWithFeedback('dashboard', 'abonnements', `Nouveau contrat « ${formData.reference?.trim() || 'créé'} » enregistré avec succès !`);
@@ -768,6 +779,31 @@ export default function AddAbonnementModal({
                             </label>
                         </div>
                     </div>
+
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '0.85rem', borderRadius: '10px', border: '1px solid var(--border-glass)' }}>
+                        <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
+                            <FileText size={15} style={{ color: 'var(--accent-primary)' }} />
+                            <span>Joindre le contrat signé / devis initial (Optionnel) :</span>
+                        </label>
+                        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                            <select
+                                className="modal-select"
+                                style={{ width: '150px' }}
+                                value={fileType}
+                                onChange={(e) => setFileType(e.target.value)}
+                            >
+                                <option value="Contrat">Contrat signé</option>
+                                <option value="BAT">BAT</option>
+                                <option value="Devis">Devis</option>
+                            </select>
+                            <input
+                                type="file"
+                                accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                                onChange={(e) => setSelectedFile(e.target.files[0] || null)}
+                            />
+                        </div>
+                    </div>
+
                     {/* Boutons d'action */}
                     <div className="modal-footer" style={{ marginTop: '0.6rem' }}>
                         <button

@@ -12,6 +12,8 @@ import { hasRole } from '../../../utils/rbac';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 import SearchableSelect from '../../../components/SearchableSelect';
+import AbonnementDocuments from '../../../components/AbonnementDocuments';
+
 
 export default function AbonnementDetailsModal({
   abonnement,
@@ -225,31 +227,31 @@ export default function AbonnementDetailsModal({
     if (emplacements && emplacements.length > 0) {
       setAvailableEmplacements(emplacements);
     } else {
-      emplacementsApi.getAll().then(data => setAvailableEmplacements(data || [])).catch(() => {});
+      emplacementsApi.getAll().then(data => setAvailableEmplacements(data || [])).catch(() => { });
     }
 
     if (allAbonnements && allAbonnements.length > 0) {
       setAbonnementsList(allAbonnements);
     } else {
-      abonnementsApi.getAll().then(data => setAbonnementsList(data || [])).catch(() => {});
+      abonnementsApi.getAll().then(data => setAbonnementsList(data || [])).catch(() => { });
     }
 
     if (clients && clients.length > 0) {
       setClientsList(clients);
     } else {
-      clientsApi.getAll().then(data => setClientsList(data || [])).catch(() => {});
+      clientsApi.getAll().then(data => setClientsList(data || [])).catch(() => { });
     }
 
     if (utilisateurs && utilisateurs.length > 0) {
       setCommercialsList(utilisateurs);
     } else {
-      utilisateursApi.getAll().then(data => setCommercialsList(data || [])).catch(() => {});
+      utilisateursApi.getAll().then(data => setCommercialsList(data || [])).catch(() => { });
     }
 
     if (typeStatut && typeStatut.length > 0) {
       setTypeStatutList(typeStatut);
     } else {
-      typeStatutAbonnementApi.getAll().then(data => setTypeStatutList(data || [])).catch(() => {});
+      typeStatutAbonnementApi.getAll().then(data => setTypeStatutList(data || [])).catch(() => { });
     }
   }, [emplacements, allAbonnements, clients, utilisateurs, typeStatut]);
 
@@ -277,9 +279,9 @@ export default function AbonnementDetailsModal({
       const rawSt = String(otherAbo.statut_abonnement || otherAbo.statut || '').trim().toLowerCase();
       const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       if (
-        cleanSt.includes('archiv') || 
-        cleanSt.includes('resili') || 
-        cleanSt.includes('annul') || 
+        cleanSt.includes('archiv') ||
+        cleanSt.includes('resili') ||
+        cleanSt.includes('annul') ||
         cleanSt.includes('expir') ||
         rawSt.includes('résili') ||
         rawSt.includes('archiv') ||
@@ -1011,6 +1013,9 @@ export default function AbonnementDetailsModal({
               </div>
             </div>
 
+            {/* Documents & Pièces Jointes en mode Édition */}
+            <AbonnementDocuments referenceAbonnement={abonnement.reference} />
+
             {/* Pied du formulaire : Boutons */}
             <div className="modal-footer" style={{ marginTop: '0.5rem' }}>
               <button
@@ -1286,6 +1291,7 @@ export default function AbonnementDetailsModal({
                 )
               )}
             </div>
+            <AbonnementDocuments referenceAbonnement={abonnement.reference} />
 
             {/* Pied de Modale : Supprimer (Admin, Resp_Com), Fermer, Renouveler remise (Admin, Direction, Resp_Com), Modifier dates/montant (Admin, Resp_Com, Commercial) */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
