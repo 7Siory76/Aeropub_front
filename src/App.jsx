@@ -10,6 +10,7 @@ import { useAuth } from './context/AuthContext';
 import { useFeedback } from './context/FeedbackContext';
 import DiscreetBanner from './components/DiscreetBanner';
 import LoginPage from './pages/LoginPage';
+import ImportPage from './pages/import/ImportPage';
 
 import { hasRole } from './utils/rbac';
 
@@ -237,6 +238,11 @@ export default function App() {
           ) : activePage === 'planning' ? (
             /* Page de Planning & Occupation des Emplacements par Zone */
             <PlanningPage key={refreshKey} />
+          ) : activePage === 'import' ? (
+            <ImportPage
+              key={refreshKey}
+              onImportSuccess={handleRefresh}
+            />
           ) : (activePage === 'settings' || activePage === 'audit') ? (
             /* Module 5 : Administration & Paramétrage (Strictement réservé à Admin) */
             hasRole(user, ['Admin']) ? (

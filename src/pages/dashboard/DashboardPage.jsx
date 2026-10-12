@@ -7,7 +7,6 @@ import {
   aeroportsApi,
   perimetresApi,
   categoriesApi,
-  formatsApi,
   typeSupportsApi,
   utilisateursApi,
   actionsCommercialesApi,
@@ -25,7 +24,6 @@ import ClientSubscriptionsModal from './modals/ClientSubscriptionsModal';
 import TypeSupportsTab from './tabs/TypeSupportsTab';
 import ZonesTab from './tabs/ZonesTab';
 import CategoriesTab from './tabs/CategoriesTab';
-import FormatsTab from './tabs/FormatsTab';
 import UtilisateursTab from './tabs/UtilisateursTab';
 import ActionsCommercialesTab from './tabs/ActionsCommercialesTab';
 import EmplacementDetailsModal from './modals/EmplacementDetailsModal';
@@ -55,7 +53,6 @@ export default function DashboardPage({
   const [aeroports, setAeroports] = useState([]);
   const [perimetres, setPerimetres] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [formats, setFormats] = useState([]);
   const [typeSupports, setTypeSupports] = useState([]);
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [actionsCommerciales, setActionsCommerciales] = useState([]);
@@ -81,7 +78,6 @@ export default function DashboardPage({
         aeros,
         peris,
         cats,
-        fmts,
         ts,
         users,
         acts,
@@ -95,7 +91,6 @@ export default function DashboardPage({
         aeroportsApi.getAll().catch(() => []),
         perimetresApi.getAll().catch(() => []),
         categoriesApi.getAll().catch(() => []),
-        formatsApi.getAll().catch(() => []),
         typeSupportsApi.getAll().catch(() => []),
         utilisateursApi.getAll().catch(() => []),
         actionsCommercialesApi.getAll().catch(() => []),
@@ -110,7 +105,6 @@ export default function DashboardPage({
       setAeroports(aeros || []);
       setPerimetres(peris || []);
       setCategories(cats || []);
-      setFormats(fmts || []);
       setTypeSupports(ts || []);
       setUtilisateurs(users || []);
       setActionsCommerciales(acts || []);
@@ -216,7 +210,6 @@ export default function DashboardPage({
                 abonnements={abonnements}
                 clients={clients}
                 zones={zones}
-                formats={formats}
                 initialSearchQuery={searchQuery}
               />
             )}
@@ -241,6 +234,7 @@ export default function DashboardPage({
                 actions={actionsCommerciales}
                 abonnements={abonnements}
                 initialSearchQuery={searchQuery}
+                onRefresh={loadAllData}
               />
             )}
           </div>

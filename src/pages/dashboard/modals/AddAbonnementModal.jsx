@@ -81,7 +81,6 @@ export default function AddAbonnementModal({
         periodicite: 'Annuel',
         date_debut: todayStr,
         date_echeance: nextYearStr,
-        probabilite_renouvellement: 80,
         preavis_jours: 30,
         reconduction_tacite: false,
         motif_non_renouvellement: '',
@@ -204,7 +203,6 @@ export default function AddAbonnementModal({
             periodicite: source.periodicite || 'Annuel',
             date_debut: newDateDebut,
             date_echeance: newDateFin,
-            probabilite_renouvellement: source.probabilite_renouvellement ?? 85,
             preavis_jours: source.preavis_jours ?? 30,
             reconduction_tacite: Boolean(source.reconduction_tacite),
             motif_non_renouvellement: '',
@@ -241,7 +239,6 @@ export default function AddAbonnementModal({
             periodicite: 'Annuel',
             date_debut: todayStr,
             date_echeance: nextYearStr,
-            probabilite_renouvellement: 80,
             preavis_jours: 30,
             reconduction_tacite: false,
             motif_non_renouvellement: '',
@@ -352,7 +349,6 @@ export default function AddAbonnementModal({
                 date_echeance: formData.date_echeance,
                 reconduction_tacite: formData.reconduction_tacite,
                 preavis_jours: parseInt(formData.preavis_jours || 30, 10),
-                probabilite_renouvellement: parseInt(formData.probabilite_renouvellement || 80, 10),
                 motif_non_renouvellement: formData.motif_non_renouvellement || null,
                 statut: formData.statut || 'Brouillon',
                 supports: selectedSupports
@@ -742,17 +738,6 @@ export default function AddAbonnementModal({
                                     </>
                                 )}
                             </select>
-                        </div>
-                        <div className="modal-form-group">
-                            <label className="modal-label">Probabilité de renouvellement (%) :</label>
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                className="modal-input"
-                                value={formData.probabilite_renouvellement}
-                                onChange={(e) => setFormData({ ...formData, probabilite_renouvellement: e.target.value })}
-                            />
                         </div>
                     </div>
                     {/* Préavis & Reconduction tacite */}

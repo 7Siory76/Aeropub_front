@@ -152,7 +152,7 @@ export default function Sidebar({
         {/* Section 1 : Planning direct & Guide des Rôles */}
         <div className="sidebar-section">
           {!isCollapsed && <span className="sidebar-section-title">Navigation</span>}
-          
+
           <button
             type="button"
             className={`sidebar-nav-item ${activePage === 'kpis' ? 'active' : ''}`}
@@ -263,29 +263,15 @@ export default function Sidebar({
           )}
 
           {/* Bouton Importer données dans la Sidebar */}
-          <div className="sidebar-import-box">
-            <input
-              type="file"
-              accept=".csv"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
+          <div className='sidebar-import-box'>
             <button
-              type="button"
-              className={`sidebar-nav-item sidebar-import-btn ${isCollapsed ? 'collapsed' : ''} ${uploadingCsv ? 'active' : ''}`}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingCsv}
-              title="Importer des données (fichier CSV)"
+              type='button'
+              className={`sidebar-nav-item sidebar-import-btn ${activePage === 'import' ? 'active' : ''}`}
+              onClick={() => handleNavigate('import')}
+              title="Centre d'importation de données"
             >
-              {uploadingCsv ? (
-                <Loader2 size={18} className="spinner-icon sidebar-item-icon" />
-              ) : (
-                <Upload size={18} className="sidebar-item-icon" />
-              )}
-              {!isCollapsed && (
-                <span className="sidebar-item-label">{uploadingCsv ? 'Importation...' : 'Importer données 📄'}</span>
-              )}
+              <Upload size={18} className='sidebar-item-icon' />
+              {!isCollapsed && <span className="sidebar-item-label">Importer données</span>}
             </button>
           </div>
         </div>
@@ -294,7 +280,7 @@ export default function Sidebar({
         {hasRole(user, ['Admin']) && (
           <div className="sidebar-section">
             {!isCollapsed && <span className="sidebar-section-title">Administration</span>}
-            
+
             {/* Menu "Paramètres / Configuration" */}
             <button
               type="button"

@@ -11,4 +11,6 @@ export const actionsCommercialesApi = {
   delete: (id) => api.delete(`/actions-commerciales/${id}`).then(res => res.data.data),
   envoyerRelanceManuelle: (reference, id_utilisateur) => 
     api.post('/actions-commerciales/relance-manuelle', { reference, id_utilisateur }).then(res => res.data),
+  envoyerPreavisReconduction: (reference, id_utilisateur) => 
+    api.post('/actions-commerciales/preavis-reconduction', { reference, id_utilisateur }).then(res => res.data),
 };

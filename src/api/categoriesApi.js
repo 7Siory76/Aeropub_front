@@ -11,8 +11,8 @@ export const categoriesApi = {
   delete: (id) => api.delete(`/categories/${id}`).then(res => res.data.data),
 };
 
-// Formats rétro-compatibles
+// Formats rétro-compatibles (neutralisé)
 export const formatsApi = {
-  getAll: () => api.get('/formats').then(res => res.data.data).catch(() => []),
-  getById: (id) => api.get(`/formats/${id}`).then(res => res.data.data).catch(() => null),
+  getAll: () => Promise.resolve([]),
+  getById: () => Promise.resolve(null),
 };

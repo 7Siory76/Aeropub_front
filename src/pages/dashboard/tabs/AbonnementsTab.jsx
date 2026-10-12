@@ -77,7 +77,6 @@ export default function AbonnementsTab({
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCommercial, setSelectedCommercial] = useState('all');
   const [selectedPeriodicite, setSelectedPeriodicite] = useState('all');
-  const [selectedProba, setSelectedProba] = useState('all');
   const [selectedYear, setSelectedYear] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -96,7 +95,7 @@ export default function AbonnementsTab({
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear]);
+  }, [searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedYear]);
 
   // Options dédupliquées pour les filtres
   const commercialOptions = useMemo(() => {
@@ -132,7 +131,6 @@ export default function AbonnementsTab({
     selectedStatus !== 'all' ||
     selectedCommercial !== 'all' ||
     selectedPeriodicite !== 'all' ||
-    selectedProba !== 'all' ||
     selectedYear !== 'all' ||
     Boolean(kpiFilter);
 
@@ -141,7 +139,6 @@ export default function AbonnementsTab({
     setSelectedStatus('all');
     setSelectedCommercial('all');
     setSelectedPeriodicite('all');
-    setSelectedProba('all');
     setSelectedYear('all');
     setCurrentPage(1);
     if (typeof onClearKpiFilter === 'function') {
@@ -201,13 +198,6 @@ export default function AbonnementsTab({
         }
       }
 
-      // 5. Probabilité de renouvellement
-      if (selectedProba !== 'all') {
-        const probaNum = parseInt(abo.probabilite_renouvellement !== undefined && abo.probabilite_renouvellement !== null ? abo.probabilite_renouvellement : 80, 10);
-        if (selectedProba === 'high' && probaNum < 75) return false;
-        if (selectedProba === 'low' && probaNum >= 75) return false;
-      }
-
       // 6. Année
       if (selectedYear !== 'all') {
         const targetYear = parseInt(selectedYear, 10);
@@ -257,7 +247,7 @@ export default function AbonnementsTab({
 
       return true;
     });
-  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedProba, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs]);
+  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs]);
 
   const sortedAbonnements = useMemo(() => {
     const list = [...filteredAbonnements];
@@ -292,10 +282,6 @@ export default function AbonnementsTab({
         case 'date_debut':
           valA = a.date_debut ? new Date(a.date_debut).getTime() : 0;
           valB = b.date_debut ? new Date(b.date_debut).getTime() : 0;
-          return sortDirection === 'asc' ? valA - valB : valB - valA;
-        case 'probabilite':
-          valA = a.probabilite_renouvellement !== undefined && a.probabilite_renouvellement !== null ? Number(a.probabilite_renouvellement) : 80;
-          valB = b.probabilite_renouvellement !== undefined && b.probabilite_renouvellement !== null ? Number(b.probabilite_renouvellement) : 80;
           return sortDirection === 'asc' ? valA - valB : valB - valA;
         case 'statut':
           valA = a.statut_abonnement || a.statut || '';
@@ -461,19 +447,6 @@ export default function AbonnementsTab({
           </select>
         </div>
 
-        <div className="ts-filter-group">
-          <span>Renouvellement :</span>
-          <select
-            className="ts-filter-select"
-            value={selectedProba}
-            onChange={(e) => setSelectedProba(e.target.value)}
-          >
-            <option value="all">Toutes probabilités</option>
-            <option value="high">🟢 Élevé (≥ 75%)</option>
-            <option value="low">🟡 Modéré / Faible (&lt; 75%)</option>
-          </select>
-        </div>
-
         {yearOptions.length > 0 && (
           <div className="ts-filter-group">
             <span>Année :</span>
@@ -570,12 +543,7 @@ export default function AbonnementsTab({
                 <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedPeriodicite('all')}>✕</button>
               </span>
             )}
-            {selectedProba !== 'all' && (
-              <span className={styles.mobileFilterChip}>
-                Proba: {selectedProba === 'high' ? '≥75%' : '<75%'}
-                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedProba('all')}>✕</button>
-              </span>
-            )}
+
             {selectedYear !== 'all' && (
               <span className={styles.mobileFilterChip}>
                 Année: {selectedYear}
@@ -664,19 +632,6 @@ export default function AbonnementsTab({
               </select>
             </div>
 
-            <div className={styles.mobileFilterField}>
-              <label className={styles.mobileFilterLabel}>Probabilité de Renouvellement</label>
-              <select
-                className={styles.mobileFilterSelect}
-                value={selectedProba}
-                onChange={(e) => setSelectedProba(e.target.value)}
-              >
-                <option value="all">Toutes probabilités</option>
-                <option value="high">🟢 Élevé (≥ 75%)</option>
-                <option value="low">🟡 Modéré / Faible (&lt; 75%)</option>
-              </select>
-            </div>
-
             {yearOptions.length > 0 && (
               <div className={styles.mobileFilterField}>
                 <label className={styles.mobileFilterLabel}>Année Contractuelle</label>
@@ -752,9 +707,6 @@ export default function AbonnementsTab({
                 <th className="table-head-cell sortable" onClick={() => handleSort('date_debut')}>
                   Période Contractuelle {renderSortIcon('date_debut')}
                 </th>
-                <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('probabilite')}>
-                  Renouv. (%) {renderSortIcon('probabilite')}
-                </th>
                 <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('statut')}>
                   Statut {renderSortIcon('statut')}
                 </th>
@@ -767,9 +719,6 @@ export default function AbonnementsTab({
                   : 'N/A';
                 const supportsStr = abo.supports_associes || abo.reference_emplacement || abo.reference || '-';
                 const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
-                const proba = abo.probabilite_renouvellement !== undefined && abo.probabilite_renouvellement !== null
-                  ? `${abo.probabilite_renouvellement}%`
-                  : '80%';
 
                 return (
                   <tr key={abo.reference || abo.id} className="table-body-row clickable-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedAbonnement(abo)}>
@@ -835,19 +784,6 @@ export default function AbonnementsTab({
                       Du {abo.date_debut ? new Date(abo.date_debut).toLocaleDateString('fr-FR') : '-'} au {abo.date_echeance || abo.date_fin ? new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR') : '-'}
                     </td>
                     <td className="table-body-cell" style={{ textAlign: 'center' }}>
-                      <span style={{
-                        padding: '0.2rem 0.6rem',
-                        borderRadius: '9999px',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        background: parseInt(proba, 10) >= 75 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                        color: parseInt(proba, 10) >= 75 ? '#10b981' : '#f59e0b',
-                        border: parseInt(proba, 10) >= 75 ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)'
-                      }}>
-                        {proba}
-                      </span>
-                    </td>
-                    <td className="table-body-cell" style={{ textAlign: 'center' }}>
                       <span className={`wireframe-badge ${statutStr.toLowerCase() === 'actif' ? 'badge-available' : 'badge-occupied'}`}>
                         {statutStr}
                       </span>
@@ -872,9 +808,6 @@ export default function AbonnementsTab({
             const rawSupports = abo.supports_associes || abo.reference_emplacement || abo.reference || '';
             const supportsList = rawSupports ? rawSupports.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
             const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
-            const proba = abo.probabilite_renouvellement !== undefined && abo.probabilite_renouvellement !== null
-              ? `${abo.probabilite_renouvellement}%`
-              : '80%';
 
             // Règle 5 : Calcul de l'urgence et bordure colorée gauche
             const now = new Date();
@@ -983,20 +916,10 @@ export default function AbonnementsTab({
                   </div>
                 </div>
 
-                {/* Dates & Probabilité de renouvellement */}
+                {/* Dates contractuelles */}
                 <div className={styles.cardDatesRow}>
                   <span>
                     Du {abo.date_debut ? new Date(abo.date_debut).toLocaleDateString('fr-FR') : '-'} au {abo.date_echeance || abo.date_fin ? new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR') : '-'}
-                  </span>
-                  <span
-                    className={styles.cardProbaBadge}
-                    style={{
-                      background: parseInt(proba, 10) >= 75 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                      color: parseInt(proba, 10) >= 75 ? '#10b981' : '#f59e0b',
-                      border: parseInt(proba, 10) >= 75 ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)'
-                    }}
-                  >
-                    Renouv. {proba}
                   </span>
                 </div>
 

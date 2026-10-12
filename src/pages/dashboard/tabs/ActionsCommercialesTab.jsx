@@ -26,6 +26,8 @@ export default function ActionsCommercialesTab({
   const [selectedCommercial, setSelectedCommercial] = useState('all');
   const [selectedEmailStatus, setSelectedEmailStatus] = useState('all');
   const [showOnlyJ30, setShowOnlyJ30] = useState(false);
+  const [showOnlyPreavis, setShowOnlyPreavis] = useState(false);
+  const [alertSectionTab, setAlertSectionTab] = useState('preavis'); // 'preavis' ou 'j30'
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState('date_action');
@@ -50,19 +52,20 @@ export default function ActionsCommercialesTab({
       : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: '#38bdf8', marginLeft: 4 }} />;
   };
 
-  // État du modèle d'email par défaut (Table Modele_Courriel)
+  // État des modèles d'email (Table Modele_Courriel)
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [selectedTemplateCode, setSelectedTemplateCode] = useState('PREAVIS_RECONDUCTION');
   const [loadingTemplate, setLoadingTemplate] = useState(false);
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState({
-    sujet: 'Échéance prochaine de votre contrat publicitaire AEROPUB - {reference}',
-    corps: `Bonjour {destNom},\n\nNous vous informons que votre contrat n° {reference}, relatif au(x) support(s) {supports}, arrivera à échéance dans {diffJours} jour(s), le {dateFr}.\n\nVotre interlocuteur AEROPUB ({interlocuteur}) prendra contact avec vous afin d'étudier son renouvellement.\n\nBien cordialement,\nL'équipe commerciale AEROPUB`
+    sujet: '',
+    corps: ''
   });
 
-  const fetchTemplate = async () => {
+  const fetchTemplate = async (code = selectedTemplateCode) => {
     try {
       setLoadingTemplate(true);
-      const data = await modeleCourrielApi.getByCode('RELANCE_ECHEANCE');
+      const data = await modeleCourrielApi.getByCode(code);
       if (data) {
         setEmailTemplate({
           sujet: data.sujet || '',
@@ -77,18 +80,20 @@ export default function ActionsCommercialesTab({
   };
 
   useEffect(() => {
-    fetchTemplate();
-  }, []);
+    if (showTemplateModal) {
+      fetchTemplate(selectedTemplateCode);
+    }
+  }, [showTemplateModal, selectedTemplateCode]);
 
   const handleSaveTemplate = async (e) => {
     e.preventDefault();
     setSavingTemplate(true);
     try {
-      await modeleCourrielApi.updateByCode('RELANCE_ECHEANCE', {
+      await modeleCourrielApi.updateByCode(selectedTemplateCode, {
         sujet: emailTemplate.sujet,
         corps: emailTemplate.corps
       });
-      showSuccess('Modèle de courriel mis à jour avec succès dans la base de données !');
+      showSuccess(`Modèle "${selectedTemplateCode === 'PREAVIS_RECONDUCTION' ? 'Préavis de reconduction' : 'Relance d\'échéance'}" mis à jour avec succès !`);
       setShowTemplateModal(false);
     } catch (err) {
       const msg = sanitizeUserError(err, 'Erreur lors de la sauvegarde du modèle.');
@@ -98,6 +103,7 @@ export default function ActionsCommercialesTab({
     }
   };
 
+  // Envoi relance manuelle (Contrats standards J-30)
   const handleSendManualEmail = async (targetInfo) => {
     const ref = targetInfo.reference || targetInfo.id_abonnement;
     const client = targetInfo.nom_client || targetInfo.raison_sociale || 'Client';
@@ -107,13 +113,12 @@ export default function ActionsCommercialesTab({
       return;
     }
 
-    // 1. Alerte de confirmation préalable avant envoi
     const confirmation = window.confirm(
-      `Confirmation d'envoi de relance\n\nÊtes-vous sûr de vouloir envoyer un courriel de relance pour le contrat "${ref}" au client "${client}" ?`
+      `Confirmation d'envoi de relance d'échéance\n\nÊtes-vous sûr de vouloir envoyer un courriel de relance pour le contrat "${ref}" au client "${client}" ?`
     );
 
     if (!confirmation) {
-      return; // L'utilisateur annule
+      return;
     }
 
     setSendingRef(ref);
@@ -130,6 +135,38 @@ export default function ActionsCommercialesTab({
     }
   };
 
+  // Envoi préavis de résiliation / reconduction (Contrats reconduction tacite)
+  const handleSendPreavisEmail = async (targetInfo) => {
+    const ref = targetInfo.reference || targetInfo.id_abonnement;
+    const client = targetInfo.nom_client || targetInfo.raison_sociale || 'Client';
+
+    if (!ref) {
+      showInfo("Impossible d'envoyer le préavis : aucun contrat n'est associé à cette action.");
+      return;
+    }
+
+    const confirmation = window.confirm(
+      `Confirmation d'envoi du préavis de reconduction tacite\n\nÊtes-vous sûr de vouloir envoyer le courriel de préavis pour le contrat "${ref}" au client "${client}" ?\n\nCe courriel informera le client de son délai de résiliation contractuel avant reconduction automatique.`
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    setSendingRef(ref);
+
+    try {
+      const res = await actionsCommercialesApi.envoyerPreavisReconduction(ref, user?.id);
+      showSuccess(res?.message || `Courriel de préavis envoyé avec succès pour ${ref} (${client}).`);
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      const errorMsg = sanitizeUserError(err, "Erreur lors de l'envoi du préavis.");
+      showError(`Échec de l'envoi : ${errorMsg}`);
+    } finally {
+      setSendingRef(null);
+    }
+  };
+
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
       setSearchTerm(initialSearchQuery);
@@ -138,10 +175,8 @@ export default function ActionsCommercialesTab({
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedTypeAction, selectedCommercial, selectedEmailStatus, showOnlyJ30]);
+  }, [searchTerm, selectedTypeAction, selectedCommercial, selectedEmailStatus, showOnlyJ30, showOnlyPreavis]);
 
-  // Calcul des contrats à échéance J-30 (alerte renouvellement)
-  // Recuperation des references de contrats deja renouveles (ceux ayant un contrat enfant)
   const renewedParentRefs = useMemo(() => {
     const set = new Set();
     abonnements.forEach((c) => {
@@ -153,24 +188,69 @@ export default function ActionsCommercialesTab({
   }, [abonnements]);
 
   const now = new Date();
+
+  // 1. Contrats avec clause de Reconduction Tacite arrivant au préavis
+  const alertPreavisAbos = useMemo(() => {
+    return abonnements.filter((abo) => {
+      // a. Clause tacite activée
+      const isTacite = abo.reconduction_tacite === true || abo.reconduction_tacite === 'true' || abo.reconduction_tacite === 1;
+      if (!isTacite) return false;
+
+      // b. Statut ACTIF uniquement
+      const statut = String(abo.statut || abo.nom_statut || abo.statut_abonnement || '').toLowerCase();
+      if (statut !== 'actif') return false;
+
+      // c. Aucun renouvellement existant
+      const ref = String(abo.reference || '').trim();
+      if (renewedParentRefs.has(ref) || abo.a_renouvellement) return false;
+
+      // d. Échéance future
+      if (!abo.date_echeance && !abo.date_fin) return false;
+      const echeance = new Date(abo.date_echeance || abo.date_fin);
+      const diffDaysEcheance = Math.ceil((echeance.getTime() - now.getTime()) / (1000 * 3600 * 24));
+      if (diffDaysEcheance <= 0) return false;
+
+      // e. Calcul préavis
+      const preavisJours = parseInt(abo.preavis_jours, 10) || 30;
+      const dateLimitePreavis = new Date(echeance.getTime() - preavisJours * 24 * 3600 * 1000);
+      const diffDaysPreavis = Math.ceil((dateLimitePreavis.getTime() - now.getTime()) / (1000 * 3600 * 24));
+
+      // Afficher si le contrat approche du préavis (30 jours avant le préavis, et tout au long du préavis jusqu'à l'échéance)
+      return diffDaysPreavis <= 30;
+    }).map((abo) => {
+      const echeance = new Date(abo.date_echeance || abo.date_fin);
+      const preavisJours = parseInt(abo.preavis_jours, 10) || 30;
+      const dateLimitePreavis = new Date(echeance.getTime() - preavisJours * 24 * 3600 * 1000);
+      const diffDaysPreavis = Math.ceil((dateLimitePreavis.getTime() - now.getTime()) / (1000 * 3600 * 24));
+      const diffDaysEcheance = Math.ceil((echeance.getTime() - now.getTime()) / (1000 * 3600 * 24));
+      return {
+        ...abo,
+        preavisJours,
+        dateLimitePreavis,
+        diffDaysPreavis,
+        diffDaysEcheance
+      };
+    });
+  }, [abonnements, renewedParentRefs, now]);
+
+  // 2. Contrats standards sans reconduction tacite approchant de leur terme (J-30 classique)
   const alertJ30Abos = useMemo(() => {
     return abonnements.filter((abo) => {
+      const isTacite = abo.reconduction_tacite === true || abo.reconduction_tacite === 'true' || abo.reconduction_tacite === 1;
+      if (isTacite) return false; // Dédié au préavis
+
       if (!abo.date_echeance && !abo.date_fin) return false;
-
       const ref = String(abo.reference || '').trim();
-      const statut = String(abo.statut || abo.nom_statut || '').toLowerCase();
+      const statut = String(abo.statut || abo.nom_statut || abo.statut_abonnement || '').toLowerCase();
 
-      if (['renouvelé', 'expiré', 'résilié', 'archivé'].includes(statut)) {
-        return false;
-      }
-      if (renewedParentRefs.has(ref)) {
-        return false;
-      }
+      if (statut !== 'actif') return false;
+      if (renewedParentRefs.has(ref) || abo.a_renouvellement) return false;
+
       const echeance = new Date(abo.date_echeance || abo.date_fin);
       const diffDays = Math.ceil((echeance.getTime() - now.getTime()) / (1000 * 3600 * 24));
       return diffDays >= 0 && diffDays <= 30;
     });
-  }, [abonnements, renewedParentRefs])
+  }, [abonnements, renewedParentRefs, now]);
 
   const typeActionOptions = useMemo(() => {
     const types = [...new Set(actions.map(a => a.type_action).filter(Boolean))];
@@ -192,7 +272,8 @@ export default function ActionsCommercialesTab({
     selectedTypeAction !== 'all' ||
     selectedCommercial !== 'all' ||
     selectedEmailStatus !== 'all' ||
-    showOnlyJ30;
+    showOnlyJ30 ||
+    showOnlyPreavis;
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -200,6 +281,7 @@ export default function ActionsCommercialesTab({
     setSelectedCommercial('all');
     setSelectedEmailStatus('all');
     setShowOnlyJ30(false);
+    setShowOnlyPreavis(false);
     setCurrentPage(1);
   };
 
@@ -239,19 +321,29 @@ export default function ActionsCommercialesTab({
         }
       }
 
-      // 5. J-30 uniquement (lié à un contrat en J-30)
+      // 5. J-30 uniquement (lié à un contrat en J-30 ou action relance)
       if (showOnlyJ30) {
         const isJ30 = alertJ30Abos.some(
           a => a.reference === act.id_abonnement ||
             a.nom_client === act.nom_client ||
             a.raison_sociale === act.nom_client
-        );
+        ) || (act.type_action || '').toLowerCase().includes('relance') || (act.type_action || '').toLowerCase().includes('échéance');
         if (!isJ30) return false;
+      }
+
+      // 6. Préavis uniquement (lié à un contrat en préavis ou action préavis)
+      if (showOnlyPreavis) {
+        const isPreavis = alertPreavisAbos.some(
+          a => a.reference === act.id_abonnement ||
+            a.nom_client === act.nom_client ||
+            a.raison_sociale === act.nom_client
+        ) || (act.type_action || '').toLowerCase().includes('préavis') || (act.type_action || '').toLowerCase().includes('preavis');
+        if (!isPreavis) return false;
       }
 
       return true;
     });
-  }, [actions, alertJ30Abos, searchTerm, selectedTypeAction, selectedCommercial, selectedEmailStatus, showOnlyJ30]);
+  }, [actions, alertJ30Abos, alertPreavisAbos, searchTerm, selectedTypeAction, selectedCommercial, selectedEmailStatus, showOnlyJ30, showOnlyPreavis]);
 
   const sortedActions = useMemo(() => {
     if (!sortField) return filteredActions;
@@ -295,89 +387,296 @@ export default function ActionsCommercialesTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Alerte J-30 pour les contrats approchant de leur terme */}
-      <div className="glass-panel" style={{
-        padding: '1rem 1.25rem',
-        borderRadius: '12px',
-        border: '1px solid rgba(250, 204, 21, 0.4)',
-        background: 'rgba(250, 204, 21, 0.08)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Bell size={18} style={{ color: 'var(--accent-secondary)' }} />
-            <h4 style={{ margin: 0, color: 'var(--accent-secondary)', fontSize: '1rem', fontWeight: 700 }}>
-              Alertes Relance J-30 ({alertJ30Abos.length} contrat(s) en échéance proche)
-            </h4>
-          </div>
+      {/* Sélecteur d'onglets pour le suivi des alertes */}
+      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <button
+          type="button"
+          className={`pill-btn ${alertSectionTab === 'preavis' ? 'active' : ''}`}
+          style={{
+            fontSize: '0.85rem',
+            padding: '0.45rem 1rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            borderColor: alertSectionTab === 'preavis' ? '#38bdf8' : 'rgba(56, 189, 248, 0.3)',
+            background: alertSectionTab === 'preavis' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(15, 23, 42, 0.5)'
+          }}
+          onClick={() => setAlertSectionTab('preavis')}
+        >
+          <RotateCcw size={15} style={{ color: '#38bdf8' }} />
+          <span style={{ fontWeight: 600 }}>Préavis Reconduction Tacite</span>
+          <span style={{
+            fontSize: '0.72rem',
+            padding: '0.1rem 0.45rem',
+            borderRadius: '999px',
+            background: alertPreavisAbos.length > 0 ? '#0284c7' : 'rgba(255,255,255,0.1)',
+            color: '#fff',
+            marginLeft: '0.2rem'
+          }}>
+            {alertPreavisAbos.length}
+          </span>
+        </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            {/* Bouton Modifier le modèle du courriel par défaut (Module 3 : Admin seul) */}
-            {canEditEmailTemplate && (
+        <button
+          type="button"
+          className={`pill-btn ${alertSectionTab === 'j30' ? 'active' : ''}`}
+          style={{
+            fontSize: '0.85rem',
+            padding: '0.45rem 1rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            borderColor: alertSectionTab === 'j30' ? '#facc15' : 'rgba(250, 204, 21, 0.3)',
+            background: alertSectionTab === 'j30' ? 'rgba(250, 204, 21, 0.15)' : 'rgba(15, 23, 42, 0.5)'
+          }}
+          onClick={() => setAlertSectionTab('j30')}
+        >
+          <Bell size={15} style={{ color: '#facc15' }} />
+          <span style={{ fontWeight: 600 }}>Échéances Standards (J-30)</span>
+          <span style={{
+            fontSize: '0.72rem',
+            padding: '0.1rem 0.45rem',
+            borderRadius: '999px',
+            background: alertJ30Abos.length > 0 ? '#ca8a04' : 'rgba(255,255,255,0.1)',
+            color: '#fff',
+            marginLeft: '0.2rem'
+          }}>
+            {alertJ30Abos.length}
+          </span>
+        </button>
+      </div>
+
+      {/* 1. Panneau Alerte : Préavis de Reconduction Tacite */}
+      {alertSectionTab === 'preavis' && (
+        <div className="glass-panel" style={{
+          padding: '1rem 1.25rem',
+          borderRadius: '12px',
+          border: '1px solid rgba(56, 189, 248, 0.4)',
+          background: 'rgba(56, 189, 248, 0.07)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <RotateCcw size={18} style={{ color: '#38bdf8' }} />
+              <div>
+                <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '1rem', fontWeight: 700 }}>
+                  Préavis de Reconduction Tacite ({alertPreavisAbos.length} contrat(s) actif(s) sous préavis)
+                </h4>
+                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  Contrats soumis à reconduction automatique sans renouvellement enregistré. Informez les clients avant la date limite de notification s'ils souhaitent résilier.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {canEditEmailTemplate && (
+                <button
+                  type="button"
+                  className="pill-btn"
+                  style={{ fontSize: '0.78rem', padding: '0.25rem 0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  onClick={() => {
+                    setSelectedTemplateCode('PREAVIS_RECONDUCTION');
+                    setShowTemplateModal(true);
+                  }}
+                  title="Modifier le modèle du courriel de préavis (Réservé Admin)"
+                >
+                  <Settings size={13} />
+                  <span>Modèle préavis</span>
+                </button>
+              )}
+
               <button
                 type="button"
-                className="pill-btn"
-                style={{ fontSize: '0.78rem', padding: '0.25rem 0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                onClick={() => setShowTemplateModal(true)}
-                title="Modifier le modèle du courriel par défaut (Réservé Admin)"
+                className={`pill-btn ${showOnlyPreavis ? 'active' : ''}`}
+                style={{ fontSize: '0.78rem', padding: '0.25rem 0.75rem' }}
+                onClick={() => {
+                  setShowOnlyPreavis(!showOnlyPreavis);
+                  if (!showOnlyPreavis) setShowOnlyJ30(false);
+                }}
               >
-                <Settings size={13} />
-                <span>Modifier modèle courriel</span>
+                {showOnlyPreavis ? '✓ Filtré sur Préavis' : 'Filtrer actions sur Préavis'}
               </button>
-            )}
-
-            <button
-              type="button"
-              className={`pill-btn ${showOnlyJ30 ? 'active' : ''}`}
-              style={{ fontSize: '0.78rem', padding: '0.25rem 0.75rem' }}
-              onClick={() => setShowOnlyJ30(!showOnlyJ30)}
-            >
-              {showOnlyJ30 ? '✓ Filtré sur J-30' : 'Filtrer actions sur J-30'}
-            </button>
+            </div>
           </div>
+
+          {alertPreavisAbos.length === 0 ? (
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+              Aucun contrat actif à reconduction tacite sous délai de préavis actuellement.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.75rem' }}>
+              {alertPreavisAbos.map((abo) => (
+                <div key={abo.reference} style={{
+                  padding: '0.75rem 0.95rem',
+                  borderRadius: '10px',
+                  background: 'rgba(15, 23, 42, 0.7)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.35rem',
+                  minWidth: '280px',
+                  flex: '1 1 calc(33.333% - 0.75rem)',
+                  maxWidth: '100%'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong style={{ color: '#38bdf8', fontSize: '0.95rem' }}>{abo.reference}</strong>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '4px',
+                      background: abo.diffDaysPreavis > 0 ? 'rgba(56, 189, 248, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                      color: abo.diffDaysPreavis > 0 ? '#38bdf8' : '#f87171',
+                      border: abo.diffDaysPreavis > 0 ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid rgba(239, 68, 68, 0.4)'
+                    }}>
+                      {abo.diffDaysPreavis > 0 
+                        ? `⏳ Reste ${abo.diffDaysPreavis} j pour résilier` 
+                        : (abo.diffDaysEcheance > 0 ? `🔒 Préavis clos (Reste ${abo.diffDaysEcheance} j)` : '🔒 Échéance atteinte')}
+                    </span>
+                  </div>
+
+                  <div style={{ color: 'var(--text-main)', fontWeight: 500 }}>
+                    {abo.nom_client || abo.raison_sociale}
+                  </div>
+
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+                    <div>
+                      📅 Échéance : <strong>{new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')}</strong>
+                    </div>
+                    <div>
+                      ⏱️ Préavis : <strong>{abo.preavisJours} jours</strong>
+                    </div>
+                    <div style={{ color: abo.diffDaysPreavis > 0 ? '#38bdf8' : '#fca5a5', fontWeight: 600 }}>
+                      ⚠️ Date limite résiliation : {abo.dateLimitePreavis.toLocaleDateString('fr-FR')}
+                    </div>
+                  </div>
+
+                  {canSendManualEmail && (
+                    <button
+                      type="button"
+                      className="pill-btn active"
+                      style={{
+                        fontSize: '0.75rem',
+                        padding: '0.3rem 0.65rem',
+                        alignSelf: 'flex-start',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        marginTop: '0.35rem',
+                        background: '#0284c7',
+                        borderColor: '#38bdf8'
+                      }}
+                      onClick={() => handleSendPreavisEmail(abo)}
+                      disabled={sendingRef === abo.reference}
+                      title="Envoyer le courriel de préavis de reconduction / résiliation au client"
+                    >
+                      {sendingRef === abo.reference ? <Loader2 size={12} className="btn-spinner" /> : <Send size={12} />}
+                      <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer préavis résiliation'}</span>
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      )}
 
-        {alertJ30Abos.length === 0 ? (
-          <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-            Aucun contrat à renouveler sous les 30 prochains jours.
-          </p>
-        ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.6rem' }}>
-            {alertJ30Abos.map((abo) => (
-              <div key={abo.reference} style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '8px',
-                background: 'rgba(15, 23, 42, 0.6)',
-                border: '1px solid rgba(250, 204, 21, 0.3)',
-                fontSize: '0.85rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.25rem'
-              }}>
-                <div>
-                  <strong style={{ color: 'var(--text-main)' }}>{abo.reference}</strong> - <span>{abo.nom_client || abo.raison_sociale}</span>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--accent-secondary)' }}>
-                  Échéance : {new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')} (Probabilité : {abo.probabilite_renouvellement || 80}%)
-                </div>
-                {/* Bouton Envoyer/Renvoyer l'e-mail de relance manuel (Module 3 : Admin, Resp_Com, Commercial) */}
-                {canSendManualEmail && (
-                  <button
-                    type="button"
-                    className="pill-btn active"
-                    style={{ fontSize: '0.74rem', padding: '0.2rem 0.55rem', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}
-                    onClick={() => handleSendManualEmail(abo)}
-                    disabled={sendingRef === abo.reference}
-                    title="Envoyer l'e-mail de relance manuel au client"
-                  >
-                    {sendingRef === abo.reference ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
-                    <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer relance manuelle'}</span>
-                  </button>
-                )}
+      {/* 2. Panneau Alerte : Échéances Standards J-30 */}
+      {alertSectionTab === 'j30' && (
+        <div className="glass-panel" style={{
+          padding: '1rem 1.25rem',
+          borderRadius: '12px',
+          border: '1px solid rgba(250, 204, 21, 0.4)',
+          background: 'rgba(250, 204, 21, 0.08)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <Bell size={18} style={{ color: 'var(--accent-secondary)' }} />
+              <div>
+                <h4 style={{ margin: 0, color: 'var(--accent-secondary)', fontSize: '1rem', fontWeight: 700 }}>
+                  Alertes Relance J-30 ({alertJ30Abos.length} contrat(s) en échéance proche)
+                </h4>
+                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  Contrats standards sans tacite reconduction arrivant à échéance sous 30 jours, sans contrat de renouvellement.
+                </p>
               </div>
-            ))}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {canEditEmailTemplate && (
+                <button
+                  type="button"
+                  className="pill-btn"
+                  style={{ fontSize: '0.78rem', padding: '0.25rem 0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                  onClick={() => {
+                    setSelectedTemplateCode('RELANCE_ECHEANCE');
+                    setShowTemplateModal(true);
+                  }}
+                  title="Modifier le modèle du courriel par défaut (Réservé Admin)"
+                >
+                  <Settings size={13} />
+                  <span>Modifier modèle courriel</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                className={`pill-btn ${showOnlyJ30 ? 'active' : ''}`}
+                style={{ fontSize: '0.78rem', padding: '0.25rem 0.75rem' }}
+                onClick={() => {
+                  setShowOnlyJ30(!showOnlyJ30);
+                  if (!showOnlyJ30) setShowOnlyPreavis(false);
+                }}
+              >
+                {showOnlyJ30 ? '✓ Filtré sur J-30' : 'Filtrer actions sur J-30'}
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+
+          {alertJ30Abos.length === 0 ? (
+            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+              Aucun contrat standard à renouveler sous les 30 prochains jours.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.6rem' }}>
+              {alertJ30Abos.map((abo) => (
+                <div key={abo.reference} style={{
+                  padding: '0.6rem 0.85rem',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.6)',
+                  border: '1px solid rgba(250, 204, 21, 0.3)',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.25rem',
+                  minWidth: '260px',
+                  flex: '1 1 calc(33.333% - 0.75rem)'
+                }}>
+                  <div>
+                    <strong style={{ color: 'var(--text-main)' }}>{abo.reference}</strong> - <span>{abo.nom_client || abo.raison_sociale}</span>
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--accent-secondary)' }}>
+                    Échéance : {new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')}
+                  </div>
+                  {canSendManualEmail && (
+                    <button
+                      type="button"
+                      className="pill-btn active"
+                      style={{ fontSize: '0.74rem', padding: '0.2rem 0.55rem', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}
+                      onClick={() => handleSendManualEmail(abo)}
+                      disabled={sendingRef === abo.reference}
+                      title="Envoyer l'e-mail de relance manuel au client"
+                    >
+                      {sendingRef === abo.reference ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
+                      <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer relance manuelle'}</span>
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Historique des Actions Commerciales */}
       <div>
@@ -569,7 +868,7 @@ export default function ActionsCommercialesTab({
         />
       </div>
 
-      {/* Modal Modification du Modèle de Courriel par défaut (Admin seul) */}
+      {/* Modal Modification du Modèle de Courriel (Admin seul) */}
       {showTemplateModal && (
         <div style={{
           position: 'fixed',
@@ -586,7 +885,7 @@ export default function ActionsCommercialesTab({
           padding: '1rem'
         }}>
           <div className="glass-panel" style={{
-            maxWidth: '550px',
+            maxWidth: '580px',
             width: '100%',
             padding: '1.75rem',
             borderRadius: '16px',
@@ -594,11 +893,11 @@ export default function ActionsCommercialesTab({
             boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
             background: 'var(--bg-secondary, #1e293b)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Mail size={20} style={{ color: 'var(--accent-secondary)' }} />
                 <h3 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--text-main)', fontWeight: 700 }}>
-                  Modifier le modèle de courriel par défaut
+                  Modifier le modèle de courriel
                 </h3>
               </div>
               <button
@@ -607,6 +906,26 @@ export default function ActionsCommercialesTab({
                 style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
               >
                 <X size={20} />
+              </button>
+            </div>
+
+            {/* Onglets de sélection du modèle */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              <button
+                type="button"
+                className={`pill-btn ${selectedTemplateCode === 'PREAVIS_RECONDUCTION' ? 'active' : ''}`}
+                style={{ fontSize: '0.82rem', padding: '0.35rem 0.8rem' }}
+                onClick={() => setSelectedTemplateCode('PREAVIS_RECONDUCTION')}
+              >
+                🔄 Préavis de reconduction tacite
+              </button>
+              <button
+                type="button"
+                className={`pill-btn ${selectedTemplateCode === 'RELANCE_ECHEANCE' ? 'active' : ''}`}
+                style={{ fontSize: '0.82rem', padding: '0.35rem 0.8rem' }}
+                onClick={() => setSelectedTemplateCode('RELANCE_ECHEANCE')}
+              >
+                ⚠️ Relance d'échéance (J-30)
               </button>
             </div>
 
@@ -637,7 +956,7 @@ export default function ActionsCommercialesTab({
                   Corps du message :
                 </label>
                 <textarea
-                  rows={7}
+                  rows={8}
                   value={emailTemplate.corps}
                   onChange={(e) => setEmailTemplate({ ...emailTemplate, corps: e.target.value })}
                   required
@@ -655,7 +974,7 @@ export default function ActionsCommercialesTab({
                 />
               </div>
 
-              {/* Guide des variables dynamiques */}
+              {/* Guide des variables dynamiques selon le modèle choisi */}
               <div style={{
                 padding: '0.65rem 0.85rem',
                 borderRadius: '8px',
@@ -664,17 +983,28 @@ export default function ActionsCommercialesTab({
                 fontSize: '0.78rem'
               }}>
                 <div style={{ fontWeight: 600, color: 'var(--accent-secondary, #38bdf8)', marginBottom: '0.35rem' }}>
-                  💡 Variables dynamiques (remplacées automatiquement à l'envoi) :
+                  💡 Variables dynamiques pour {selectedTemplateCode === 'PREAVIS_RECONDUCTION' ? 'le préavis de reconduction' : 'la relance d\'échéance'} :
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
-                  {[
+                  {(selectedTemplateCode === 'PREAVIS_RECONDUCTION' ? [
+                    { tag: '{destNom}', desc: 'Nom du destinataire / client' },
+                    { tag: '{reference}', desc: 'Réf contrat' },
+                    { tag: '{supports}', desc: 'Supports' },
+                    { tag: '{dateFr}', desc: 'Date d\'échéance' },
+                    { tag: '{preavisJours}', desc: 'Délai préavis en jours' },
+                    { tag: '{dateLimitePreavisFr}', desc: 'Date limite notification résiliation' },
+                    { tag: '{diffJoursPreavis}', desc: 'Jours restants avant date limite préavis' },
+                    { tag: '{diffJoursEcheance}', desc: 'Jours restants avant échéance' },
+                    { tag: '{nbJoursRestants}', desc: 'Texte complet jours restants (avec rattrapage)' },
+                    { tag: '{interlocuteur}', desc: 'Commercial' },
+                  ] : [
                     { tag: '{destNom}', desc: 'Nom du destinataire / client' },
                     { tag: '{reference}', desc: 'Réf contrat' },
                     { tag: '{supports}', desc: 'Supports' },
                     { tag: '{diffJours}', desc: 'Jours restants' },
                     { tag: '{dateFr}', desc: 'Date d\'échéance' },
                     { tag: '{interlocuteur}', desc: 'Commercial' },
-                  ].map(({ tag, desc }) => (
+                  ]).map(({ tag, desc }) => (
                     <code
                       key={tag}
                       style={{
@@ -685,7 +1015,7 @@ export default function ActionsCommercialesTab({
                         border: '1px solid rgba(147, 197, 253, 0.3)',
                         cursor: 'pointer'
                       }}
-                      title={`${desc} - Cliquer pour insérer à la fin du message`}
+                      title={`${desc} - Cliquer pour insérer`}
                       onClick={() => setEmailTemplate(prev => ({ ...prev, corps: prev.corps + ' ' + tag }))}
                     >
                       {tag}

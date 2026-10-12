@@ -7,13 +7,11 @@ export default function CategoriesTab({
   abonnements = [],
   clients = [],
   zones = [],
-  formats = [],
   initialSearchQuery = ''
 }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [catSearch, setCatSearch] = useState('');
   const [supportSearch, setSupportSearch] = useState(initialSearchQuery);
-  const [catFormatFilter, setCatFormatFilter] = useState('all');
   const [catDateFilter, setCatDateFilter] = useState('all');
   const [catClientFilter, setCatClientFilter] = useState('all');
   const [catStatusFilter, setCatStatusFilter] = useState('all');
@@ -45,7 +43,6 @@ export default function CategoriesTab({
 
   const hasActiveFilters =
     supportSearch.trim() !== '' ||
-    catFormatFilter !== 'all' ||
     catDateFilter !== 'all' ||
     catZoneFilter !== 'all' ||
     catClientFilter !== 'all' ||
@@ -53,7 +50,6 @@ export default function CategoriesTab({
 
   const resetFilters = () => {
     setSupportSearch('');
-    setCatFormatFilter('all');
     setCatDateFilter('all');
     setCatZoneFilter('all');
     setCatClientFilter('all');
@@ -76,14 +72,6 @@ export default function CategoriesTab({
         (emp.nom_zone || emp.nom_lieu || '').toLowerCase().includes(q) ||
         (emp.observation || '').toLowerCase().includes(q);
       if (!match) return false;
-    }
-
-    // 2. Filtre Format
-    if (catFormatFilter !== 'all') {
-      const empFormat = (emp.caracteristiques || emp.ref_format || '').toLowerCase();
-      if (!empFormat.includes(catFormatFilter.toLowerCase())) {
-        return false;
-      }
     }
 
     // 3. Filtre par Date sélectionnée (Contrat actif à cette date)
@@ -229,25 +217,6 @@ export default function CategoriesTab({
                   style={{ width: '150px' }}
                 />
               </div>
-
-              {/* Filtre Formats */}
-              {formats.length > 0 && (
-                <div className="ts-filter-group">
-                  <span>Format :</span>
-                  <select
-                    className="ts-filter-select"
-                    value={catFormatFilter}
-                    onChange={(e) => setCatFormatFilter(e.target.value)}
-                  >
-                    <option value="all">Tous formats</option>
-                    {formats.map((f) => (
-                      <option key={f.id || f.ref_format} value={f.ref_format || f.nom}>
-                        {f.ref_format || f.nom}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
 
               {/* Filtre par Date */}
               <div className="ts-filter-group">

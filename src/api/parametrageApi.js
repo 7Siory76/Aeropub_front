@@ -21,4 +21,10 @@ export const csvApi = {
       },
     }).then(res => res.data);
   },
+
+  importInfrastructure: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/csv/import-infrastructure', formData, { headers: { 'Content-Type': 'multipart/formData' } }).then(res => res.data);
+  }
 };

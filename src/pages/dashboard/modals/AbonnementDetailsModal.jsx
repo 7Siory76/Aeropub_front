@@ -118,7 +118,6 @@ export default function AbonnementDetailsModal({
     periodicite: abonnement?.periodicite || 'Annuel',
     date_debut: formatDateForInput(abonnement?.date_debut),
     date_echeance: formatDateForInput(abonnement?.date_echeance || abonnement?.date_fin),
-    probabilite_renouvellement: abonnement?.probabilite_renouvellement ?? 80,
     preavis_jours: abonnement?.preavis_jours ?? 30,
     reconduction_tacite: Boolean(abonnement?.reconduction_tacite),
     motif_non_renouvellement: abonnement?.motif_non_renouvellement || '',
@@ -140,7 +139,6 @@ export default function AbonnementDetailsModal({
         periodicite: abonnement.periodicite || 'Annuel',
         date_debut: formatDateForInput(abonnement.date_debut),
         date_echeance: formatDateForInput(abonnement.date_echeance || abonnement.date_fin),
-        probabilite_renouvellement: abonnement.probabilite_renouvellement ?? 80,
         preavis_jours: abonnement.preavis_jours ?? 30,
         reconduction_tacite: Boolean(abonnement.reconduction_tacite),
         motif_non_renouvellement: abonnement.motif_non_renouvellement || '',
@@ -425,7 +423,6 @@ export default function AbonnementDetailsModal({
         periodicite: formData.periodicite,
         date_debut: formData.date_debut,
         date_echeance: formData.date_echeance,
-        probabilite_renouvellement: formData.probabilite_renouvellement !== '' ? parseInt(formData.probabilite_renouvellement, 10) : undefined,
         preavis_jours: formData.preavis_jours !== '' ? parseInt(formData.preavis_jours, 10) : undefined,
         reconduction_tacite: formData.reconduction_tacite,
         motif_non_renouvellement: formData.motif_non_renouvellement,
@@ -494,7 +491,6 @@ export default function AbonnementDetailsModal({
       await abonnementsApi.update(abonnement.reference, {
         tarif: newTarif,
         date_echeance: nextEnd.toISOString(),
-        probabilite_renouvellement: 100,
         statut_abonnement: 'Actif',
         commentaire: `Renouvellement validé par ${user?.nom || 'Direction'} avec remise exceptionnelle de ${remisePercent}%. Motif: ${remiseMotif || 'Geste commercial'}.`
       });
@@ -911,51 +907,37 @@ export default function AbonnementDetailsModal({
               </div>
             </div>
 
-            {/* Ligne 5 : Statut & Probabilité de renouvellement */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <div className="modal-form-group">
-                <label className="modal-label">Statut du contrat :</label>
-                <select
-                  className="modal-select"
-                  value={formData.id_type_statut || formData.statut}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    const matchedType = typeStatutList.find(t => String(t.id) === String(val) || t.nom_statut.toLowerCase() === val.toLowerCase());
-                    setFormData({
-                      ...formData,
-                      id_type_statut: matchedType ? matchedType.id : val,
-                      statut: matchedType ? matchedType.nom_statut : val
-                    });
-                  }}
-                >
-                  {typeStatutList && typeStatutList.length > 0 ? (
-                    typeStatutList.map(st => (
-                      <option key={st.id} value={st.id}>
-                        {st.nom_statut.charAt(0).toUpperCase() + st.nom_statut.slice(1)}
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="Actif">Actif</option>
-                      <option value="En attente">En attente</option>
-                      <option value="Terminé">Terminé</option>
-                      <option value="Résilié">Résilié</option>
-                    </>
-                  )}
-                </select>
-              </div>
-
-              <div className="modal-form-group">
-                <label className="modal-label">Probabilité de renouvellement (%) :</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  className="modal-input"
-                  value={formData.probabilite_renouvellement}
-                  onChange={(e) => setFormData({ ...formData, probabilite_renouvellement: e.target.value })}
-                />
-              </div>
+            {/* Ligne 5 : Statut */}
+            <div className="modal-form-group">
+              <label className="modal-label">Statut du contrat :</label>
+              <select
+                className="modal-select"
+                value={formData.id_type_statut || formData.statut}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const matchedType = typeStatutList.find(t => String(t.id) === String(val) || t.nom_statut.toLowerCase() === val.toLowerCase());
+                  setFormData({
+                    ...formData,
+                    id_type_statut: matchedType ? matchedType.id : val,
+                    statut: matchedType ? matchedType.nom_statut : val
+                  });
+                }}
+              >
+                {typeStatutList && typeStatutList.length > 0 ? (
+                  typeStatutList.map(st => (
+                    <option key={st.id} value={st.id}>
+                      {st.nom_statut.charAt(0).toUpperCase() + st.nom_statut.slice(1)}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="Actif">Actif</option>
+                    <option value="En attente">En attente</option>
+                    <option value="Terminé">Terminé</option>
+                    <option value="Résilié">Résilié</option>
+                  </>
+                )}
+              </select>
             </div>
 
             {/* Ligne 6 : Préavis & Reconduction tacite */}
@@ -1114,12 +1096,7 @@ export default function AbonnementDetailsModal({
                 </div>
               </div>
 
-              <div className="client-abo-card">
-                <span className="client-abo-label">Probabilité de Renouvellement :</span>
-                <div className="client-abo-value" style={{ fontWeight: 700, color: (abonnement.probabilite_renouvellement ?? 80) >= 75 ? '#10b981' : '#f59e0b' }}>
-                  {abonnement.probabilite_renouvellement ?? 80} %
-                </div>
-              </div>
+
 
               <div className="client-abo-card">
                 <span className="client-abo-label">Préavis & Reconduction :</span>
