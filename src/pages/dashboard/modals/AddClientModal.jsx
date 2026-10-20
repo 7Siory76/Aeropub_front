@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, UserPlus, Check, Building2, Mail, MapPin, User, Loader2, Plus, Trash2, Users, Star, Phone } from 'lucide-react';
-import { clientsApi, utilisateursApi } from '../../../api';
-import { useAuth } from '../../../context/AuthContext';
+import { X, UserPlus, Building2, MapPin, Loader2, Plus, Trash2, Users, Star, Check } from 'lucide-react';
+import { clientsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
-import { hasRole } from '../../../utils/rbac';
-import SearchableSelect from '../../../components/SearchableSelect';
 
 export default function AddClientModal({ onClose, onRefresh }) {
-  const { user } = useAuth();
   const { navigateWithFeedback, scrollToTop } = useFeedback();
-  const canAssignCommercial = hasRole(user, ['Admin', 'Resp_Com']);
 
   const [loading, setLoading] = useState(false);
   const [modalError, setModalError] = useState('');
-  const [commercials, setCommercials] = useState([]);
   const [contacts, setContacts] = useState([
     { id: 1, type: 'Téléphone', nom_contact: '', valeur: '', est_principal: true }
   ]);
@@ -23,8 +17,7 @@ export default function AddClientModal({ onClose, onRefresh }) {
     raison_sociale: '',
     adresse_postale: '',
     adresse_facturation: '',
-    etat_client: 'Actif',
-    id_commercial: user?.id || ''
+    etat_client: 'Actif'
   });
 
   const handleAddContact = () => {
@@ -65,17 +58,6 @@ export default function AddClientModal({ onClose, onRefresh }) {
     }
   }, [modalError, scrollToTop]);
 
-  useEffect(() => {
-    utilisateursApi.getAll()
-      .then((users) => {
-        if (users) {
-          const coms = users.filter(u => u.nom_role?.toLowerCase().includes('com') || u.nom_role?.toLowerCase().includes('admin'));
-          setCommercials(coms.length > 0 ? coms : users);
-        }
-      })
-      .catch((err) => console.error('Erreur chargement commerciaux:', err));
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setModalError('');
@@ -108,8 +90,7 @@ export default function AddClientModal({ onClose, onRefresh }) {
         contacts: cleanContacts,
         adresse_postale: formData.adresse_postale.trim() || undefined,
         adresse_facturation: formData.adresse_facturation.trim() || undefined,
-        etat_client: formData.etat_client,
-        id_commercial: formData.id_commercial ? parseInt(formData.id_commercial, 10) : undefined
+        etat_client: formData.etat_client
       });
 
       if (onRefresh) onRefresh();
@@ -332,45 +313,18 @@ export default function AddClientModal({ onClose, onRefresh }) {
             </div>
           </div>
 
-          {/* Statut & Assignation Commercial Responsable (Module 2) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="modal-form-group">
-              <label className="modal-label">Statut Initial :</label>
-              <select
-                className="modal-select"
-                value={formData.etat_client}
-                onChange={(e) => setFormData({ ...formData, etat_client: e.target.value })}
-              >
-                <option value="Actif">🟢 Actif</option>
-                <option value="Prospect">🟡 Prospect</option>
-                <option value="Inactif">⚪ Inactif</option>
-              </select>
-            </div>
-
-            <div className="modal-form-group">
-              <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <User size={14} style={{ color: 'var(--accent-primary)' }} />
-                <span>Commercial Responsable :</span>
-              </label>
-              {canAssignCommercial ? (
-                /* Assignation réservée à Admin & Resp_Com */
-                <SearchableSelect
-                  options={commercials}
-                  value={formData.id_commercial}
-                  onChange={(val) => setFormData(prev => ({ ...prev, id_commercial: val }))}
-                  placeholder="-- Assigner un commercial --"
-                  searchPlaceholder="Rechercher un commercial..."
-                  getOptionValue={(c) => c.id}
-                  getOptionLabel={(c) => c.nom}
-                  getOptionBadge={(c) => c.nom_role || 'Commercial'}
-                />
-              ) : (
-                /* Commercial simple : assigné automatiquement à lui-même */
-                <div style={{ padding: '0.55rem 0.75rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', border: '1px solid var(--border-glass)', fontSize: '0.88rem', color: 'var(--accent-primary)' }}>
-                  👤 {user?.nom || 'Votre compte'}
-                </div>
-              )}
-            </div>
+          {/* Statut Initial */}
+          <div className="modal-form-group">
+            <label className="modal-label">Statut Initial :</label>
+            <select
+              className="modal-select"
+              value={formData.etat_client}
+              onChange={(e) => setFormData({ ...formData, etat_client: e.target.value })}
+            >
+              <option value="Actif">🟢 Actif</option>
+              <option value="Prospect">🟡 Prospect</option>
+              <option value="Inactif">⚪ Inactif</option>
+            </select>
           </div>
 
           {/* Boutons d'action */}

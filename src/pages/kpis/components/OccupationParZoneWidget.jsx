@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { MapPin, Flame } from 'lucide-react';
+import { MapPin, Flame, ChevronDown, ChevronUp } from 'lucide-react';
 
 // Nettoie les encodages mal convertis (ex: 'arriv‚e' -> 'arrivée')
 const sanitizeText = (txt) => {
@@ -7,12 +7,15 @@ const sanitizeText = (txt) => {
     return String(txt).replace(/‚/g, 'é').replace(/Ext‚rieur/g, 'Extérieur');
 };
 
+const SEUIL_ZONES_VISIBLES = 4;
+
 export default function OccupationParZoneWidget({
     emplacements = [],
     userContracts = [],
     onSelectZone
 }) {
     const [vueOnglet, setVueOnglet] = useState('occupation'); // 'occupation' | 'popularite'
+    const [afficherTout, setAfficherTout] = useState(false);
 
     // 1. Calcul du taux d'occupation par zone
     const statsParZone = useMemo(() => {
@@ -75,6 +78,9 @@ export default function OccupationParZoneWidget({
             }))
             .sort((a, b) => b.count - a.count);
     }, [emplacements, userContracts]);
+
+    const visibleStatsParZone = afficherTout ? statsParZone : statsParZone.slice(0, SEUIL_ZONES_VISIBLES);
+    const visiblePopulariteZones = afficherTout ? populariteZones : populariteZones.slice(0, SEUIL_ZONES_VISIBLES);
 
     return (
         <div
@@ -170,7 +176,7 @@ export default function OccupationParZoneWidget({
                             Aucune zone répertoriée pour le moment.
                         </div>
                     ) : (
-                        statsParZone.map((z) => {
+                        visibleStatsParZone.map((z) => {
                             const color = z.taux >= 70 ? '#10b981' : z.taux >= 40 ? '#06b6d4' : '#ef4444';
                             return (
                                 <div
@@ -227,7 +233,7 @@ export default function OccupationParZoneWidget({
                             Aucun contrat associé à une zone pour le moment.
                         </div>
                     ) : (
-                        populariteZones.map((z, idx) => (
+                        visiblePopulariteZones.map((z, idx) => (
                             <div
                                 key={z.zone}
                                 onClick={() => onSelectZone && onSelectZone(z.zone)}
@@ -270,6 +276,57 @@ export default function OccupationParZoneWidget({
                             </div>
                         ))
                     )}
+                </div>
+            )}
+
+            {/* Bouton "Afficher tout / Voir moins" pour préserver l'espace vertical */}
+            {((vueOnglet === 'occupation' && statsParZone.length > SEUIL_ZONES_VISIBLES) ||
+              (vueOnglet === 'popularite' && populariteZones.length > SEUIL_ZONES_VISIBLES)) && (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginTop: '0.9rem',
+                    paddingTop: '0.75rem',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+                }}>
+                    <button
+                        type="button"
+                        onClick={() => setAfficherTout(!afficherTout)}
+                        style={{
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: 'var(--text-main, #ffffff)',
+                            padding: '0.4rem 0.95rem',
+                            borderRadius: '20px',
+                            fontSize: '0.78rem',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+                        }}
+                    >
+                        {afficherTout ? (
+                            <>
+                                <span>Voir moins</span>
+                                <ChevronUp size={14} />
+                            </>
+                        ) : (
+                            <>
+                                <span>Afficher tout ({vueOnglet === 'occupation' ? statsParZone.length : populariteZones.length} zones)</span>
+                                <ChevronDown size={14} />
+                            </>
+                        )}
+                    </button>
                 </div>
             )}
         </div>

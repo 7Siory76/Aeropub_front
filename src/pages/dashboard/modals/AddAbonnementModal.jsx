@@ -9,6 +9,7 @@ import {
     utilisateursApi, typeStatutAbonnementApi, documentsApi
 } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
+import { useAuth } from '../../../context/AuthContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 import SearchableSelect from '../../../components/SearchableSelect';
 
@@ -21,6 +22,7 @@ export default function AddAbonnementModal({
     utilisateurs = [],
     typeStatut = []
 }) {
+    const { user } = useAuth();
     const { navigateWithFeedback, scrollToTop } = useFeedback();
     const [loading, setLoading] = useState(false);
     const [modalError, setModalError] = useState('');
@@ -75,6 +77,7 @@ export default function AddAbonnementModal({
     const [formData, setFormData] = useState({
         reference: '',
         id_client: '',
+        id_commercial: user?.id || '',
         annonceur_campagne: '',
         tarif: '',
         devise: 'MGA',
@@ -89,6 +92,13 @@ export default function AddAbonnementModal({
     });
     const [selectedSupports, setSelectedSupports] = useState([]);
     const [supportToAdd, setSupportToAdd] = useState('');
+
+    // Présélection automatique du commercial connecté s'il se charge de manière asynchrone
+    useEffect(() => {
+        if (user?.id && !formData.id_commercial) {
+            setFormData(prev => ({ ...prev, id_commercial: user.id }));
+        }
+    }, [user?.id]);
 
     // Recalcul automatique de la date d'échéance selon la durée et date_debut
     useEffect(() => {
@@ -232,7 +242,7 @@ export default function AddAbonnementModal({
         setFormData({
             reference: '',
             id_client: '',
-            id_commercial: '',
+            id_commercial: user?.id || '',
             annonceur_campagne: '',
             tarif: '',
             devise: 'MGA',
@@ -339,7 +349,7 @@ export default function AddAbonnementModal({
             const newAbo = await abonnementsApi.create({
                 reference: formData.reference.trim() || undefined, // Auto-généré si non spécifié
                 id_client: parseInt(formData.id_client, 10),
-                id_commercial: formData.id_commercial ? parseInt(formData.id_commercial, 10) : 1,
+                id_commercial: formData.id_commercial ? parseInt(formData.id_commercial, 10) : (user?.id ? parseInt(user.id, 10) : 1),
                 id_abonnement_precedent: formData.id_abonnement_precedent || null,
                 annonceur_campagne: formData.annonceur_campagne || null,
                 tarif: formData.tarif !== '' ? parseFloat(formData.tarif) : 0,

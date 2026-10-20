@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useFeedback } from '../../context/FeedbackContext';
 import { normalizeRole } from '../../utils/rbac';
 import AbonnementDetailsModal from '../dashboard/modals/AbonnementDetailsModal';
+import CalculateurRepartitionCaModal from './modals/CalculateurRepartitionCaModal';
 
 // Widgets modulaires existants
 import KpiHeroHeader from './components/KpiHeroHeader';
@@ -32,6 +33,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
   const [actionsCommerciales, setActionsCommerciales] = useState([]);
   const [clients, setClients] = useState([]);
   const [selectedAbonnement, setSelectedAbonnement] = useState(null);
+  const [showCaCalculatorModal, setShowCaCalculatorModal] = useState(false);
 
   const now = new Date();
 
@@ -154,6 +156,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         roleName={roleName}
         isCommercialSimple={isCommercialSimple}
         onRefresh={loadKpiData}
+        onOpenCaCalculator={() => setShowCaCalculatorModal(true)}
         loading={loading}
       />
 
@@ -162,6 +165,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         userContracts={userContracts}
         renewedParentRefs={renewedParentRefs}
         onFilterClick={handleFilterClick}
+        onOpenCaCalculator={() => setShowCaCalculatorModal(true)}
       />
 
       {/* 3. Grille des Indicateurs Opérationnels (Échéances, Alertes, Taux d'occupation global) */}
@@ -225,6 +229,20 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
           allAbonnements={abonnements}
           emplacements={emplacements}
           clients={clients}
+        />
+      )}
+
+      {/* 8. Modale Moniteur & Répartition du Chiffre d'Affaires Contractuel */}
+      {showCaCalculatorModal && (
+        <CalculateurRepartitionCaModal
+          isOpen={showCaCalculatorModal}
+          onClose={() => setShowCaCalculatorModal(false)}
+          userContracts={userContracts}
+          emplacements={emplacements}
+          onSelectAbonnement={(abo) => {
+            setShowCaCalculatorModal(false);
+            setSelectedAbonnement(abo);
+          }}
         />
       )}
     </div>

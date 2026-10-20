@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
-import { Layers, ChevronRight, ChevronDown, ChevronUp, FolderKanban, Search, RotateCcw } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Layers, ChevronRight, ChevronDown, ChevronUp, FolderKanban, Search, RotateCcw, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import Pagination from '../../../components/Pagination';
+import CategorieModal from '../modals/CategorieModal';
+import DeleteConfirmModal from '../modals/DeleteConfirmModal';
+import { categoriesApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function CategoriesTab({
   categories = [],
@@ -7,9 +13,15 @@ export default function CategoriesTab({
   abonnements = [],
   clients = [],
   zones = [],
-  initialSearchQuery = ''
+  initialSearchQuery = '',
+  onRefresh
 }) {
+  const { showSuccess, showError } = useFeedback();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showAddEditModal, setShowAddEditModal] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState(null);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+
   const [catSearch, setCatSearch] = useState('');
   const [supportSearch, setSupportSearch] = useState(initialSearchQuery);
   const [catDateFilter, setCatDateFilter] = useState('all');
@@ -17,6 +29,8 @@ export default function CategoriesTab({
   const [catStatusFilter, setCatStatusFilter] = useState('all');
   const [catZoneFilter, setCatZoneFilter] = useState('all');
   const [expandedRefAcc, setExpandedRefAcc] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const toggleRefExpand = (ref) => {
     setExpandedRefAcc(prev => ({
@@ -28,7 +42,37 @@ export default function CategoriesTab({
   const activeCategory = selectedCategory || categories[0];
 
   if (categories.length === 0) {
-    return <p className="empty-msg">Aucune catégorie de support trouvée.</p>;
+    return (
+      <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', margin: '1rem auto', maxWidth: '600px', borderRadius: '16px' }}>
+        <FolderKanban size={48} style={{ color: 'var(--accent-primary)', marginBottom: '1rem', opacity: 0.7 }} />
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Aucune catégorie de support trouvée</h3>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+          Vous pouvez initialiser votre référentiel en créant une première catégorie d'affichage.
+        </p>
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => {
+            setCategoryToEdit(null);
+            setShowAddEditModal(true);
+          }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.4rem' }}
+        >
+          <Plus size={16} />
+          <span>Créer une Catégorie</span>
+        </button>
+
+        <CategorieModal
+          isOpen={showAddEditModal}
+          category={categoryToEdit}
+          onClose={() => {
+            setShowAddEditModal(false);
+            setCategoryToEdit(null);
+          }}
+          onRefresh={onRefresh}
+        />
+      </div>
+    );
   }
 
   const activeCatName = activeCategory?.nom || activeCategory?.nom_categorie;
@@ -54,6 +98,17 @@ export default function CategoriesTab({
     setCatZoneFilter('all');
     setCatClientFilter('all');
     setCatStatusFilter('all');
+    setCurrentPage(1);
+  };
+
+  // Réinitialiser la page si la catégorie ou un filtre change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory?.id, supportSearch, catDateFilter, catZoneFilter, catClientFilter, catStatusFilter]);
+
+  // Déclenchement de la modale de suppression sécurisée
+  const handleDeleteCategory = (cat) => {
+    setCategoryToDelete(cat);
   };
 
   // Application des filtres : Recherche textuelle, Format, Date, Client, Status, Zone
@@ -128,6 +183,12 @@ export default function CategoriesTab({
     return true;
   });
 
+  // Découpage paginé des supports de la catégorie
+  const paginatedCatEmps = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredCatEmps.slice(start, start + pageSize);
+  }, [filteredCatEmps, currentPage, pageSize]);
+
   // Catégories filtrées par la recherche de gauche
   const filteredCategories = categories.filter(c => {
     if (!catSearch.trim()) return true;
@@ -139,10 +200,25 @@ export default function CategoriesTab({
     <div className="ts-two-panel-grid">
       {/* COLONNE 1 (GAUCHE) : Liste des Catégories */}
       <div className="ts-panel-box ts-left-panel">
-        <h3 className="ts-panel-title">
-          <FolderKanban size={18} style={{ color: 'var(--accent-primary)' }} />
-          <span>Catégories (base_v3)</span>
-        </h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+          <h3 className="ts-panel-title" style={{ margin: 0 }}>
+            <FolderKanban size={18} style={{ color: 'var(--accent-primary)' }} />
+            <span>Catégories ({categories.length})</span>
+          </h3>
+          <button
+            type="button"
+            className="btn-primary"
+            style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', borderRadius: '8px' }}
+            onClick={() => {
+              setCategoryToEdit(null);
+              setShowAddEditModal(true);
+            }}
+            title="Ajouter une nouvelle catégorie"
+          >
+            <Plus size={14} />
+            <span>Ajouter</span>
+          </button>
+        </div>
 
         {/* Barre de recherche sur les catégories */}
         <div style={{ marginBottom: '0.85rem' }}>
@@ -172,6 +248,7 @@ export default function CategoriesTab({
                 onClick={() => {
                   setSelectedCategory(cat);
                   setExpandedRefAcc({});
+                  setCurrentPage(1);
                 }}
               >
                 <div>
@@ -180,7 +257,52 @@ export default function CategoriesTab({
                     {empCount} support{empCount > 1 ? 's' : ''} rattaché{empCount > 1 ? 's' : ''}
                   </span>
                 </div>
-                <ChevronRight size={18} style={{ color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)' }} className="ts-card-arrow" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCategoryToEdit(cat);
+                      setShowAddEditModal(true);
+                    }}
+                    title="Modifier cette catégorie"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderRadius: '4px'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                  >
+                    <Edit size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCategory(cat);
+                    }}
+                    title="Supprimer cette catégorie"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#ef4444',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                  <ChevronRight size={18} style={{ color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)' }} className="ts-card-arrow" />
+                </div>
               </div>
             );
           })}
@@ -194,13 +316,46 @@ export default function CategoriesTab({
         ) : (
           <div>
             {/* En-tête de la Catégorie sélectionnée */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 900, letterSpacing: '0.5px', color: 'var(--text-main)', textTransform: 'uppercase' }}>
-                Catégorie : {activeCatName}
-              </h3>
-              <span className="client-badge-discrete" style={{ fontSize: '0.82rem', padding: '0.2rem 0.75rem' }}>
-                {filteredCatEmps.length} / {catEmplacements.length} SUPPORT{catEmplacements.length > 1 ? 'S' : ''}
-              </span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 900, letterSpacing: '0.5px', color: 'var(--text-main)', textTransform: 'uppercase', margin: 0 }}>
+                  Catégorie : {activeCatName}
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  ID #{activeCategory.id} &bull; {catEmplacements.length} support{catEmplacements.length > 1 ? 's' : ''} au total
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <span className="client-badge-discrete" style={{ fontSize: '0.82rem', padding: '0.25rem 0.75rem' }}>
+                  {filteredCatEmps.length} / {catEmplacements.length} SUPPORT{catEmplacements.length > 1 ? 'S' : ''}
+                </span>
+
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => {
+                    setCategoryToEdit(activeCategory);
+                    setShowAddEditModal(true);
+                  }}
+                  title="Modifier le nom de cette catégorie"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', padding: '0.35rem 0.8rem' }}
+                >
+                  <Edit size={14} style={{ color: 'var(--accent-primary)' }} />
+                  <span>Modifier</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => handleDeleteCategory(activeCategory)}
+                  title="Supprimer cette catégorie"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.82rem', padding: '0.35rem 0.8rem', borderColor: 'rgba(239, 68, 68, 0.35)', color: '#ef4444' }}
+                >
+                  <Trash2 size={14} />
+                  <span>Supprimer</span>
+                </button>
+              </div>
             </div>
 
             {/* Barre de Filtres Multicritères */}
@@ -295,7 +450,7 @@ export default function CategoriesTab({
               {filteredCatEmps.length === 0 ? (
                 <p className="empty-msg">Aucun support publicitaire ne correspond à ces critères pour cette catégorie.</p>
               ) : (
-                filteredCatEmps.map((emp) => {
+                paginatedCatEmps.map((emp) => {
                   const abo = abonnements.find(a =>
                     (a.reference_emplacement || a.reference) === emp.reference ||
                     (a.supports_associes && a.supports_associes.includes(emp.reference))
@@ -400,10 +555,58 @@ export default function CategoriesTab({
                   );
                 })
               )}
+
+              {filteredCatEmps.length > 0 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalItems={filteredCatEmps.length}
+                  pageSize={pageSize}
+                  onPageChange={setCurrentPage}
+                  onPageSizeChange={setPageSize}
+                />
+              )}
             </div>
           </div>
         )}
       </div>
+
+      {/* Modale d'ajout ou modification de catégorie */}
+      <CategorieModal
+        isOpen={showAddEditModal}
+        category={categoryToEdit}
+        onClose={() => {
+          setShowAddEditModal(false);
+          setCategoryToEdit(null);
+        }}
+        onRefresh={onRefresh}
+      />
+
+      {/* Modale de confirmation de suppression */}
+      {categoryToDelete && (
+        <DeleteConfirmModal
+          isOpen={!!categoryToDelete}
+          title="Supprimer la catégorie"
+          itemName={categoryToDelete.nom || categoryToDelete.nom_categorie || `Catégorie #${categoryToDelete.id}`}
+          itemType="catégorie"
+          associatedCount={
+            emplacements.filter(e =>
+              e.id_categorie === categoryToDelete.id ||
+              e.nom_categorie === (categoryToDelete.nom || categoryToDelete.nom_categorie)
+            ).length
+          }
+          associatedLabel="support(s) rattaché(s)"
+          onConfirm={async () => {
+            const catName = categoryToDelete.nom || categoryToDelete.nom_categorie || `Catégorie #${categoryToDelete.id}`;
+            await categoriesApi.delete(categoryToDelete.id);
+            showSuccess(`Catégorie « ${catName} » supprimée avec succès.`);
+            if (selectedCategory?.id === categoryToDelete.id) {
+              setSelectedCategory(null);
+            }
+            if (onRefresh) onRefresh();
+          }}
+          onClose={() => setCategoryToDelete(null)}
+        />
+      )}
     </div>
   );
 }

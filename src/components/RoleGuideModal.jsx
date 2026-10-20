@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 export default function RoleGuideModal({ isOpen, onClose }) {
   const { user } = useAuth();
   const userNormRole = normalizeRole(user?.role);
-  
+
   // Rôle sélectionné dans la modale (par défaut, le rôle de l'utilisateur connecté s'il existe)
   const [selectedRoleCode, setSelectedRoleCode] = useState(() => {
     const found = ROLES_GUIDE.find(r => r.code === userNormRole);
@@ -250,61 +250,85 @@ export default function RoleGuideModal({ isOpen, onClose }) {
           <h4 style={{ margin: '0 0 0.6rem 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
             Comparatif rapide des modules :
           </h4>
-          <div className="aeropub-table-wrapper" style={{ maxHeight: '200px' }}>
+          <div className="aeropub-table-wrapper" style={{ maxHeight: '280px' }}>
             <table className="aeropub-table" style={{ fontSize: '0.78rem' }}>
               <thead>
                 <tr className="table-head-row-indigo">
-                  <th className="table-head-cell">Module</th>
+                  <th className="table-head-cell">Module / Action</th>
                   <th className="table-head-cell">Admin</th>
+                  <th className="table-head-cell">Direction</th>
                   <th className="table-head-cell">Resp. Com</th>
                   <th className="table-head-cell">Commercial</th>
-                  <th className="table-head-cell">Direction</th>
                   <th className="table-head-cell">Lecture Seule</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="table-body-row">
-                  <td className="cell-bold-white">Créer / Modifier Contrat</td>
+                  <td className="cell-bold-white">Création & Modif. Contrats / Clients</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
+                  <td style={{ color: '#38bdf8', textAlign: 'center' }}>✓ Ses dossiers</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                </tr>
+                <tr className="table-body-row">
+                  <td className="cell-bold-white">Affectation & Suivi d'équipe</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                </tr>
+                <tr className="table-body-row">
+                  <td className="cell-bold-white">Indicateurs & KPIs de pilotage</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Globaux</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Stratégiques</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Équipe</td>
+                  <td style={{ color: '#38bdf8', textAlign: 'center' }}>✓ Portefeuille</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Consultation</td>
+                </tr>
+                <tr className="table-body-row">
+                  <td className="cell-bold-white">Relances & Comptes rendus (J-30)</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
+                  <td style={{ color: '#38bdf8', textAlign: 'center' }}>✓ Ses clients</td>
+                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                </tr>
+                <tr className="table-body-row">
+                  <td className="cell-bold-white">Activation d'un contrat</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Tous</td>
                   <td style={{ color: '#38bdf8', textAlign: 'center' }}>✓ Ses contrats</td>
                   <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
                 </tr>
                 <tr className="table-body-row">
-                  <td className="cell-bold-white">Remise exceptionnelle</td>
+                  <td className="cell-bold-white">Validation Remises / Renouvellements</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Arbitrage</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
-                </tr>
-                <tr className="table-body-row">
-                  <td className="cell-bold-white">Supprimer Contrat / Client</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
                   <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
                   <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
                 </tr>
                 <tr className="table-body-row">
-                  <td className="cell-bold-white">Changer commercial attitré</td>
+                  <td className="cell-bold-white">Importation de données (CSV)</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
-                  <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Oui</td>
                 </tr>
                 <tr className="table-body-row">
-                  <td className="cell-bold-white">Vue portefeuille</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>Globale</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>Globale</td>
-                  <td style={{ color: '#f59e0b', textAlign: 'center' }}>🔒 Restreint</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>Globale</td>
-                  <td style={{ color: '#10b981', textAlign: 'center' }}>Globale</td>
+                  <td className="cell-bold-white">Exportation (Excel / CSV)</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Exhaustif</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Global</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Équipe</td>
+                  <td style={{ color: '#38bdf8', textAlign: 'center' }}>✓ Portefeuille</td>
+                  <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Périmètre</td>
                 </tr>
                 <tr className="table-body-row">
-                  <td className="cell-bold-white">Paramètres & Audit Log</td>
+                  <td className="cell-bold-white">Paramétrage, Modèles & Journal d'Audit</td>
                   <td style={{ color: '#10b981', textAlign: 'center' }}>✓ Exclusif</td>
                   <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>
                   <td style={{ color: '#ef4444', textAlign: 'center' }}>✗ Non</td>

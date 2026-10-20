@@ -193,6 +193,7 @@ export default function DashboardPage({
                 clients={clients}
                 zones={zones}
                 initialSearchQuery={searchQuery}
+                onRefresh={loadAllData}
               />
             )}
             {activeTab === 'zones' && (
@@ -211,6 +212,7 @@ export default function DashboardPage({
                 clients={clients}
                 zones={zones}
                 initialSearchQuery={searchQuery}
+                onRefresh={loadAllData}
               />
             )}
             {activeTab === 'utilisateurs' && (
@@ -259,6 +261,7 @@ export default function DashboardPage({
             categories={categories}
             zones={zones}
             typeEtats={typeEtatsSupport}
+            abonnements={abonnements}
           />
         )}
 

@@ -17,6 +17,7 @@ import {
   Check
 } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import ExportExcelCsv from '../../../components/ExportExcelCsv';
 import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
 import AddAbonnementModal from '../modals/AddAbonnementModal';
 import { useAuth } from '../../../context/AuthContext';
@@ -174,7 +175,7 @@ export default function AbonnementsTab({
         const userNom = (user?.nom || '').trim().toLowerCase();
         const aboCom = (abo.nom_commercial || '').trim().toLowerCase();
         const isMyContrat = (userNom && (aboCom.includes(userNom) || userNom.includes(aboCom))) ||
-                            (abo.id_commercial && user?.id && String(abo.id_commercial) === String(user.id));
+          (abo.id_commercial && user?.id && String(abo.id_commercial) === String(user.id));
         if (!isMyContrat) return false;
       }
 
@@ -321,35 +322,18 @@ export default function AbonnementsTab({
       : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />;
   };
 
-  // Fonction d'exportation Excel / CSV (Module 4)
-  const handleExportCSV = () => {
-    if (filteredAbonnements.length === 0) {
-      showInfo('Aucun contrat à exporter.');
-      return;
-    }
-    const headers = ['Reference', 'Client', 'Commercial', 'Supports', 'Tarif', 'Devise', 'Periodicite', 'Date_Debut', 'Date_Echeance', 'Statut'];
-    const rows = filteredAbonnements.map(a => [
-      `"${a.reference || a.id || ''}"`,
-      `"${a.raison_sociale || a.nom_client || ''}"`,
-      `"${a.nom_commercial || ''}"`,
-      `"${a.supports_associes || a.reference_emplacement || ''}"`,
-      `"${a.tarif || ''}"`,
-      `"${a.devise || 'MGA'}"`,
-      `"${a.periodicite || ''}"`,
-      `"${a.date_debut ? new Date(a.date_debut).toLocaleDateString('fr-FR') : ''}"`,
-      `"${a.date_echeance ? new Date(a.date_echeance).toLocaleDateString('fr-FR') : ''}"`,
-      `"${a.statut_abonnement || a.statut || ''}"`
-    ]);
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `contrats_aeropub_${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showSuccess('Exportation des contrats réussie !');
-  };
+  const exportColumns = useMemo(() => [
+    { header: 'Reference', accessor: a => a.reference || a.id || '' },
+    { header: 'Client', accessor: a => a.raison_sociale || a.nom_client || '' },
+    { header: 'Commercial', accessor: a => a.nom_commercial || '' },
+    { header: 'Supports', accessor: a => a.supports_associes || a.reference_emplacement || '' },
+    { header: 'Tarif', accessor: a => a.tarif || '' },
+    { header: 'Devise', accessor: a => a.devise || 'MGA' },
+    { header: 'Periodicite', accessor: a => a.periodicite || '' },
+    { header: 'Date_Debut', accessor: a => a.date_debut ? new Date(a.date_debut).toLocaleDateString('fr-FR') : '' },
+    { header: 'Date_Echeance', accessor: a => a.date_echeance ? new Date(a.date_echeance).toLocaleDateString('fr-FR') : '' },
+    { header: 'Statut', accessor: a => a.statut_abonnement || a.statut || '' }
+  ], []);
 
   return (
     <div className={styles.container}>
@@ -477,19 +461,15 @@ export default function AbonnementsTab({
           </button>
         )}
 
-        {/* Bouton Exporter en Excel / PDF */}
-        {canExport && (
-          <button
-            type="button"
-            className="btn-secondary"
-            onClick={handleExportCSV}
-            title="Exporter les contrats en fichier CSV / Excel"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', padding: '0.45rem 0.85rem', minHeight: '36px' }}
-          >
-            <Download size={14} />
-            <span>Exporter (Excel / CSV)</span>
-          </button>
-        )}
+        {/* Bouton Exporter en Excel / CSV via composant réutilisable */}
+        <ExportExcelCsv
+          data={filteredAbonnements}
+          columns={exportColumns}
+          filename="contrats_aeropub"
+          emptyMessage="Aucun contrat à exporter."
+          successMessage="Exportation des contrats réussie !"
+          canExport={canExport}
+        />
 
         <div className={styles.filterCountBadge}>
           {filteredAbonnements.length} / {abonnements.length} contrat{abonnements.length > 1 ? 's' : ''}

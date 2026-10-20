@@ -22,6 +22,7 @@ import {
   Loader2,
   ScrollText,
   BarChart3,
+  BookOpen,
   X
 } from 'lucide-react';
 import { csvApi } from '../api';
@@ -30,6 +31,7 @@ import { hasRole } from '../utils/rbac';
 import { useFeedback } from '../context/FeedbackContext';
 import { sanitizeUserError } from '../utils/errorHandler';
 import RoleGuideModal from './RoleGuideModal';
+import AppGuideModal from './AppGuideModal';
 import './Sidebar.css';
 
 export default function Sidebar({
@@ -49,6 +51,7 @@ export default function Sidebar({
   const { showSuccess, showError } = useFeedback();
   const isAdmin = hasRole(user, ['Admin']);
   const [showRoleGuide, setShowRoleGuide] = useState(false);
+  const [showAppGuide, setShowAppGuide] = useState(false);
 
   // État de la "poche" (accordéon ouvert par défaut)
   const [isCrudPocketOpen, setIsCrudPocketOpen] = useState(true);
@@ -181,6 +184,16 @@ export default function Sidebar({
           >
             <ShieldCheck size={18} className="sidebar-item-icon" style={{ color: 'var(--accent-secondary)' }} />
             {!isCollapsed && <span className="sidebar-item-label">Guide des Rôles 💡</span>}
+          </button>
+
+          <button
+            type="button"
+            className="sidebar-nav-item"
+            onClick={() => setShowAppGuide(true)}
+            title="Guide d'utilisation de l'Application (Où et comment tout faire ?)"
+          >
+            <BookOpen size={18} className="sidebar-item-icon" style={{ color: '#38bdf8' }} />
+            {!isCollapsed && <span className="sidebar-item-label">Guide de l'App 📖</span>}
           </button>
         </div>
 
@@ -355,6 +368,12 @@ export default function Sidebar({
       <RoleGuideModal
         isOpen={showRoleGuide}
         onClose={() => setShowRoleGuide(false)}
+      />
+
+      {/* Modale du Guide complet de l'application */}
+      <AppGuideModal
+        isOpen={showAppGuide}
+        onClose={() => setShowAppGuide(false)}
       />
     </aside>
   );

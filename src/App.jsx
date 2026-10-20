@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
-import NotificationTester from './components/NotificationTester';
 import Footer from './components/Footer';
 import { DashboardPage, PlanningPage, ParametragePage, KpiStatsPage } from './pages';
 import { checkHealthApi } from './api';
@@ -24,7 +23,7 @@ export default function App() {
   const initialNav = parseHash();
 
   const { user } = useAuth();
-  const { feedback, clearFeedback, registerNavigationHandler, showInfo } = useFeedback();
+  const { feedback, clearFeedback, registerNavigationHandler } = useFeedback();
   const [isBackendOnline, setIsBackendOnline] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
@@ -240,7 +239,6 @@ export default function App() {
             <PlanningPage key={refreshKey} />
           ) : activePage === 'import' ? (
             <ImportPage
-              key={refreshKey}
               onImportSuccess={handleRefresh}
             />
           ) : (activePage === 'settings' || activePage === 'audit') ? (
@@ -264,9 +262,6 @@ export default function App() {
               </div>
             )
           ) : null}
-
-          {/* Panneau de Test des Notifications In-App */}
-          <NotificationTester onSimulateImport={handleRefresh} />
         </main>
 
         <Footer />

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { typeEtatSupportApi } from '../../../api';
 import { PlusCircle, Trash2, Edit3, Check, X, RefreshCw, Loader2, Search, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import DeleteConfirmModal from '../../dashboard/modals/DeleteConfirmModal';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 
@@ -20,7 +21,7 @@ export default function EtatsSupportsTab({ onCountChange }) {
   const [editingEtatId, setEditingEtatId] = useState(null);
   const [editNomEtat, setEditNomEtat] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+  const [etatToDelete, setEtatToDelete] = useState(null);
 
   const fetchTypesEtats = async () => {
     setLoadingEtats(true);
@@ -139,19 +140,8 @@ export default function EtatsSupportsTab({ onCountChange }) {
     }
   };
 
-  const handleDeleteEtat = async (id, nom) => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer l'état de support « ${nom} » ?`)) return;
-    setDeletingId(id);
-    try {
-      await typeEtatSupportApi.delete(id);
-      showSuccess(`État « ${nom} » supprimé.`);
-      fetchTypesEtats();
-    } catch (err) {
-      const msg = sanitizeUserError(err, 'Erreur lors de la suppression (le statut est peut-être lié à des supports).');
-      showError(msg);
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDeleteEtat = (etat) => {
+    setEtatToDelete(etat);
   };
 
   const getBadgeClass = (nom) => {
@@ -319,12 +309,11 @@ export default function EtatsSupportsTab({ onCountChange }) {
                             <Edit3 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDeleteEtat(etat.id, etat.nom_etat)}
-                            disabled={deletingId === etat.id}
-                            style={{ color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', cursor: deletingId === etat.id ? 'not-allowed' : 'pointer' }}
+                            onClick={() => handleDeleteEtat(etat)}
+                            style={{ color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', cursor: 'pointer' }}
                             title="Supprimer cet état"
                           >
-                            {deletingId === etat.id ? <Loader2 size={16} className="btn-spinner" /> : <Trash2 size={16} />}
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       )}
@@ -342,6 +331,23 @@ export default function EtatsSupportsTab({ onCountChange }) {
               pageSize={pageSize}
               onPageChange={setCurrentPage}
               onPageSizeChange={setPageSize}
+            />
+          )}
+
+          {/* Modale de confirmation de suppression */}
+          {etatToDelete && (
+            <DeleteConfirmModal
+              isOpen={!!etatToDelete}
+              title="Supprimer l'état de support"
+              itemName={etatToDelete.nom_etat}
+              itemType="état de support"
+              confirmDescription="Cette action supprimera cet état de support du référentiel (s'il n'est lié à aucun support)."
+              onConfirm={async () => {
+                await typeEtatSupportApi.delete(etatToDelete.id);
+                showSuccess(`État « ${etatToDelete.nom_etat} » supprimé.`);
+                fetchTypesEtats();
+              }}
+              onClose={() => setEtatToDelete(null)}
             />
           )}
         </>

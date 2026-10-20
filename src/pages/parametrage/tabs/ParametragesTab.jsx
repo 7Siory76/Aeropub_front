@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { parametragesApi } from '../../../api';
 import { Sliders, PlusCircle, Trash2, Edit3, Check, X, RefreshCw, Loader2, Search, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import DeleteConfirmModal from '../../dashboard/modals/DeleteConfirmModal';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 
@@ -21,7 +22,7 @@ export default function ParametragesTab({ onCountChange }) {
   const [editingParamId, setEditingParamId] = useState(null);
   const [editValeur, setEditValeur] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+  const [paramToDelete, setParamToDelete] = useState(null);
 
   const fetchParametrages = async () => {
     setLoadingParams(true);
@@ -148,19 +149,8 @@ export default function ParametragesTab({ onCountChange }) {
     }
   };
 
-  const handleDeleteParam = async (id, nomParam) => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le paramètre « ${nomParam} » ?`)) return;
-    setDeletingId(id);
-    try {
-      await parametragesApi.delete(id);
-      showSuccess(`Paramètre « ${nomParam} » supprimé.`);
-      fetchParametrages();
-    } catch (err) {
-      const msg = sanitizeUserError(err, 'Erreur lors de la suppression.');
-      showError(msg);
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDeleteParam = (param) => {
+    setParamToDelete(param);
   };
 
   return (
@@ -334,12 +324,11 @@ export default function ParametragesTab({ onCountChange }) {
                             <Edit3 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDeleteParam(p.id, p.nom_parametre)}
-                            disabled={deletingId === p.id}
-                            style={{ color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', cursor: deletingId === p.id ? 'not-allowed' : 'pointer' }}
+                            onClick={() => handleDeleteParam(p)}
+                            style={{ color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', cursor: 'pointer' }}
                             title="Supprimer"
                           >
-                            {deletingId === p.id ? <Loader2 size={16} className="btn-spinner" /> : <Trash2 size={16} />}
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       )}
@@ -357,6 +346,23 @@ export default function ParametragesTab({ onCountChange }) {
               pageSize={pageSize}
               onPageChange={setCurrentPage}
               onPageSizeChange={setPageSize}
+            />
+          )}
+
+          {/* Modale de confirmation de suppression */}
+          {paramToDelete && (
+            <DeleteConfirmModal
+              isOpen={!!paramToDelete}
+              title="Supprimer le paramètre"
+              itemName={paramToDelete.nom_parametre}
+              itemType="paramètre système"
+              confirmDescription="Cette action supprimera définitivement ce paramètre de la configuration."
+              onConfirm={async () => {
+                await parametragesApi.delete(paramToDelete.id);
+                showSuccess(`Paramètre « ${paramToDelete.nom_parametre} » supprimé.`);
+                fetchParametrages();
+              }}
+              onClose={() => setParamToDelete(null)}
             />
           )}
         </>

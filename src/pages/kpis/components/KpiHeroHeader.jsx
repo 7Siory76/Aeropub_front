@@ -1,11 +1,12 @@
 import React from 'react';
-import { BarChart3, RefreshCw, Sparkles, Plane } from 'lucide-react';
+import { BarChart3, RefreshCw, Sparkles, Plane, Calculator } from 'lucide-react';
 
 export default function KpiHeroHeader({
   user,
   userContractsCount = 0,
   loading = false,
   onRefresh,
+  onOpenCaCalculator,
   isCommercialSimple = false
 }) {
   return (
@@ -59,7 +60,29 @@ export default function KpiHeroHeader({
           </div>
         </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+        {onOpenCaCalculator && (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={onOpenCaCalculator}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.6rem 1.15rem',
+              background: 'linear-gradient(135deg, #06b6d4, #2563eb)',
+              boxShadow: '0 4px 14px rgba(6, 182, 212, 0.35)',
+              fontWeight: 600,
+              borderRadius: '10px'
+            }}
+            title="Ouvrir le moniteur de calcul et de répartition du chiffre d'affaires contractuel"
+          >
+            <Calculator size={16} />
+            <span>Moniteur &amp; Répartition CA</span>
+          </button>
+        )}
+
         {onRefresh && (
           <button
             type="button"

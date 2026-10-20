@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ScrollText, ChevronRight, ShieldCheck, LogOut, User as UserIcon, BarChart3, Menu } from 'lucide-react';
+import { RefreshCw, Sun, Moon, LayoutDashboard, MapPin, Settings, ScrollText, ChevronRight, ShieldCheck, LogOut, User as UserIcon, BarChart3, Menu, BookOpen } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 import { useAuth } from '../context/AuthContext';
 import RoleGuideModal from './RoleGuideModal';
+import AppGuideModal from './AppGuideModal';
 
 export default function Header({
   isBackendOnline,
@@ -14,6 +15,7 @@ export default function Header({
   onToggleMobileSidebar
 }) {
   const [showRoleGuide, setShowRoleGuide] = useState(false);
+  const [showAppGuide, setShowAppGuide] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const tabLabels = {
     emplacements: 'Supports & Emplacements',
@@ -164,6 +166,18 @@ export default function Header({
             <span>Guide Rôles 💡</span>
           </button>
 
+          {/* Bouton Guide de l'Application accessible à TOUS les utilisateurs */}
+          <button
+            type="button"
+            onClick={() => setShowAppGuide(true)}
+            className="btn-secondary desktop-only-header-item"
+            title="Consulter le Guide complet de l'Application (Où et comment tout faire ?)"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', borderColor: 'rgba(56, 189, 248, 0.3)' }}
+          >
+            <BookOpen size={16} style={{ color: '#38bdf8' }} />
+            <span>Guide de l'App 📖</span>
+          </button>
+
           {/* Profil utilisateur & Rôle */}
           {user && (
             <div className="user-header-badge">
@@ -197,6 +211,12 @@ export default function Header({
       <RoleGuideModal
         isOpen={showRoleGuide}
         onClose={() => setShowRoleGuide(false)}
+      />
+
+      {/* Modale du Guide complet de l'application */}
+      <AppGuideModal
+        isOpen={showAppGuide}
+        onClose={() => setShowAppGuide(false)}
       />
     </header>
   );

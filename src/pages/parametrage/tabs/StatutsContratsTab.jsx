@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { typeStatutAbonnementApi } from '../../../api';
 import { PlusCircle, Trash2, Edit3, Check, X, RefreshCw, Loader2, Search, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import DeleteConfirmModal from '../../dashboard/modals/DeleteConfirmModal';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 
@@ -20,7 +21,7 @@ export default function StatutsContratsTab({ onCountChange }) {
   const [editingStatutId, setEditingStatutId] = useState(null);
   const [editNomStatut, setEditNomStatut] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+  const [statutToDelete, setStatutToDelete] = useState(null);
 
   const fetchTypesStatuts = async () => {
     setLoadingStatuts(true);
@@ -139,19 +140,8 @@ export default function StatutsContratsTab({ onCountChange }) {
     }
   };
 
-  const handleDeleteStatut = async (id, nom) => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer le statut d'abonnement « ${nom} » ?`)) return;
-    setDeletingId(id);
-    try {
-      await typeStatutAbonnementApi.delete(id);
-      showSuccess(`Statut « ${nom} » supprimé.`);
-      fetchTypesStatuts();
-    } catch (err) {
-      const msg = sanitizeUserError(err, 'Erreur lors de la suppression (le statut est peut-être lié à des abonnements).');
-      showError(msg);
-    } finally {
-      setDeletingId(null);
-    }
+  const handleDeleteStatut = (statut) => {
+    setStatutToDelete(statut);
   };
 
   const getBadgeClass = (nom) => {
@@ -319,12 +309,11 @@ export default function StatutsContratsTab({ onCountChange }) {
                             <Edit3 size={16} />
                           </button>
                           <button
-                            onClick={() => handleDeleteStatut(statut.id, statut.nom_statut)}
-                            disabled={deletingId === statut.id}
-                            style={{ color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', cursor: deletingId === statut.id ? 'not-allowed' : 'pointer' }}
+                            onClick={() => handleDeleteStatut(statut)}
+                            style={{ color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.15)', cursor: 'pointer' }}
                             title="Supprimer ce statut"
                           >
-                            {deletingId === statut.id ? <Loader2 size={16} className="btn-spinner" /> : <Trash2 size={16} />}
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       )}
@@ -342,6 +331,23 @@ export default function StatutsContratsTab({ onCountChange }) {
               pageSize={pageSize}
               onPageChange={setCurrentPage}
               onPageSizeChange={setPageSize}
+            />
+          )}
+
+          {/* Modale de confirmation de suppression */}
+          {statutToDelete && (
+            <DeleteConfirmModal
+              isOpen={!!statutToDelete}
+              title="Supprimer le statut de contrat"
+              itemName={statutToDelete.nom_statut}
+              itemType="statut de contrat"
+              confirmDescription="Cette action supprimera ce statut du référentiel (s'il n'est lié à aucun contrat)."
+              onConfirm={async () => {
+                await typeStatutAbonnementApi.delete(statutToDelete.id);
+                showSuccess(`Statut « ${statutToDelete.nom_statut} » supprimé.`);
+                fetchTypesStatuts();
+              }}
+              onClose={() => setStatutToDelete(null)}
             />
           )}
         </>

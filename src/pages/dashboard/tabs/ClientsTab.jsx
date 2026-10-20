@@ -3,6 +3,7 @@ import { ExternalLink, Mail, MapPin, Building2, Search, RotateCcw, Plus, Edit3, 
 import Pagination from '../../../components/Pagination';
 import AddClientModal from '../modals/AddClientModal';
 import EditClientModal from '../modals/EditClientModal';
+import DeleteConfirmModal from '../modals/DeleteConfirmModal';
 import { clientsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
@@ -34,7 +35,7 @@ export default function ClientsTab({
   // États pour les modales d'ajout et de modification
   const [showAddModal, setShowAddModal] = useState(false);
   const [clientToEdit, setClientToEdit] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+  const [clientToDelete, setClientToDelete] = useState(null);
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -153,24 +154,9 @@ export default function ClientsTab({
     return sortedClients.slice(start, start + pageSize);
   }, [sortedClients, currentPage, pageSize]);
 
-  // Suppression d'un client avec confirmation
-  const handleDeleteClient = async (cli) => {
-    const clientName = cli.raison_sociale || cli.nom_client || `Client #${cli.id}`;
-    if (!window.confirm(`Êtes-vous certain de vouloir supprimer le client « ${clientName} » ? Cette action est irréversible.`)) {
-      return;
-    }
-
-    setDeletingId(cli.id);
-    try {
-      await clientsApi.delete(cli.id);
-      showSuccess(`Client « ${clientName} » supprimé avec succès.`);
-      if (onRefresh) onRefresh();
-    } catch (err) {
-      const msg = sanitizeUserError(err, 'Erreur lors de la suppression du client.');
-      showError(msg);
-    } finally {
-      setDeletingId(null);
-    }
+  // Déclenchement de la suppression sécurisée
+  const handleDeleteClient = (cli) => {
+    setClientToDelete(cli);
   };
 
   return (
@@ -345,13 +331,12 @@ export default function ClientsTab({
                         type="button"
                         className="client-action-btn btn-delete"
                         title="Supprimer ce client (Admin / Resp_Com)"
-                        disabled={deletingId === cli.id}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteClient(cli);
                         }}
                       >
-                        {deletingId === cli.id ? <Loader2 size={13} className="btn-spinner" /> : <Trash2 size={13} />}
+                        <Trash2 size={13} />
                       </button>
                     )}
                   </div>
@@ -402,6 +387,31 @@ export default function ClientsTab({
           client={clientToEdit}
           onClose={() => setClientToEdit(null)}
           onRefresh={onRefresh}
+        />
+      )}
+
+      {/* Modale de confirmation de suppression du client */}
+      {clientToDelete && (
+        <DeleteConfirmModal
+          isOpen={!!clientToDelete}
+          title="Supprimer le client"
+          itemName={clientToDelete.raison_sociale || clientToDelete.nom_client || `Client #${clientToDelete.id}`}
+          itemType="client"
+          associatedCount={
+            abonnements.filter(a =>
+              a.id_client === clientToDelete.id ||
+              a.client_id === clientToDelete.id ||
+              a.nom_client === (clientToDelete.raison_sociale || clientToDelete.nom_client)
+            ).length
+          }
+          associatedLabel="contrat(s) d'affichage rattaché(s)"
+          onConfirm={async () => {
+            const clientName = clientToDelete.raison_sociale || clientToDelete.nom_client || `Client #${clientToDelete.id}`;
+            await clientsApi.delete(clientToDelete.id);
+            showSuccess(`Client « ${clientName} » supprimé avec succès.`);
+            if (onRefresh) onRefresh();
+          }}
+          onClose={() => setClientToDelete(null)}
         />
       )}
     </div>

@@ -1,8 +1,8 @@
 # FRONT_OFFICE - Vitrine Catalogue & Services (React + Vite)
 
-Cette application est l'interface utilisateur / vitrine web cliente (**FRONT_OFFICE**) construite avec **React**, **Vite**, **Axios** (pour les requêtes HTTP) et **react-toastify** (pour les notifications In-App).
+Cette application est l'interface utilisateur (**Aeropub_front**) construite avec **React**, **Vite** et **Axios** (pour les requêtes HTTP).
 
-Elle communique avec l'API Backend **BACK_OFFICE** (Express + PostgreSQL + Multer + Firebase).
+Elle communique avec l'API Backend **Aeropub_back** (Express + PostgreSQL + Multer + Firebase).
 
 ---
 
@@ -10,7 +10,6 @@ Elle communique avec l'API Backend **BACK_OFFICE** (Express + PostgreSQL + Multe
 
 - **Framework** : React 18 + Vite
 - **Requêtes HTTP** : Axios (avec intercepteurs et fallback mode démo)
-- **Notifications In-App** : `react-toastify`
 - **Icônes** : `lucide-react`
 - **Design System** : Vanilla CSS moderne avec thème Sombre Glassmorphism & Polices Google (Outfit / Inter)
 

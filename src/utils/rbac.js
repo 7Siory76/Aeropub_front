@@ -48,48 +48,14 @@ export const ROLES_GUIDE = [
     badgeColor: '#f87171',
     badgeBg: 'rgba(239, 68, 68, 0.15)',
     badgeBorder: 'rgba(239, 68, 68, 0.35)',
-    summary: 'Accès intégral et gouvernance complète du système.',
+    summary: 'Paramétrage global, utilisateurs, référentiels, modèles d’e-mails, accès à toutes les données et au journal.',
     permissions: [
-      { text: 'Contrats & Abonnements : Création, duplication, modification et suppression', allowed: true },
-      { text: 'Validation des renouvellements avec remise exceptionnelle', allowed: true },
-      { text: 'Clients & Contacts : Création, modification, suppression et réassignation commerciale', allowed: true },
-      { text: 'Alertes & Relances (J-30) : Envoi manuel et modification du modèle type de courriel', allowed: true },
-      { text: 'Vision globale : Consultation de tous les contrats et export Excel / CSV', allowed: true },
-      { text: 'Zone Réservée : Administration des utilisateurs, des paramètres et du Journal d\'Audit', allowed: true }
-    ]
-  },
-  {
-    id: 4,
-    code: 'Resp_Com',
-    nom: 'Responsable Commercial',
-    badgeColor: '#fbbf24',
-    badgeBg: 'rgba(245, 158, 11, 0.15)',
-    badgeBorder: 'rgba(245, 158, 11, 0.35)',
-    summary: 'Supervision de l\'équipe commerciale et validation contractuelle.',
-    permissions: [
-      { text: 'Contrats & Abonnements : Création, duplication, modification et suppression', allowed: true },
-      { text: 'Validation des renouvellements avec remise exceptionnelle', allowed: true },
-      { text: 'Clients : Création, modification, suppression et réattribution du commercial attitré', allowed: true },
-      { text: 'Alertes (J-30) : Envoi et suivi des relances manuelles', allowed: true },
-      { text: 'Vision globale : Consultation de tous les contrats de l\'entreprise et export Excel', allowed: true },
-      { text: 'Restrictions : Pas d\'accès à la configuration système ni aux utilisateurs', allowed: false }
-    ]
-  },
-  {
-    id: 2,
-    code: 'Commercial',
-    nom: 'Commercial',
-    badgeColor: '#60a5fa',
-    badgeBg: 'rgba(59, 130, 246, 0.15)',
-    badgeBorder: 'rgba(59, 130, 246, 0.35)',
-    summary: 'Gestion opérationnelle de son propre portefeuille clients.',
-    permissions: [
-      { text: 'Contrats : Création, duplication et modification des dates et montants', allowed: true },
-      { text: 'Clients : Création et modification de ses fiches clients', allowed: true },
-      { text: 'Alertes (J-30) : Envoi des courriels de relance manuelle pour ses clients', allowed: true },
-      { text: 'Portefeuille : Vue strictement restreinte à ses propres contrats et clients', allowed: true },
-      { text: 'Restrictions : Interdiction de suppression de contrats ou de clients', allowed: false },
-      { text: 'Restrictions : Pas de validation de remise exceptionnelle ni de réassignation', allowed: false }
+      { text: 'Paramétrage global du système & gestion des comptes utilisateurs et rôles', allowed: true },
+      { text: 'Gestion de tous les référentiels : Aéroports, Zones, Catégories, Types et Supports', allowed: true },
+      { text: 'Gestion des modèles d’e-mails et suivi des automatisations (CRON)', allowed: true },
+      { text: 'Importation de données multi-fichiers (Infrastructure, Inventaire, Contrats)', allowed: true },
+      { text: 'Accès intégral à toutes les données de l\'entreprise et au Journal d\'Audit', allowed: true },
+      { text: 'Contrats & Clients : Création, modification, affectation, validation, activation et suppression', allowed: true }
     ]
   },
   {
@@ -99,12 +65,49 @@ export const ROLES_GUIDE = [
     badgeColor: '#c084fc',
     badgeBg: 'rgba(168, 85, 247, 0.15)',
     badgeBorder: 'rgba(168, 85, 247, 0.35)',
-    summary: 'Supervision stratégique et arbitrage financier.',
+    summary: 'Consultation globale, indicateurs, exports, validation éventuelle des remises ou renouvellements.',
     permissions: [
-      { text: 'Contrats : Validation des renouvellements avec remise exceptionnelle', allowed: true },
-      { text: 'Vision globale : Consultation de tous les contrats et clients de l\'entreprise', allowed: true },
-      { text: 'Export : Exportation complète des tableaux en Excel / CSV', allowed: true },
-      { text: 'Restrictions : Pas de suppression de contrats/clients ni d\'administration système', allowed: false }
+      { text: 'Consultation globale de tous les contrats, clients, supports et plannings', allowed: true },
+      { text: 'Pilotage par les indicateurs clés et statistiques globales (KPIs d\'occupation et CA)', allowed: true },
+      { text: 'Validation éventuelle des remises exceptionnelles ou des renouvellements stratégiques', allowed: true },
+      { text: 'Importation de données et exports exhaustifs des tableaux (Excel / CSV)', allowed: true },
+      { text: 'Restrictions : Pas de modification opérationnelle directe ni de suppression', allowed: false },
+      { text: 'Restrictions : Pas d\'accès à l\'administration technique ni aux modèles de courriels', allowed: false }
+    ]
+  },
+  {
+    id: 4,
+    code: 'Resp_Com',
+    nom: 'Responsable Commercial',
+    badgeColor: '#fbbf24',
+    badgeBg: 'rgba(245, 158, 11, 0.15)',
+    badgeBorder: 'rgba(245, 158, 11, 0.35)',
+    summary: 'Création et modification des clients et contrats, affectation, suivi d’équipe, exports.',
+    permissions: [
+      { text: 'Création, modification et activation des fiches clients et contrats d’abonnement', allowed: true },
+      { text: 'Affectation et réattribution des dossiers aux commerciaux de l\'équipe', allowed: true },
+      { text: 'Suivi d’équipe, pilotage des portefeuilles commerciaux et indicateurs d\'activité', allowed: true },
+      { text: 'Validation des renouvellements et remises commerciales', allowed: true },
+      { text: 'Importation de données et exports complets des tableaux (Excel / CSV)', allowed: true },
+      { text: 'Restrictions : Pas d\'accès au paramétrage global, aux utilisateurs ni aux modèles d\'e-mails', allowed: false }
+    ]
+  },
+  {
+    id: 2,
+    code: 'Commercial',
+    nom: 'Commercial',
+    badgeColor: '#60a5fa',
+    badgeBg: 'rgba(59, 130, 246, 0.15)',
+    badgeBorder: 'rgba(59, 130, 246, 0.35)',
+    summary: 'Gestion des dossiers qui lui sont attribués, recherche, relances et comptes rendus.',
+    permissions: [
+      { text: 'Gestion opérationnelle et activation de ses contrats attribués (passage direct au statut Actif)', allowed: true },
+      { text: 'Recherche et consultation des supports disponibles dans le planning', allowed: true },
+      { text: 'Importation de données : Accès à l\'outil d\'importation de fichiers CSV', allowed: true },
+      { text: 'Envoi des relances préventives (J-30, préavis de reconduction tacite)', allowed: true },
+      { text: 'Saisie des comptes rendus et suivi de l\'historique des actions commerciales', allowed: true },
+      { text: 'Restrictions : Vue restreinte à son portefeuille (pas d\'affectation d\'équipe)', allowed: false },
+      { text: 'Restrictions : Interdiction de suppression de contrats ou clients et pas d\'accès aux paramètres', allowed: false }
     ]
   },
   {
@@ -114,11 +117,13 @@ export const ROLES_GUIDE = [
     badgeColor: '#94a3b8',
     badgeBg: 'rgba(148, 163, 184, 0.15)',
     badgeBorder: 'rgba(148, 163, 184, 0.35)',
-    summary: 'Consultation passive et audit sans pouvoir de modification.',
+    summary: 'Consultation et export selon périmètre autorisé, sans modification.',
     permissions: [
-      { text: 'Consultation : Lecture de tous les contrats, supports et clients', allowed: true },
-      { text: 'Export : Exportation des données en Excel / CSV', allowed: true },
-      { text: 'Restrictions : Aucune création, modification ou suppression possible', allowed: false }
+      { text: 'Consultation passive des contrats, clients et inventaires selon le périmètre autorisé', allowed: true },
+      { text: 'Importation de données : Accès à l\'outil d\'importation de fichiers CSV', allowed: true },
+      { text: 'Exportations des données autorisées (Excel / CSV)', allowed: true },
+      { text: 'Restrictions : Aucune création, modification, suppression ou relance possible', allowed: false },
+      { text: 'Restrictions : Pas d\'accès aux paramètres globaux ni aux journaux confidentiels', allowed: false }
     ]
   }
 ];

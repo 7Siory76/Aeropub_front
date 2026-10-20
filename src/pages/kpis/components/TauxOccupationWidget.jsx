@@ -192,55 +192,6 @@ export default function TauxOccupationWidget({
           </div>
         </div>
       </div>
-
-      {/* Détail rapide des supports disponibles vs occupés */}
-      <div style={{
-        marginTop: '1.1rem',
-        paddingTop: '0.9rem',
-        borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '0.6rem',
-        alignItems: 'center',
-        fontSize: '0.78rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#10b981' }}>
-          <span>● Disponibles ({statsOccupation.availableList.length}) :</span>
-          {statsOccupation.availableList.map(ref => (
-            <span
-              key={ref}
-              style={{
-                background: 'rgba(16, 185, 129, 0.15)',
-                color: '#10b981',
-                padding: '0.15rem 0.45rem',
-                borderRadius: '6px',
-                fontWeight: 600
-              }}
-              title={ref === '4A1' ? 'Libéré suite à archivage/résiliation de contrat' : 'Disponible'}
-            >
-              {ref}
-            </span>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#94a3b8', marginLeft: 'auto' }}>
-          <span>● Occupés ({statsOccupation.occupiedList.length}) :</span>
-          {statsOccupation.occupiedList.map(ref => (
-            <span
-              key={ref}
-              style={{
-                background: 'rgba(255, 255, 255, 0.08)',
-                color: '#f8fafc',
-                padding: '0.15rem 0.45rem',
-                borderRadius: '6px',
-                fontWeight: 600
-              }}
-            >
-              {ref}
-            </span>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

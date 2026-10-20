@@ -1,0 +1,18 @@
+Reference;Aeroport;Perimetre;Zone;Categorie;Type_Support;Caracteristiques;Statut;Observation
+REF-IV-001;Ivato;National;Hall Départ;Statique;Panneau 4x3m;4x3m;Disponible;Emplacement face aux comptoirs d'enregistrement
+REF-IV-002;Ivato;International;Zone Arrivée;Numérique;Ecran LED;75 pouces;Disponible;Écran haute luminosité face carrousel bagages
+REF-IV-003;Ivato;International;Salle d'Embarquement;Statique;Caisson Lumineux;2x1.5m;Disponible;Caisson rétro-éclairé haute visibilité
+REF-IV-004;Ivato;Public;Parking Visiteurs;Statique;Totem Double Face;3x1m;Disponible;Totem d'entrée principale parking
+REF-IV-005;Ivato;National;Couloir Passerelle;Numérique;Ecran Synchronisé;55 pouces;Disponible;Affichage dynamique couloir départ
+REF-IV-006;Ivato;National;Hall Public;Numérique;Kiosque Interactif;55 pouces tactile;Disponible;Kiosque d'information et annonces
+REF-IV-007;Ivato;Public;Zone Tarmac;Evénementiel;Banderole Extérieure;10x2m;Disponible;Banderole visible depuis les pistes
+REF-IV-008;Ivato;International;Duty Free;Statique;Chevalet Display;1.5x1m;Disponible;Display face boutique hors taxes
+REF-NB-001;Nosy Be;National;Hall Principal;Numérique;Mur Vidéo;3x2m;Disponible;Mur vidéo au cœur de l'aérogare Fascene
+REF-NB-002;Nosy Be;International;Zone Bagages;Statique;Affiche Murale;2x1m;Disponible;Affiche murale sortie internationale
+REF-NB-003;Nosy Be;Public;Esplanade Extérieure;Statique;Panneau 4x3m;4x3m;Disponible;Grand panneau extérieur face arrivées
+REF-NB-004;Nosy Be;International;Salon VIP;Numérique;Ecran LED;65 pouces;Disponible;Écran salon affaires et officiel
+REF-NB-005;Nosy Be;Public;Parking Loueurs;Statique;Panneau 2x1.5m;2x1.5m;Disponible;Panneau zone loueurs de véhicules
+REF-TM-001;Tamatave;National;Aérogare Principale;Statique;Bâche Lumineuse;5x2.5m;Disponible;Grande bâche rétro-éclairée hall
+REF-TM-002;Tamatave;National;Zone Embarquement;Numérique;Ecran LED;65 pouces;Disponible;Écran dynamique salle d'attente
+REF-IV-001;Ivato;National;Hall Départ;Statique;Panneau 4x3m;4x3m;Disponible;TEST DOUBLON INTERNE : référence déjà existante
+;Ivato;International;Duty Free;Statique;Chevalet;1x1m;Disponible;TEST ERREUR STRUCTURE : référence vide

@@ -1,0 +1,11 @@
+Reference_Abo;Client;Email_Commercial;Annonceur;Tarif;Periodicite;Date_Debut;Date_Echeance;Statut;Supports
+ABO-2027-001;Air Madagascar;jean@aeropub.mg;Campagne Hiver Air Mad;3500000;Annuel;2025-10-20;2026-10-19;Actif;[REF-IV-001, REF-IV-002]
+ABO-2027-002;Orange B2B;jean@aeropub.mg;Offres Fibre Pro & 5G;5200000;Annuel;2025-11-05;2026-11-04;Actif;[REF-IV-003, REF-NB-001]
+ABO-2027-003;Brasserie Star;jean@aeropub.mg;Promo THB Fresh;2800000;Semestriel;2026-05-10;2026-11-10;Actif;[REF-IV-008, REF-TM-001]
+ABO-2027-004;Telma SA;jean@aeropub.mg;Paiement Mobile Mvola;7500000;Annuel;2025-12-02;2026-12-01;Actif;[REF-NB-002, REF-NB-003, REF-IV-004]
+ABO-2027-005;TotalEnergies;jean@aeropub.mg;Carburant Excellium;4100000;Annuel;2026-01-06;2027-01-05;Actif;[REF-IV-005, REF-NB-004]
+ABO-2027-006;BNI Madagascar;marie@aeropub.mg;Crédit Entreprise BNI;6000000;Annuel;2026-04-15;2027-04-14;Actif;[REF-IV-006, REF-TM-002]
+ABO-2027-007;Canal+ Madagascar;marie@aeropub.mg;Formule Tout Canal;8200000;Annuel;2026-10-01;2027-09-30;Actif;[REF-IV-007, REF-NB-005]
+ABO-2027-008;Ravinala Airports;marie@aeropub.mg;Soutien Institutionnel;1900000;Annuel;2026-01-01;2026-12-31;Actif;[REF-IV-001]
+ABO-2027-001;Air Madagascar;marie@aeropub.mg;Campagne Hiver Air Mad;3500000;Annuel;2025-10-20;2026-10-19;Actif;[REF-IV-001, REF-IV-002]
+ABO-2027-009;Orange B2B;marie@aeropub.mg;Campagne Data Illimitee;2000000;Annuel;2026-11-01;2027-11-01;Actif;[REF-IV-001, REF-INCONNU-999]

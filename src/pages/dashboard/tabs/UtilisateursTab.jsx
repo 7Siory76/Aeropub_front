@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, UserCheck, Lock, HelpCircle, ChevronDown, ChevronUp, ShieldCheck, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import UserModal from '../modals/UserModal';
+import DeleteConfirmModal from '../modals/DeleteConfirmModal';
 import { utilisateursApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
@@ -48,7 +49,7 @@ export default function UtilisateursTab({
   // Modales d'ajout et d'édition d'utilisateur
   const [showAddModal, setShowAddModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -146,27 +147,12 @@ export default function UtilisateursTab({
   }, [sortedUtilisateurs, currentPage, pageSize]);
 
   // Supprimer un utilisateur
-  const handleDeleteUser = async (u) => {
+  const handleDeleteUser = (u) => {
     if (currentUser && currentUser.id === u.id) {
       showInfo('Vous ne pouvez pas supprimer votre propre compte administrateur actuellement connecté.');
       return;
     }
-
-    if (!window.confirm(`Êtes-vous certain de vouloir supprimer définitivement l'utilisateur « ${u.nom} » ?`)) {
-      return;
-    }
-
-    try {
-      setDeletingId(u.id);
-      await utilisateursApi.delete(u.id);
-      showSuccess(`Utilisateur « ${u.nom} » supprimé avec succès.`);
-      if (onRefresh) onRefresh();
-    } catch (err) {
-      const msg = sanitizeUserError(err, 'Erreur lors de la suppression de l\'utilisateur.');
-      showError(msg);
-    } finally {
-      setDeletingId(null);
-    }
+    setUserToDelete(u);
   };
 
   return (
@@ -478,11 +464,11 @@ export default function UtilisateursTab({
                           type="button"
                           className="client-action-btn btn-delete"
                           title="Supprimer cet utilisateur"
-                          disabled={isCurrent || deletingId === u.id}
-                          style={isCurrent || deletingId === u.id ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+                          disabled={isCurrent}
+                          style={isCurrent ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
                           onClick={() => handleDeleteUser(u)}
                         >
-                          {deletingId === u.id ? <Loader2 size={14} className="btn-spinner" /> : <Trash2 size={14} />}
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
@@ -518,6 +504,23 @@ export default function UtilisateursTab({
           userToEdit={userToEdit}
           onClose={() => setUserToEdit(null)}
           onRefresh={onRefresh}
+        />
+      )}
+
+      {/* Modale de confirmation de suppression */}
+      {userToDelete && (
+        <DeleteConfirmModal
+          isOpen={!!userToDelete}
+          title="Supprimer l'utilisateur"
+          itemName={`${userToDelete.nom} (${userToDelete.email})`}
+          itemType="utilisateur"
+          confirmDescription="L'utilisateur n'aura plus accès à la plateforme. Cette action est irréversible."
+          onConfirm={async () => {
+            await utilisateursApi.delete(userToDelete.id);
+            showSuccess(`Utilisateur « ${userToDelete.nom} » supprimé avec succès.`);
+            if (onRefresh) onRefresh();
+          }}
+          onClose={() => setUserToDelete(null)}
         />
       )}
     </div>

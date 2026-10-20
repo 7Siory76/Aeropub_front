@@ -25,6 +25,29 @@ export const csvApi = {
   importInfrastructure: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/csv/import-infrastructure', formData, { headers: { 'Content-Type': 'multipart/formData' } }).then(res => res.data);
+    return api.post('/csv/import-infrastructure', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then(res => res.data);
+  },
+  importClients: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/csv/import-clients', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then(res => res.data);
+  },
+  importAbonnements: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/csv/import-abonnements', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then(res => res.data);
   }
+
 };
+
+

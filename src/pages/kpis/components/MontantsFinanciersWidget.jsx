@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { DollarSign, RefreshCw, Clock, ArrowUpRight, FileCheck, FileEdit } from 'lucide-react';
+import { DollarSign, RefreshCw, Clock, ArrowUpRight, FileCheck, FileEdit, Calculator } from 'lucide-react';
 
 export default function MontantsFinanciersWidget({
   userContracts = [],
   renewedParentRefs = new Set(),
-  onFilterClick
+  onFilterClick,
+  onOpenCaCalculator
 }) {
   const now = new Date();
 
@@ -88,9 +89,33 @@ export default function MontantsFinanciersWidget({
           <DollarSign size={18} style={{ color: '#10b981' }} />
           <span>Statut des Contrats & Performances Financières</span>
         </h2>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          Nombres en 1er plan • Cliquez sur une carte pour filtrer les contrats
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {onOpenCaCalculator && (
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={onOpenCaCalculator}
+              style={{
+                fontSize: '0.8rem',
+                padding: '0.35rem 0.75rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: 'rgba(6, 182, 212, 0.12)',
+                borderColor: 'rgba(6, 182, 212, 0.35)',
+                color: '#38bdf8',
+                borderRadius: '8px'
+              }}
+              title="Ouvrir le simulateur et moniteur de calcul de CA"
+            >
+              <Calculator size={14} />
+              <span>Répartition &amp; Simulateur CA</span>
+            </button>
+          )}
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Nombres en 1er plan • Cliquez sur une carte pour filtrer les contrats
+          </span>
+        </div>
       </div>
 
       <div style={{

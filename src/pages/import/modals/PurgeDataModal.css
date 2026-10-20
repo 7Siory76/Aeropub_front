@@ -1,0 +1,287 @@
+/* ==============================================================================
+   STYLES : MODAL DE SUPPRESSION / PURGE DE DONNÉES (AEROPUB)
+   ============================================================================== */
+
+.purge-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1.5rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.purge-modal-card {
+    background: var(--bg-card, #1e293b);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(239, 68, 68, 0.1);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--text-main, #f8fafc);
+}
+
+/* En-tête */
+.purge-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 1.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, transparent 100%);
+}
+
+.purge-modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.purge-modal-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.purge-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main, #ffffff);
+    margin: 0;
+}
+
+.purge-modal-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted, #94a3b8);
+    margin-top: 0.2rem;
+}
+
+.purge-modal-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #94a3b8);
+    cursor: pointer;
+    padding: 0.4rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.purge-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Corps */
+.purge-modal-body {
+    padding: 1.5rem 1.75rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Bannière d'avertissement */
+.purge-warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Badge de protection */
+.purge-protected-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #10b981;
+    font-size: 0.82rem;
+}
+
+.purge-selection-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+.purge-select-btn {
+    background: transparent;
+    border: none;
+    color: var(--accent-primary, #3b82f6);
+    font-size: 0.82rem;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.purge-select-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Liste des tables */
+.purge-tables-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.purge-table-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.purge-table-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.purge-table-item.selected {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+.purge-item-left {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.purge-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    accent-color: #ef4444;
+}
+
+.purge-item-icon {
+    color: var(--text-muted, #94a3b8);
+    display: flex;
+    align-items: center;
+}
+
+.purge-table-item.selected .purge-item-icon {
+    color: #ef4444;
+}
+
+.purge-item-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-main, #ffffff);
+}
+
+.purge-item-desc {
+    font-size: 0.76rem;
+    color: var(--text-muted, #94a3b8);
+    margin-top: 0.15rem;
+}
+
+.purge-item-badge {
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted, #94a3b8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.purge-table-item.selected .purge-item-badge {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Barre de progression */
+.purge-progress-box {
+    padding: 1rem;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.purge-progress-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fca5a5;
+}
+
+/* Pied de modale */
+.purge-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.25rem 1.75rem;
+    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.btn-purge-danger {
+    background: #ef4444;
+    color: #ffffff;
+    border: 1px solid #dc2626;
+    padding: 0.65rem 1.35rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-purge-danger:hover:not(:disabled) {
+    background: #dc2626;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+}
+
+.btn-purge-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

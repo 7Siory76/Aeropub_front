@@ -5,6 +5,9 @@ import { emplacementsApi, typeSupportsApi, categoriesApi, zonesApi, typeEtatSupp
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';
 import SearchableSelect from '../../../components/SearchableSelect';
+import { useAuth } from '../../../context/AuthContext';
+import { hasRole } from '../../../utils/rbac';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 export default function EmplacementDetailsModal({
   emplacement,
@@ -12,12 +15,17 @@ export default function EmplacementDetailsModal({
   onRefresh,
   typeSupports = [],
   categories = [],
-  zones = []
+  zones = [],
+  abonnements = []
 }) {
   const { showSuccess, showError, scrollToTop } = useFeedback();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalError, setModalError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { user } = useAuth();
+  const canEdit = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
+  const canDelete = hasRole(user, ['Admin', 'Resp_Com']);
 
   useEffect(() => {
     if (modalError) {
@@ -70,43 +78,29 @@ export default function EmplacementDetailsModal({
     if (typeSupports && typeSupports.length > 0) {
       setTypesList(typeSupports);
     } else {
-      typeSupportsApi.getAll().then(data => setTypesList(data || [])).catch(() => {});
+      typeSupportsApi.getAll().then(data => setTypesList(data || [])).catch(() => { });
     }
 
     if (categories && categories.length > 0) {
       setCatsList(categories);
     } else {
-      categoriesApi.getAll().then(data => setCatsList(data || [])).catch(() => {});
+      categoriesApi.getAll().then(data => setCatsList(data || [])).catch(() => { });
     }
 
     if (zones && zones.length > 0) {
       setZonesList(zones);
     } else {
-      zonesApi.getAll().then(data => setZonesList(data || [])).catch(() => {});
+      zonesApi.getAll().then(data => setZonesList(data || [])).catch(() => { });
     }
 
-    typeEtatSupportApi.getAll().then(data => setEtatsList(data || [])).catch(() => {});
+    typeEtatSupportApi.getAll().then(data => setEtatsList(data || [])).catch(() => { });
   }, [typeSupports, categories, zones]);
 
   if (!emplacement) return null;
 
-  // Action : Supprimer le support via l'API REST
-  const handleDelete = async () => {
-    const confirmed = window.confirm(`Êtes-vous sûr de supprimer le support "${emplacement.reference}" ?`);
-    if (!confirmed) return;
-    setLoading(true);
-    setModalError('');
-    try {
-      await emplacementsApi.delete(emplacement.reference);
-      showSuccess(`Support "${emplacement.reference}" supprimé avec succès.`);
-      onClose();
-      if (onRefresh) onRefresh();
-    } catch (err) {
-      const msg = sanitizeUserError(err, `Impossible de supprimer le support "${emplacement.reference}".`);
-      setModalError(msg);
-    } finally {
-      setLoading(false);
-    }
+  // Action : Déclencher la modale de suppression sécurisée
+  const handleDelete = () => {
+    setShowDeleteConfirm(true);
   };
 
   // Action : Enregistrer les modifications via l'API REST
@@ -446,16 +440,20 @@ export default function EmplacementDetailsModal({
 
             {/* Pied de Modale : Boutons Modifier, Supprimer, Fermer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
-              <button
-                type="button"
-                className="pill-btn"
-                style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? <Loader2 size={15} className="btn-spinner" /> : <Trash2 size={15} />}
-                <span>{loading ? 'Suppression...' : 'Supprimer'}</span>
-              </button>
+              {canDelete ? (
+                <button
+                  type="button"
+                  className="pill-btn"
+                  style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                  onClick={handleDelete}
+                  disabled={loading}
+                >
+                  <Trash2 size={15} />
+                  <span>Supprimer</span>
+                </button>
+              ) : (
+                <div />
+              )}
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <button
                   type="button"
@@ -464,20 +462,48 @@ export default function EmplacementDetailsModal({
                 >
                   Fermer
                 </button>
-                <button
-                  type="button"
-                  className="pill-btn active"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-                  onClick={() => setIsEditing(true)}
-                >
-                  <Edit3 size={15} />
-                  <span>Modifier</span>
-                </button>
+                {canEdit && (
+                  <button
+                    type="button"
+                    className="pill-btn active"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Edit3 size={15} />
+                    <span>Modifier</span>
+                  </button>
+                )}
+
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Modale de confirmation de suppression */}
+      {showDeleteConfirm && (
+        <DeleteConfirmModal
+          isOpen={showDeleteConfirm}
+          title="Supprimer le support d'affichage"
+          itemName={emplacement.reference}
+          itemType="support d'affichage"
+          associatedCount={
+            abonnements.filter(a =>
+              (a.reference_emplacement || a.reference) === emplacement.reference ||
+              (a.supports_associes && a.supports_associes.includes(emplacement.reference))
+            ).length
+          }
+          associatedLabel="contrat(s) d'affichage rattaché(s)"
+          confirmDescription="Cette action supprimera définitivement le support et son historique d'états."
+          onConfirm={async () => {
+            await emplacementsApi.delete(emplacement.reference);
+            showSuccess(`Support "${emplacement.reference}" supprimé avec succès.`);
+            onClose();
+            if (onRefresh) onRefresh();
+          }}
+          onClose={() => setShowDeleteConfirm(false)}
+        />
+      )}
     </div>,
     document.body
   );

@@ -4,6 +4,7 @@ import {
     History, AlertCircle, Loader2, Plus, CheckCircle2
 } from 'lucide-react'
 import { documentsApi } from '../api';
+import DeleteConfirmModal from '../pages/dashboard/modals/DeleteConfirmModal';
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/api\/?$/, '');
 
@@ -14,6 +15,7 @@ export default function AbonnementDocuments({ referenceAbonnement }) {
     const [error, setError] = useState('');
     const [typeDocument, setTypeDocument] = useState('Contrat');
     const [showUploadForm, setShowUploadForm] = useState(false);
+    const [docToDelete, setDocToDelete] = useState(null);
     const fileInputRef = useRef(null);
 
     const fetchDocs = async () => {
@@ -57,14 +59,8 @@ export default function AbonnementDocuments({ referenceAbonnement }) {
         }
     };
 
-    const handleDelete = async (id, nomFichier) => {
-        if (!window.confirm(`Supprimer définitivement le document « ${nomFichier} » ?`)) return;
-        try {
-            await documentsApi.delete(id);
-            fetchDocs();
-        } catch (err) {
-            setError(err?.response?.data?.message || 'Erreur lors de la suppression.');
-        }
+    const handleDelete = (doc) => {
+        setDocToDelete(doc);
     };
 
     return (
@@ -198,7 +194,7 @@ export default function AbonnementDocuments({ referenceAbonnement }) {
                                             type="button"
                                             className="pill-btn"
                                             style={{ padding: '0.35rem 0.65rem', fontSize: '0.78rem', color: '#ef4444' }}
-                                            onClick={() => handleDelete(doc.id, doc.nom_fichier)}
+                                            onClick={() => handleDelete(doc)}
                                             title="Supprimer"
                                         >
                                             <Trash2 size={13} />
@@ -209,6 +205,22 @@ export default function AbonnementDocuments({ referenceAbonnement }) {
                         );
                     })}
                 </div>
+            )}
+
+            {/* Modale de confirmation de suppression */}
+            {docToDelete && (
+                <DeleteConfirmModal
+                    isOpen={!!docToDelete}
+                    title="Supprimer la pièce jointe"
+                    itemName={docToDelete.nom_fichier}
+                    itemType="document"
+                    confirmDescription="Le fichier sera définitivement supprimé du serveur et du contrat."
+                    onConfirm={async () => {
+                        await documentsApi.delete(docToDelete.id);
+                        fetchDocs();
+                    }}
+                    onClose={() => setDocToDelete(null)}
+                />
             )}
         </div>
     )
