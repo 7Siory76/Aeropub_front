@@ -54,7 +54,9 @@ export default function PlanningPage() {
       setAbonnements(abos || []);
       setClients(cls || []);
     } catch (err) {
-      console.error('Erreur de chargement des données:', err);
+      if (import.meta.env?.DEV) {
+        console.error('Erreur chargement données planning:', err);
+      }
     } finally {
       setLoading(false);
     }

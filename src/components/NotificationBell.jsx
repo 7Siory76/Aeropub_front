@@ -33,8 +33,8 @@ export default function NotificationBell() {
             const res = await journalNotificationApi.getAll(selectedCategory);
             setNotifications(res.data || []);
             setUnreadCount(res.unreadCount || 0);
-        } catch (err) {
-            console.error('Erreur chargement notifications:', err);
+        } catch {
+            // Échec silencieux lors du rafraîchissement périodique en arrière-plan
         } finally {
             setLoading(false);
         }
@@ -65,8 +65,8 @@ export default function NotificationBell() {
             await journalNotificationApi.markAsRead(id);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, lu_par_admin: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (err) {
-            console.error(err);
+        } catch {
+            // Échec de la mise à jour de l'état lu
         } finally {
             setMarkingId(null);
         }
@@ -78,8 +78,8 @@ export default function NotificationBell() {
             await journalNotificationApi.markAllAsRead();
             setNotifications(prev => prev.map(n => ({ ...n, lu_par_admin: true })));
             setUnreadCount(0);
-        } catch (err) {
-            console.error(err);
+        } catch {
+            // Échec de la mise à jour globale
         } finally {
             setMarkingAll(false);
         }

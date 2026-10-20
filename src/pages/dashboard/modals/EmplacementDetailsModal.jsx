@@ -68,7 +68,7 @@ export default function EmplacementDetailsModal({
       setLoadingHistorique(true);
       emplacementsApi.getHistoriqueEtats(emplacement.reference)
         .then(data => setHistoriqueEtats(data || []))
-        .catch(err => console.error('Erreur chargement historique support:', err))
+        .catch(() => {})
         .finally(() => setLoadingHistorique(false));
     }
   }, [emplacement]);

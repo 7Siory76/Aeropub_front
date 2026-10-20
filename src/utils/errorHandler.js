@@ -98,8 +98,10 @@ export function translateTechnicalMessage(rawMsg) {
 }
 
 export function sanitizeUserError(err, fallback = "Une erreur est survenue lors de l'opération. Veuillez vérifier les données saisies.") {
-  // 1. Journalisation technique complète dans les logs développeur (Console F12)
-  console.error('[DEV LOG - Trace complète de l\'erreur technique] :', err);
+  // 1. Journalisation technique uniquement en environnement de développement
+  if (import.meta.env?.DEV) {
+    console.error('[DEV LOG] Trace technique :', err);
+  }
 
   if (!err) return fallback;
 

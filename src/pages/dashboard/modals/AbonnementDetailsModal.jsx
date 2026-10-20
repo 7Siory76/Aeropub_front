@@ -87,7 +87,7 @@ export default function AbonnementDetailsModal({
       setLoadingHistorique(true);
       abonnementsApi.getHistoriqueStatuts(abonnement.reference)
         .then(data => setHistoriqueStatuts(data || []))
-        .catch(err => console.error('Erreur historique statut:', err))
+        .catch(() => {})
         .finally(() => setLoadingHistorique(false));
     }
   }, [abonnement]);

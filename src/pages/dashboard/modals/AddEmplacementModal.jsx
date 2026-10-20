@@ -39,7 +39,7 @@ export default function AddEmplacementModal({
             }
           }
         })
-        .catch(err => console.error('Erreur chargement états supports:', err));
+        .catch(() => {});
     }
   }, [typeEtats]);
 

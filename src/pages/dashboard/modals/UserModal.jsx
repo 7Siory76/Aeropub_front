@@ -34,7 +34,7 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
           setRoles(data);
         }
       })
-      .catch((err) => console.error('Erreur chargement des rôles:', err));
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

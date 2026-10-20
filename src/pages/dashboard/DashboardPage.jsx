@@ -123,7 +123,9 @@ export default function DashboardPage({
         });
       }
     } catch (err) {
-      console.error('Erreur de chargement des données AeroPub base_v3:', err);
+      if (import.meta.env?.DEV) {
+        console.error('Erreur chargement données Dashboard:', err);
+      }
     } finally {
       setLoading(false);
     }

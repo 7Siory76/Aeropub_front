@@ -48,8 +48,8 @@ export function FeedbackProvider({ children }) {
       openModals.forEach((modal) => {
         modal.scrollTo({ top: 0, behavior: 'smooth' });
       });
-    } catch (err) {
-      console.warn('Erreur lors du défilement haut:', err);
+    } catch {
+      // Ignorer l'erreur si l'élément DOM n'est plus accessible lors du défilement
     }
   }, []);
 
@@ -131,9 +131,9 @@ export function useFeedback() {
     // Repli de secours pour éviter tout crash si un composant l'utilise hors provider
     return {
       feedback: null,
-      showSuccess: (msg) => console.log('[SUCCESS]', msg),
-      showError: (err) => console.error('[ERROR]', err),
-      showInfo: (msg) => console.log('[INFO]', msg),
+      showSuccess: () => {},
+      showError: () => {},
+      showInfo: () => {},
       clearFeedback: () => {},
       registerNavigationHandler: () => {},
       navigateWithFeedback: () => {},

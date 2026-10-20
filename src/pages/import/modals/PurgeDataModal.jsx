@@ -231,8 +231,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                 notifications: notifItems.length,
                 actionsCommerciales: actItems.length
             });
-        } catch (err) {
-            console.error('[PURGE MODAL] Erreur de chargement des compteurs :', err);
+        } catch {
+            // Échec silencieux du chargement préalable des compteurs
         } finally {
             setLoadingCounts(false);
         }
@@ -318,12 +318,11 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                                         valeur_apres: { count: res.count, label: res.label },
                                         message_notification: `Suppression de ${res.count} ${res.label.toLowerCase()} (Purge des données).`
                                     });
-                                } catch (notifErr) {
-                                    console.warn('[PURGE] Notification journal non enregistrée :', notifErr);
+                                } catch {
+                                    // Journalisation optionnelle ignorée si indisponible
                                 }
                             }
                         } catch (err) {
-                            console.error(`[PURGE] Erreur suppression ${key}:`, err);
                             const errMsg = err.response?.data?.message || err.message || 'Erreur inconnue';
                             errors.push(`${mod.title} : ${errMsg}`);
                         }

@@ -72,8 +72,8 @@ export default function ActionsCommercialesTab({
           corps: data.corps || ''
         });
       }
-    } catch (err) {
-      console.warn('Impossible de charger le modèle depuis la base :', err.message);
+    } catch {
+      // Modèle par défaut conservé
     } finally {
       setLoadingTemplate(false);
     }

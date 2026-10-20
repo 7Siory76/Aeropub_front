@@ -18,10 +18,9 @@ export function useArticles() {
       // 2. Appel du lien des articles HTTP GET http://localhost:5000/api/articles
       const data = await articlesApi.getAll();
       setArticles(data || []);
-    } catch (error) {
+    } catch {
       setIsBackendOnline(false);
       setArticles([]);
-      console.warn('❌ Impossible d\'interroger le BACK_OFFICE:', error.message);
     } finally {
       setLoading(false);
     }
