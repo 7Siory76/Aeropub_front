@@ -30,9 +30,9 @@ export default function NotificationBell() {
     const loadNotifications = async () => {
         setLoading(true);
         try {
-            const res = await journalNotificationApi.getAll(selectedCategory);
-            setNotifications(res.data || []);
-            setUnreadCount(res.unreadCount || 0);
+            const reponseNotifications = await journalNotificationApi.getAll(selectedCategory);
+            setNotifications(reponseNotifications.data || []);
+            setUnreadCount(reponseNotifications.unreadCount || 0);
         } catch {
             // Échec silencieux lors du rafraîchissement périodique en arrière-plan
         } finally {

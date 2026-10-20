@@ -115,7 +115,7 @@ export default function AbonnementsTab({
       if (a.date_echeance) years.add(new Date(a.date_echeance).getFullYear());
       if (a.date_fin) years.add(new Date(a.date_fin).getFullYear());
     });
-    return [...years].filter(y => !isNaN(y)).sort((a, b) => b - a);
+    return [...years].filter(annee => !isNaN(annee)).sort((anneeA, anneeB) => anneeB - anneeA);
   }, [abonnements]);
 
   const availableStatuses = useMemo(() => {
@@ -439,9 +439,9 @@ export default function AbonnementsTab({
               onChange={(e) => setSelectedYear(e.target.value)}
             >
               <option value="all">Toutes 📆</option>
-              {yearOptions.map((y) => (
-                <option key={y} value={y}>
-                  {y}
+              {yearOptions.map((anneeOption) => (
+                <option key={anneeOption} value={anneeOption}>
+                  {anneeOption}
                 </option>
               ))}
             </select>
@@ -620,9 +620,9 @@ export default function AbonnementsTab({
                   onChange={(e) => setSelectedYear(e.target.value)}
                 >
                   <option value="all">Toutes les années 📆</option>
-                  {yearOptions.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
+                  {yearOptions.map((anneeOption) => (
+                    <option key={anneeOption} value={anneeOption}>
+                      {anneeOption}
                     </option>
                   ))}
                 </select>

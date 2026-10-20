@@ -25,8 +25,8 @@ export default function AuditLogsTab({ onCountChange }) {
   const fetchAuditLogs = async () => {
     setLoadingAudit(true);
     try {
-      const res = await journalNotificationApi.getAll(auditCategory, auditNonLu);
-      const logs = Array.isArray(res) ? res : (res?.data || []);
+      const reponseJournal = await journalNotificationApi.getAll(auditCategory, auditNonLu);
+      const logs = Array.isArray(reponseJournal) ? reponseJournal : (reponseJournal?.data || []);
       setAuditLogs(logs);
       if (onCountChange) onCountChange(logs.length);
     } catch (err) {

@@ -236,7 +236,7 @@ export default function EmplacementDetailsModal({
                 <SearchableSelect
                   options={typesList}
                   value={formData.id_type}
-                  onChange={(val) => setFormData(prev => ({ ...prev, id_type: val }))}
+                  onChange={(selectedTypeId) => setFormData(prev => ({ ...prev, id_type: selectedTypeId }))}
                   placeholder="-- Sélectionner un type --"
                   searchPlaceholder="Rechercher un type..."
                   getOptionValue={(ts) => ts.id}
@@ -252,7 +252,7 @@ export default function EmplacementDetailsModal({
                 <SearchableSelect
                   options={catsList}
                   value={formData.id_categorie}
-                  onChange={(val) => setFormData(prev => ({ ...prev, id_categorie: val }))}
+                  onChange={(selectedCategorieId) => setFormData(prev => ({ ...prev, id_categorie: selectedCategorieId }))}
                   placeholder="-- Sélectionner une catégorie --"
                   searchPlaceholder="Rechercher une catégorie..."
                   getOptionValue={(cat) => cat.id}
@@ -265,7 +265,7 @@ export default function EmplacementDetailsModal({
                 <SearchableSelect
                   options={zonesList}
                   value={formData.id_zone}
-                  onChange={(val) => setFormData(prev => ({ ...prev, id_zone: val }))}
+                  onChange={(selectedZoneId) => setFormData(prev => ({ ...prev, id_zone: selectedZoneId }))}
                   placeholder="-- Sélectionner une zone --"
                   searchPlaceholder="Rechercher une zone, un aéroport..."
                   getOptionValue={(zn) => zn.id}

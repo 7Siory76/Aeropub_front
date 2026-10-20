@@ -138,7 +138,7 @@ export default function AddEmplacementModal({
               <SearchableSelect
                 options={typeSupports}
                 value={formData.id_type}
-                onChange={(val) => setFormData(prev => ({ ...prev, id_type: val }))}
+                onChange={(selectedTypeId) => setFormData(prev => ({ ...prev, id_type: selectedTypeId }))}
                 placeholder="-- Choisir un type de support --"
                 searchPlaceholder="Rechercher un type (Panneau, Caisson...)..."
                 getOptionValue={(ts) => ts.id}
@@ -154,7 +154,7 @@ export default function AddEmplacementModal({
               <SearchableSelect
                 options={categories}
                 value={formData.id_categorie}
-                onChange={(val) => setFormData(prev => ({ ...prev, id_categorie: val }))}
+                onChange={(selectedCategorieId) => setFormData(prev => ({ ...prev, id_categorie: selectedCategorieId }))}
                 placeholder="-- Choisir une catégorie --"
                 searchPlaceholder="Rechercher une catégorie..."
                 getOptionValue={(c) => c.id}
@@ -168,7 +168,7 @@ export default function AddEmplacementModal({
               <SearchableSelect
                 options={zones}
                 value={formData.id_zone}
-                onChange={(val) => setFormData(prev => ({ ...prev, id_zone: val }))}
+                onChange={(selectedZoneId) => setFormData(prev => ({ ...prev, id_zone: selectedZoneId }))}
                 placeholder="-- Choisir une zone terminale --"
                 searchPlaceholder="Rechercher une zone, un aéroport..."
                 getOptionValue={(z) => z.id}

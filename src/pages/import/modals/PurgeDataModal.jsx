@@ -58,12 +58,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <CalendarCheck size={18} />,
             count: counts.abonnements,
             execute: async (onProgress) => {
-                const items = await abonnementsApi.getAll();
+                const abonnements = await abonnementsApi.getAll();
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des abonnements (${i + 1}/${items.length})...`);
-                    await abonnementsApi.delete(item.reference || item.id);
+                for (let i = 0; i < abonnements.length; i++) {
+                    const abonnement = abonnements[i];
+                    onProgress(`Suppression des abonnements (${i + 1}/${abonnements.length})...`);
+                    await abonnementsApi.delete(abonnement.reference || abonnement.id);
                     deleted++;
                 }
                 return { label: 'Abonnements', count: deleted };
@@ -76,12 +76,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <Database size={18} />,
             count: counts.supports,
             execute: async (onProgress) => {
-                const items = await supportsApi.getAll();
+                const supports = await supportsApi.getAll();
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des supports (${i + 1}/${items.length})...`);
-                    await supportsApi.delete(item.reference);
+                for (let i = 0; i < supports.length; i++) {
+                    const support = supports[i];
+                    onProgress(`Suppression des supports (${i + 1}/${supports.length})...`);
+                    await supportsApi.delete(support.reference);
                     deleted++;
                 }
                 return { label: 'Supports', count: deleted };
@@ -94,12 +94,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <Building2 size={18} />,
             count: counts.clients,
             execute: async (onProgress) => {
-                const items = await clientsApi.getAll();
+                const clients = await clientsApi.getAll();
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des clients (${i + 1}/${items.length})...`);
-                    await clientsApi.delete(item.id);
+                for (let i = 0; i < clients.length; i++) {
+                    const client = clients[i];
+                    onProgress(`Suppression des clients (${i + 1}/${clients.length})...`);
+                    await clientsApi.delete(client.id);
                     deleted++;
                 }
                 return { label: 'Clients', count: deleted };
@@ -112,12 +112,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <MapPin size={18} />,
             count: counts.zones,
             execute: async (onProgress) => {
-                const items = await zonesApi.getAll();
+                const zones = await zonesApi.getAll();
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des zones (${i + 1}/${items.length})...`);
-                    await zonesApi.delete(item.id);
+                for (let i = 0; i < zones.length; i++) {
+                    const zone = zones[i];
+                    onProgress(`Suppression des zones (${i + 1}/${zones.length})...`);
+                    await zonesApi.delete(zone.id);
                     deleted++;
                 }
                 return { label: 'Zones', count: deleted };
@@ -130,12 +130,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <Layers size={18} />,
             count: counts.categories,
             execute: async (onProgress) => {
-                const items = await categoriesApi.getAll();
+                const categories = await categoriesApi.getAll();
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des catégories (${i + 1}/${items.length})...`);
-                    await categoriesApi.delete(item.id);
+                for (let i = 0; i < categories.length; i++) {
+                    const categorie = categories[i];
+                    onProgress(`Suppression des catégories (${i + 1}/${categories.length})...`);
+                    await categoriesApi.delete(categorie.id);
                     deleted++;
                 }
                 return { label: 'Catégories', count: deleted };
@@ -148,12 +148,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <Tag size={18} />,
             count: counts.types,
             execute: async (onProgress) => {
-                const items = await typeSupportsApi.getAll();
+                const types = await typeSupportsApi.getAll();
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des types (${i + 1}/${items.length})...`);
-                    await typeSupportsApi.delete(item.id);
+                for (let i = 0; i < types.length; i++) {
+                    const typeSupport = types[i];
+                    onProgress(`Suppression des types (${i + 1}/${types.length})...`);
+                    await typeSupportsApi.delete(typeSupport.id);
                     deleted++;
                 }
                 return { label: 'Types de Support', count: deleted };
@@ -166,13 +166,13 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <Mail size={18} />,
             count: counts.actionsCommerciales,
             execute: async (onProgress) => {
-                const res = await actionsCommercialesApi.getAll();
-                const items = Array.isArray(res) ? res : (res?.data || []);
+                const reponseActions = await actionsCommercialesApi.getAll();
+                const actions = Array.isArray(reponseActions) ? reponseActions : (reponseActions?.data || []);
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des actions commerciales (${i + 1}/${items.length})...`);
-                    await actionsCommercialesApi.delete(item.id);
+                for (let i = 0; i < actions.length; i++) {
+                    const action = actions[i];
+                    onProgress(`Suppression des actions commerciales (${i + 1}/${actions.length})...`);
+                    await actionsCommercialesApi.delete(action.id);
                     deleted++;
                 }
                 return { label: 'Actions Commerciales', count: deleted };
@@ -185,13 +185,13 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
             icon: <Bell size={18} />,
             count: counts.notifications,
             execute: async (onProgress) => {
-                const res = await journalNotificationApi.getAll();
-                const items = Array.isArray(res) ? res : (res?.data || []);
+                const reponseNotifications = await journalNotificationApi.getAll();
+                const notifications = Array.isArray(reponseNotifications) ? reponseNotifications : (reponseNotifications?.data || []);
                 let deleted = 0;
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    onProgress(`Suppression des notifications (${i + 1}/${items.length})...`);
-                    await journalNotificationApi.delete(item.id);
+                for (let i = 0; i < notifications.length; i++) {
+                    const notification = notifications[i];
+                    onProgress(`Suppression des notifications (${i + 1}/${notifications.length})...`);
+                    await journalNotificationApi.delete(notification.id);
                     deleted++;
                 }
                 return { label: 'Journal & Notifications', count: deleted };
@@ -302,14 +302,14 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
 
             for (const key of executionOrder) {
                 if (selectedKeys.has(key)) {
-                    const mod = purgeModules.find(m => m.key === key);
-                    if (mod) {
+                    const modulePurge = purgeModules.find(m => m.key === key);
+                    if (modulePurge) {
                         try {
-                            const res = await mod.execute(setProgressStatus);
-                            results.push(res);
+                            const resultatPurge = await modulePurge.execute(setProgressStatus);
+                            results.push(resultatPurge);
 
                             // Enregistrer la notification récapitulative dans le journal d'audit
-                            if (res && res.count > 0 && key !== 'journal_notification') {
+                            if (resultatPurge && resultatPurge.count > 0 && key !== 'journal_notification') {
                                 try {
                                     await journalNotificationApi.create({
                                         categorie_action: 'SUPPRESSION',

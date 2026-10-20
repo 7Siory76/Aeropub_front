@@ -240,7 +240,7 @@ export default function DashboardKpisOverview({
         };
     }, [userContracts, renewedParentRefs]);
 
-    const formatMontant = (val) => new Intl.NumberFormat('fr-MG').format(Math.round(val)) + ' MGA';
+    const formatMontant = (montantNumerique) => new Intl.NumberFormat('fr-MG').format(Math.round(montantNumerique)) + ' MGA';
 
     const triggerFilter = (filterKey) => {
         if (onSelectKpiFilter) {

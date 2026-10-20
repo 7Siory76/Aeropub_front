@@ -9,9 +9,9 @@ const MOIS_NOMS = [
 // Fonction pour normaliser une date à minuit local
 const parseDateOnly = (dateInput) => {
     if (!dateInput) return null;
-    const d = new Date(dateInput);
-    if (isNaN(d.getTime())) return null;
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const dateParse = new Date(dateInput);
+    if (isNaN(dateParse.getTime())) return null;
+    return new Date(dateParse.getFullYear(), dateParse.getMonth(), dateParse.getDate());
 };
 
 // Calcule le nombre de jours calendaires d'activité d'un contrat dans une fenêtre [pStart, pEnd] (inclusif)
@@ -38,12 +38,12 @@ export default function TopClientsWidget({ userContracts = [] }) {
     const [selectedMonth, setSelectedMonth] = useState(currentMonthIndex);
     const [selectedYear, setSelectedYear] = useState(currentYear);
 
-    const formatDevise = (val) => {
+    const formatDevise = (montantAriary) => {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
             currency: 'MGA',
             maximumFractionDigits: 0
-        }).format(val || 0).replace('MGA', 'Ar');
+        }).format(montantAriary || 0).replace('MGA', 'Ar');
     };
 
     // Extraire dynamiquement les années disponibles dans les contrats
@@ -51,12 +51,12 @@ export default function TopClientsWidget({ userContracts = [] }) {
         const years = new Set([currentYear]);
         userContracts.forEach((c) => {
             if (c.date_debut) {
-                const y = new Date(c.date_debut).getFullYear();
-                if (!isNaN(y)) years.add(y);
+                const anneeDebut = new Date(c.date_debut).getFullYear();
+                if (!isNaN(anneeDebut)) years.add(anneeDebut);
             }
             if (c.date_echeance || c.date_fin) {
-                const y = new Date(c.date_echeance || c.date_fin).getFullYear();
-                if (!isNaN(y)) years.add(y);
+                const anneeFin = new Date(c.date_echeance || c.date_fin).getFullYear();
+                if (!isNaN(anneeFin)) years.add(anneeFin);
             }
         });
         return Array.from(years).sort((a, b) => a - b);
@@ -250,9 +250,9 @@ export default function TopClientsWidget({ userContracts = [] }) {
                                 cursor: 'pointer'
                             }}
                         >
-                            {availableYears.map((y) => (
-                                <option key={y} value={y} style={{ background: '#1e293b', color: '#fff' }}>
-                                    {y}
+                            {availableYears.map((anneeOption) => (
+                                <option key={anneeOption} value={anneeOption} style={{ background: '#1e293b', color: '#fff' }}>
+                                    {anneeOption}
                                 </option>
                             ))}
                         </select>

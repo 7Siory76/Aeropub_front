@@ -30,9 +30,9 @@ export default function AssociateAbonnementModal({
 
     // Date de fin par défaut (+1 an)
     const defaultEnd = () => {
-        const d = new Date(selectedDate || new Date());
-        d.setFullYear(d.getFullYear() + 1);
-        return d.toISOString().split('T')[0];
+        const dateReference = new Date(selectedDate || new Date());
+        dateReference.setFullYear(dateReference.getFullYear() + 1);
+        return dateReference.toISOString().split('T')[0];
     }
     const [endDate, setEndDate] = useState(defaultEnd());
     const [duree, setDuree] = useState('1 an');
@@ -42,21 +42,21 @@ export default function AssociateAbonnementModal({
     const [facture, setFacture] = useState('');
     const [loading, setLoanding] = useState(false);
 
-    const deducePeriodicite = (val, unite) => {
-        const n = parseInt(val, 10) || 1;
+    const deducePeriodicite = (dureeChiffre, unite) => {
+        const nombre = parseInt(dureeChiffre, 10) || 1;
         if (unite === 'an') return 'Annuel';
-        if (n <= 1) return 'Mensuel';
-        if (n >= 2 && n <= 4) return 'Trimestriel';
-        if (n >= 5 && n <= 8) return 'Semestriel';
+        if (nombre <= 1) return 'Mensuel';
+        if (nombre >= 2 && nombre <= 4) return 'Trimestriel';
+        if (nombre >= 5 && nombre <= 8) return 'Semestriel';
         return 'Annuel';
     };
 
-    const getDureeContratText = (val, unite) => {
-        const n = parseInt(val, 10) || 1;
+    const getDureeContratText = (dureeChiffre, unite) => {
+        const nombre = parseInt(dureeChiffre, 10) || 1;
         if (unite === 'an') {
-            return `${n} ${n > 1 ? 'ans' : 'an'}`;
+            return `${nombre} ${nombre > 1 ? 'ans' : 'an'}`;
         }
-        return `${n} mois`;
+        return `${nombre} mois`;
     };
 
     useEffect(() => {
@@ -64,20 +64,20 @@ export default function AssociateAbonnementModal({
 
         // Décomposition pour éviter tout problème de décalage de fuseau horaire
         const [year, month, day] = startDate.split('-').map(Number);
-        const d = new Date(year, month - 1, day);
-        const val = parseInt(dureeValeur, 10) || 1;
+        const dateCalculFin = new Date(year, month - 1, day);
+        const nombreDuree = parseInt(dureeValeur, 10) || 1;
         if (dureeUnite === 'an') {
-            d.setFullYear(d.getFullYear() + val);
+            dateCalculFin.setFullYear(dateCalculFin.getFullYear() + nombreDuree);
         } else if (dureeUnite === 'mois') {
-            d.setMonth(d.getMonth() + val);
+            dateCalculFin.setMonth(dateCalculFin.getMonth() + nombreDuree);
         }
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const dayStr = String(d.getDate()).padStart(2, '0');
-        setEndDate(`${y}-${m}-${dayStr}`);
+        const anneeFin = dateCalculFin.getFullYear();
+        const moisFin = String(dateCalculFin.getMonth() + 1).padStart(2, '0');
+        const jourFin = String(dateCalculFin.getDate()).padStart(2, '0');
+        setEndDate(`${anneeFin}-${moisFin}-${jourFin}`);
 
         // Déduire la périodicité adaptée à la durée
-        setPeriodicite(deducePeriodicite(val, dureeUnite));
+        setPeriodicite(deducePeriodicite(nombreDuree, dureeUnite));
     }, [startDate, dureeValeur, dureeUnite]);
 
     //2. Soumission du formulaire
@@ -219,7 +219,7 @@ export default function AssociateAbonnementModal({
                         <SearchableSelect
                             options={clients}
                             value={clientId}
-                            onChange={(val) => setClientId(val)}
+                            onChange={(selectedClientId) => setClientId(selectedClientId)}
                             placeholder="-- Sélectionner un client --"
                             searchPlaceholder="Rechercher un client (nom, secteur)..."
                             getOptionValue={(c) => c.id}

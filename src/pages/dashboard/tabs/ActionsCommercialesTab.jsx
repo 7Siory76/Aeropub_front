@@ -124,8 +124,8 @@ export default function ActionsCommercialesTab({
     setSendingRef(ref);
 
     try {
-      const res = await actionsCommercialesApi.envoyerRelanceManuelle(ref, user?.id);
-      showSuccess(res?.message || `Courriel de relance envoyé avec succès pour ${ref} (${client}).`);
+      const reponseRelance = await actionsCommercialesApi.envoyerRelanceManuelle(ref, user?.id);
+      showSuccess(reponseRelance?.message || `Courriel de relance envoyé avec succès pour ${ref} (${client}).`);
       if (onRefresh) onRefresh();
     } catch (err) {
       const errorMsg = sanitizeUserError(err, "Erreur lors de l'envoi du courriel.");
@@ -156,8 +156,8 @@ export default function ActionsCommercialesTab({
     setSendingRef(ref);
 
     try {
-      const res = await actionsCommercialesApi.envoyerPreavisReconduction(ref, user?.id);
-      showSuccess(res?.message || `Courriel de préavis envoyé avec succès pour ${ref} (${client}).`);
+      const reponsePreavis = await actionsCommercialesApi.envoyerPreavisReconduction(ref, user?.id);
+      showSuccess(reponsePreavis?.message || `Courriel de préavis envoyé avec succès pour ${ref} (${client}).`);
       if (onRefresh) onRefresh();
     } catch (err) {
       const errorMsg = sanitizeUserError(err, "Erreur lors de l'envoi du préavis.");

@@ -187,8 +187,8 @@ export default function PlanningPage() {
 
   const formatDateFr = (dateStr) => {
     if (!dateStr) return '';
-    const d = new Date(String(dateStr).replace(' ', 'T'));
-    return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('fr-FR');
+    const dateObjet = new Date(String(dateStr).replace(' ', 'T'));
+    return isNaN(dateObjet.getTime()) ? dateStr : dateObjet.toLocaleDateString('fr-FR');
   };
 
   //ASSOSIATION UN REF A UN ABONNEMENT PAS ENCORE CONFIRMER

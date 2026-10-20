@@ -128,16 +128,16 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
     return {
       j7: actifs.filter(c => getDiffJours(c.date_echeance || c.date_fin) <= 7),
       j30: actifs.filter(c => {
-        const d = getDiffJours(c.date_echeance || c.date_fin);
-        return d > 7 && d <= 30;
+        const joursRestants = getDiffJours(c.date_echeance || c.date_fin);
+        return joursRestants > 7 && joursRestants <= 30;
       }),
       j60: actifs.filter(c => {
-        const d = getDiffJours(c.date_echeance || c.date_fin);
-        return d > 30 && d <= 60;
+        const joursRestants = getDiffJours(c.date_echeance || c.date_fin);
+        return joursRestants > 30 && joursRestants <= 60;
       }),
       j90: actifs.filter(c => {
-        const d = getDiffJours(c.date_echeance || c.date_fin);
-        return d > 60 && d <= 90;
+        const joursRestants = getDiffJours(c.date_echeance || c.date_fin);
+        return joursRestants > 60 && joursRestants <= 90;
       })
     };
   }, [userContracts, renewedParentRefs]);

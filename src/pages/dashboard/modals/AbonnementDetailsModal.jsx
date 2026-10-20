@@ -412,9 +412,9 @@ export default function AbonnementDetailsModal({
                     value={selectedNewStatut}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => {
-                      const val = e.target.value;
-                      setSelectedNewStatut(val);
-                      handleQuickStatutChange(val);
+                      const nouveauStatut = e.target.value;
+                      setSelectedNewStatut(nouveauStatut);
+                      handleQuickStatutChange(nouveauStatut);
                     }}
                     onBlur={() => setIsChangingStatut(false)}
                   >

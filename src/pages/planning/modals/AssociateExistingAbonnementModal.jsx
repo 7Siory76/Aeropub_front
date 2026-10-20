@@ -90,8 +90,8 @@ export default function AssociateExistingAbonnementModal({
     };
     const formatDateFr = (dStr) => {
         if (!dStr) return '-';
-        const d = new Date(String(dStr).replace(' ', 'T'));
-        return isNaN(d.getTime()) ? dStr : d.toLocaleDateString('fr-FR');
+        const dateObjet = new Date(String(dStr).replace(' ', 'T'));
+        return isNaN(dateObjet.getTime()) ? dStr : dateObjet.toLocaleDateString('fr-FR');
     };
 
 
@@ -149,7 +149,7 @@ export default function AssociateExistingAbonnementModal({
                             <SearchableSelect
                                 options={eligibleAbonnements}
                                 value={selectedAboRef}
-                                onChange={(val) => setSelectedAboRef(val)}
+                                onChange={(selectedAboReference) => setSelectedAboRef(selectedAboReference)}
                                 placeholder="-- Choisir un contrat d'abonnement --"
                                 searchPlaceholder="Rechercher par référence, client..."
                                 getOptionValue={(abo) => abo.reference}

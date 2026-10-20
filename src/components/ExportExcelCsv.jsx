@@ -46,14 +46,14 @@ export default function ExportExcelCsv({
 
     const rows = data.map(item => {
       return effectiveColumns.map(col => {
-        let val = '';
+        let valeurCellule = '';
         if (typeof col.accessor === 'function') {
-          val = col.accessor(item);
+          valeurCellule = col.accessor(item);
         } else if (col.key) {
-          val = item[col.key];
+          valeurCellule = item[col.key];
         }
-        if (val === null || val === undefined) val = '';
-        const escapedVal = String(val).replace(/"/g, '""');
+        if (valeurCellule === null || valeurCellule === undefined) valeurCellule = '';
+        const escapedVal = String(valeurCellule).replace(/"/g, '""');
         return `"${escapedVal}"`;
       });
     });
@@ -61,7 +61,7 @@ export default function ExportExcelCsv({
     // Encodage UTF-8 avec BOM (\uFEFF) pour compatibilité immédiate avec Excel
     const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [
       headers.join(';'),
-      ...rows.map(r => r.join(';'))
+      ...rows.map(ligne => ligne.join(';'))
     ].join('\n');
 
     const encodedUri = encodeURI(csvContent);

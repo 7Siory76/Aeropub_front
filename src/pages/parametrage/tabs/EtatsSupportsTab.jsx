@@ -145,10 +145,10 @@ export default function EtatsSupportsTab({ onCountChange }) {
   };
 
   const getBadgeClass = (nom) => {
-    const val = String(nom || '').toLowerCase();
-    if (val.includes('disponible') || val.includes('actif')) return 'badge-active';
-    if (val.includes('réservé') || val.includes('attente') || val.includes('bientôt')) return 'badge-warning';
-    if (val.includes('occupé') || val.includes('expiré') || val.includes('résilié') || val.includes('indisponible')) return 'badge-expired';
+    const nomMinuscule = String(nom || '').toLowerCase();
+    if (nomMinuscule.includes('disponible') || nomMinuscule.includes('actif')) return 'badge-active';
+    if (nomMinuscule.includes('réservé') || nomMinuscule.includes('attente') || nomMinuscule.includes('bientôt')) return 'badge-warning';
+    if (nomMinuscule.includes('occupé') || nomMinuscule.includes('expiré') || nomMinuscule.includes('résilié') || nomMinuscule.includes('indisponible')) return 'badge-expired';
     return 'badge-neutral';
   };
 

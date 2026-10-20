@@ -80,7 +80,7 @@ export default function MontantsFinanciersWidget({
     };
   }, [userContracts, renewedParentRefs]);
 
-  const formatMontant = (val) => new Intl.NumberFormat('fr-MG').format(Math.round(val)) + ' MGA';
+  const formatMontant = (montantNumerique) => new Intl.NumberFormat('fr-MG').format(Math.round(montantNumerique)) + ' MGA';
 
   return (
     <div style={{ marginBottom: '1.75rem' }}>

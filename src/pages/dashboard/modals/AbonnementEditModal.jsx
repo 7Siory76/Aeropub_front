@@ -143,39 +143,39 @@ export default function AbonnementEditModal({
     const [year, month, day] = formData.date_debut.split('-').map(Number);
     if (!year || !month || !day) return;
 
-    const d = new Date(year, month - 1, day);
-    const val = parseInt(dureeValeur, 10) || 1;
+    const dateCalculEcheance = new Date(year, month - 1, day);
+    const nombreDuree = parseInt(dureeValeur, 10) || 1;
 
     if (dureeUnite === 'an') {
-      d.setFullYear(d.getFullYear() + val);
+      dateCalculEcheance.setFullYear(dateCalculEcheance.getFullYear() + nombreDuree);
     } else if (dureeUnite === 'mois') {
-      d.setMonth(d.getMonth() + val);
+      dateCalculEcheance.setMonth(dateCalculEcheance.getMonth() + nombreDuree);
     }
 
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const dayStr = String(d.getDate()).padStart(2, '0');
+    const anneeEcheance = dateCalculEcheance.getFullYear();
+    const moisEcheance = String(dateCalculEcheance.getMonth() + 1).padStart(2, '0');
+    const jourEcheance = String(dateCalculEcheance.getDate()).padStart(2, '0');
 
     const durationChanged =
-      prevDurationRef.current.val !== val ||
+      prevDurationRef.current.val !== nombreDuree ||
       prevDurationRef.current.unite !== dureeUnite;
 
     let autoPeriodicite = null;
     if (durationChanged) {
       if (dureeUnite === 'mois') {
-        if (val <= 1) autoPeriodicite = 'Mensuel';
-        else if (val >= 2 && val <= 4) autoPeriodicite = 'Trimestriel';
-        else if (val >= 5 && val <= 8) autoPeriodicite = 'Semestriel';
+        if (nombreDuree <= 1) autoPeriodicite = 'Mensuel';
+        else if (nombreDuree >= 2 && nombreDuree <= 4) autoPeriodicite = 'Trimestriel';
+        else if (nombreDuree >= 5 && nombreDuree <= 8) autoPeriodicite = 'Semestriel';
         else autoPeriodicite = 'Annuel';
       } else {
         autoPeriodicite = 'Annuel';
       }
-      prevDurationRef.current = { val, unite: dureeUnite };
+      prevDurationRef.current = { val: nombreDuree, unite: dureeUnite };
     }
 
     setFormData(prev => ({
       ...prev,
-      date_echeance: `${y}-${m}-${dayStr}`,
+      date_echeance: `${anneeEcheance}-${moisEcheance}-${jourEcheance}`,
       ...(autoPeriodicite ? { periodicite: autoPeriodicite } : {})
     }));
   }, [formData.date_debut, dureeValeur, dureeUnite]);
@@ -402,7 +402,7 @@ export default function AbonnementEditModal({
               <SearchableSelect
                 options={clientsList}
                 value={formData.id_client}
-                onChange={(val) => setFormData(prev => ({ ...prev, id_client: val }))}
+                onChange={(selectedClientId) => setFormData(prev => ({ ...prev, id_client: selectedClientId }))}
                 placeholder="-- Sélectionner un client --"
                 searchPlaceholder="Rechercher un client (nom, secteur)..."
                 getOptionValue={(c) => c.id}
@@ -417,7 +417,7 @@ export default function AbonnementEditModal({
               <SearchableSelect
                 options={commercialsList}
                 value={formData.id_commercial}
-                onChange={(val) => setFormData(prev => ({ ...prev, id_commercial: val }))}
+                onChange={(selectedCommercialId) => setFormData(prev => ({ ...prev, id_commercial: selectedCommercialId }))}
                 placeholder="-- Sélectionner un commercial --"
                 searchPlaceholder="Rechercher un commercial..."
                 getOptionValue={(u) => u.id}
@@ -531,7 +531,7 @@ export default function AbonnementEditModal({
                     <SearchableSelect
                       options={filteredAvailableEmplacements}
                       value={supportToAdd}
-                      onChange={(val) => setSupportToAdd(val)}
+                      onChange={(selectedSupportRef) => setSupportToAdd(selectedSupportRef)}
                       placeholder={filteredAvailableEmplacements.length > 0
                         ? `-- Sélectionner un support disponible à ajouter (${filteredAvailableEmplacements.length} libres) --`
                         : `-- Aucun support disponible sur cette période --`}
@@ -661,12 +661,12 @@ export default function AbonnementEditModal({
               className="modal-select"
               value={formData.id_type_statut || formData.statut}
               onChange={(e) => {
-                const val = e.target.value;
-                const matchedType = typeStatutList.find(t => String(t.id) === String(val) || t.nom_statut.toLowerCase() === val.toLowerCase());
+                const selectedStatutValue = e.target.value;
+                const matchedType = typeStatutList.find(t => String(t.id) === String(selectedStatutValue) || t.nom_statut.toLowerCase() === selectedStatutValue.toLowerCase());
                 setFormData({
                   ...formData,
-                  id_type_statut: matchedType ? matchedType.id : val,
-                  statut: matchedType ? matchedType.nom_statut : val
+                  id_type_statut: matchedType ? matchedType.id : selectedStatutValue,
+                  statut: matchedType ? matchedType.nom_statut : selectedStatutValue
                 });
               }}
             >
@@ -721,7 +721,7 @@ export default function AbonnementEditModal({
               <SearchableSelect
                 options={abonnementsList.filter(a => a.reference !== abonnement.reference)}
                 value={formData.id_abonnement_precedent}
-                onChange={(val) => setFormData(prev => ({ ...prev, id_abonnement_precedent: val }))}
+                onChange={(selectedParentAboRef) => setFormData(prev => ({ ...prev, id_abonnement_precedent: selectedParentAboRef }))}
                 placeholder="-- Aucun contrat précédent --"
                 searchPlaceholder="Rechercher par référence, client..."
                 getOptionValue={(a) => a.reference}

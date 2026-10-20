@@ -37,8 +37,8 @@ const sanitizeText = (txt) => {
   return String(txt).replace(/‚/g, 'é').replace(/Ext‚rieur/g, 'Extérieur').trim();
 };
 
-const formatMGA = (val) => {
-  return new Intl.NumberFormat('fr-MG').format(Math.round(val || 0)) + ' MGA';
+const formatMGA = (montantNumerique) => {
+  return new Intl.NumberFormat('fr-MG').format(Math.round(montantNumerique || 0)) + ' MGA';
 };
 
 export default function CalculateurRepartitionCaModal({
@@ -97,12 +97,12 @@ export default function CalculateurRepartitionCaModal({
     const years = new Set([currentYear]);
     activeContracts.forEach((c) => {
       if (c.date_debut) {
-        const y = new Date(c.date_debut).getFullYear();
-        if (!isNaN(y)) years.add(y);
+        const anneeDebut = new Date(c.date_debut).getFullYear();
+        if (!isNaN(anneeDebut)) years.add(anneeDebut);
       }
       if (c.date_echeance || c.date_fin) {
-        const y = new Date(c.date_echeance || c.date_fin).getFullYear();
-        if (!isNaN(y)) years.add(y);
+        const anneeFin = new Date(c.date_echeance || c.date_fin).getFullYear();
+        if (!isNaN(anneeFin)) years.add(anneeFin);
       }
     });
     return Array.from(years).sort((a, b) => b - a);
@@ -153,18 +153,18 @@ export default function CalculateurRepartitionCaModal({
     let pEnd = null;
 
     if (selectedAnnee !== 'all' && selectedMois !== 'all') {
-      const y = parseInt(selectedAnnee, 10);
-      const m = parseInt(selectedMois, 10);
-      pStart = new Date(y, m, 1, 0, 0, 0);
-      pEnd = new Date(y, m + 1, 0, 23, 59, 59);
+      const anneeFiltre = parseInt(selectedAnnee, 10);
+      const moisFiltre = parseInt(selectedMois, 10);
+      pStart = new Date(anneeFiltre, moisFiltre, 1, 0, 0, 0);
+      pEnd = new Date(anneeFiltre, moisFiltre + 1, 0, 23, 59, 59);
     } else if (selectedAnnee !== 'all' && selectedMois === 'all') {
-      const y = parseInt(selectedAnnee, 10);
-      pStart = new Date(y, 0, 1, 0, 0, 0);
-      pEnd = new Date(y, 11, 31, 23, 59, 59);
+      const anneeFiltre = parseInt(selectedAnnee, 10);
+      pStart = new Date(anneeFiltre, 0, 1, 0, 0, 0);
+      pEnd = new Date(anneeFiltre, 11, 31, 23, 59, 59);
     } else if (selectedAnnee === 'all' && selectedMois !== 'all') {
-      const m = parseInt(selectedMois, 10);
-      pStart = new Date(currentYear, m, 1, 0, 0, 0);
-      pEnd = new Date(currentYear, m + 1, 0, 23, 59, 59);
+      const moisFiltre = parseInt(selectedMois, 10);
+      pStart = new Date(currentYear, moisFiltre, 1, 0, 0, 0);
+      pEnd = new Date(currentYear, moisFiltre + 1, 0, 23, 59, 59);
     }
 
     const filteredContrats = [];
