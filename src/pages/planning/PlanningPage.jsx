@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { emplacementsApi, abonnementsApi, zonesApi, aeroportsApi, clientsApi } from '../../api';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, PlusCircle, User, Clock, CheckCircle2, XCircle, X, RotateCw, Tag, Monitor, Layers, Plane, MapPin, ArrowLeftRight, Search } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, PlusCircle, CheckCircle2, XCircle, RotateCw, Tag, Monitor, Layers, Plane, ArrowLeftRight } from 'lucide-react';
 import AssociateAbonnementModal from './modals/AssociateAbonnementModal';
 import ChangeEmplacementModal from './modals/ChangeEmplacementModal';
 import AssociateExistingAbonnementModal from './modals/AssociateExistingAbonnementModal';

@@ -19,7 +19,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Upload,
-  Loader2,
   ScrollText,
   BarChart3,
   BookOpen,

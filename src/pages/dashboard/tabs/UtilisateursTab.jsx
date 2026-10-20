@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, UserCheck, Lock, HelpCircle, ChevronDown, ChevronUp, ShieldCheck, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { User, Shield, Mail, Search, RotateCcw, Plus, Edit3, Trash2, HelpCircle, ChevronDown, ChevronUp, ShieldCheck, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import UserModal from '../modals/UserModal';
 import DeleteConfirmModal from '../modals/DeleteConfirmModal';
 import { utilisateursApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
-import { sanitizeUserError } from '../../../utils/errorHandler';
 import { useAuth } from '../../../context/AuthContext';
 import { ROLES_GUIDE, getRoleGuide } from '../../../utils/rbac';
 

@@ -196,7 +196,7 @@ export default function Header({
                 </span>
               </div>
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="btn-logout"
                 title="Déconnexion"
               >

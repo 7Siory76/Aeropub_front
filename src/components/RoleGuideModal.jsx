@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, ShieldCheck, Shield, Check, User, Info, Lock } from 'lucide-react';
-import { ROLES_GUIDE, getRoleGuide, normalizeRole } from '../utils/rbac';
+import { X, ShieldCheck, Shield, User } from 'lucide-react';
+import { ROLES_GUIDE, normalizeRole } from '../utils/rbac';
 import { useAuth } from '../context/AuthContext';
 
 export default function RoleGuideModal({ isOpen, onClose }) {

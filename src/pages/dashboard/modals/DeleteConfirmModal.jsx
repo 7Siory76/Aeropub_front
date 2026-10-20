@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { AlertTriangle, Trash2, X, Loader2, ShieldAlert } from 'lucide-react';
+import { Trash2, X, Loader2, ShieldAlert } from 'lucide-react';
 
 export default function DeleteConfirmModal({
   isOpen,

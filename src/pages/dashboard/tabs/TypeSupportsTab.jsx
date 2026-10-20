@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Layers, ChevronRight, ChevronDown, ChevronUp, Search, RotateCcw, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Layers, ChevronRight, ChevronDown, ChevronUp, Search, RotateCcw, Plus, Edit, Trash2 } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import TypeSupportModal from '../modals/TypeSupportModal';
 import DeleteConfirmModal from '../modals/DeleteConfirmModal';
 import { typeSupportsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
-import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function TypeSupportsTab({
   typeSupports = [],

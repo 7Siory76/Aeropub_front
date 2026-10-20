@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Bell, Calendar, User, Search, RotateCcw, Filter, Send, Settings, Mail, Check, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Bell, Calendar, User, Search, RotateCcw, Send, Settings, Mail, Check, X, Loader2, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';

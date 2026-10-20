@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import {
-    Calendar, AlertTriangle, AlertCircle, Percent,
-    DollarSign, Clock, CheckCircle2, TrendingUp, ChevronRight,
-    RefreshCw, ArrowUpRight, ShieldAlert, Sparkles,
+    Calendar, AlertTriangle, Percent,
+    DollarSign, Clock, TrendingUp,
+    RefreshCw, ShieldAlert, Sparkles,
     FileCheck, FileEdit
 } from 'lucide-react';
 

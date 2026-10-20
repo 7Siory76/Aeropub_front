@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Bell, CheckCheck, PlusCircle, Edit, Trash2,
-    RefreshCw, Layers, FileText, Check, Loader2
+    RefreshCw, Layers, Check, Loader2
 } from 'lucide-react';
 import { journalNotificationApi } from '../api';
 import './NotificationBell.css';

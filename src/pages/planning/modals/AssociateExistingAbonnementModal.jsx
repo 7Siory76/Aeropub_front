@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, CheckCircle2, AlertTriangle, AlertCircle, Calendar, User, FileText, Loader2 } from 'lucide-react';
+import { X, AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
 import { abonnementsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
 import { sanitizeUserError } from '../../../utils/errorHandler';

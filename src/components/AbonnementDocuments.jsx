@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    FileText, UploadCloud, Eye, Download, Trash2,
-    History, AlertCircle, Loader2, Plus, CheckCircle2
-} from 'lucide-react'
+    FileText, Eye, Download, Trash2,
+    History, AlertCircle, Loader2, Plus
+} from 'lucide-react';
 import { documentsApi } from '../api';
 import DeleteConfirmModal from '../pages/dashboard/modals/DeleteConfirmModal';
 

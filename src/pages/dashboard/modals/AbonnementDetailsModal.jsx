@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  X, Edit3, Trash2, Layers, AlertCircle, History, Gift, Loader2
+  X, Edit3, Trash2, AlertCircle, History, Gift, Loader2
 } from 'lucide-react';
 import {
   abonnementsApi, typeStatutAbonnementApi

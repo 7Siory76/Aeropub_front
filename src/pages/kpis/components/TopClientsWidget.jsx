@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Trophy, Calendar, Award } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
 const MOIS_NOMS = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',

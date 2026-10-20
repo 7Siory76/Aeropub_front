@@ -4,7 +4,6 @@ import {
   Search,
   RotateCcw,
   Plus,
-  Download,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,

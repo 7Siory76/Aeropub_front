@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Layers, ChevronRight, ChevronDown, ChevronUp, FolderKanban, Search, RotateCcw, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { ChevronRight, ChevronDown, ChevronUp, FolderKanban, Search, RotateCcw, Plus, Edit, Trash2 } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import CategorieModal from '../modals/CategorieModal';
 import DeleteConfirmModal from '../modals/DeleteConfirmModal';
 import { categoriesApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
-import { sanitizeUserError } from '../../../utils/errorHandler';
 
 export default function CategoriesTab({
   categories = [],

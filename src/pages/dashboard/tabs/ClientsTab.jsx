@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ExternalLink, Mail, MapPin, Building2, Search, RotateCcw, Plus, Edit3, Trash2, Loader2, ArrowUpDown } from 'lucide-react';
+import { ExternalLink, Mail, MapPin, Building2, Search, RotateCcw, Plus, Edit3, Trash2, ArrowUpDown } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 import AddClientModal from '../modals/AddClientModal';
 import EditClientModal from '../modals/EditClientModal';
 import DeleteConfirmModal from '../modals/DeleteConfirmModal';
 import { clientsApi } from '../../../api';
 import { useFeedback } from '../../../context/FeedbackContext';
-import { sanitizeUserError } from '../../../utils/errorHandler';
 import { useAuth } from '../../../context/AuthContext';
 import { hasRole } from '../../../utils/rbac';
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
-    X, Plus, Copy, FileText, Layers, CheckCircle2,
-    AlertTriangle, AlertCircle, Calendar, User, DollarSign, Sparkles, Loader2
+    X, Copy, FileText, Layers,
+    AlertCircle, Sparkles, Loader2
 } from 'lucide-react';
 import {
     abonnementsApi, emplacementsApi, clientsApi,
