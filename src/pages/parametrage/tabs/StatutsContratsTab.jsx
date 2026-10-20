@@ -302,7 +302,6 @@ export default function StatutsContratsTab({ onCountChange }) {
                         <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
                           <button
                             onClick={() => { setEditingStatutId(statut.id); setEditNomStatut(statut.nom_statut); }}
-                            disabled={deletingId === statut.id}
                             style={{ color: '#6366f1', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', cursor: 'pointer' }}
                             title="Modifier le nom"
                           >

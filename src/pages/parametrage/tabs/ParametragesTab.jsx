@@ -317,7 +317,6 @@ export default function ParametragesTab({ onCountChange }) {
                         <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
                           <button
                             onClick={() => { setEditingParamId(p.id); setEditValeur(p.valeur); }}
-                            disabled={deletingId === p.id}
                             style={{ color: '#6366f1', padding: '0.3rem 0.6rem', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.15)', cursor: 'pointer' }}
                             title="Modifier"
                           >
