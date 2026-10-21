@@ -26,7 +26,7 @@ import { APP_PAGES_GUIDE } from './appGuideData';
 import { useFeedback } from '../context/FeedbackContext';
 import './AppGuideModal.css';
 
-// Registre d'icônes dynamiques
+// Icônes du guide
 const ICONS = {
   MapPin,
   BarChart3,
@@ -46,13 +46,13 @@ const ICONS = {
 export default function AppGuideModal({ isOpen, onClose }) {
   const { navigateWithFeedback } = useFeedback();
 
-  // Page active sélectionnée dans le guide
+  // Page active sélectionnée
   const [selectedPageId, setSelectedPageId] = useState(APP_PAGES_GUIDE[0].id);
 
-  // Sous-onglet actif pour les pages avec sous-tables (Tableau de Bord)
+  // Sous-onglet actif
   const [activeSubTabKey, setActiveSubTabKey] = useState('abonnements');
 
-  // Fermeture par la touche Échap
+  // Ferme avec la touche Échap
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -68,7 +68,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
   const currentPage = APP_PAGES_GUIDE.find((p) => p.id === selectedPageId) || APP_PAGES_GUIDE[0];
   const PageIcon = ICONS[currentPage.icon] || Compass;
 
-  // Téléportation vers la page ou l'onglet
+  // Navigue vers la page ou l'onglet
   const handleGoToPage = (pageKey, tabKey = null) => {
     if (!pageKey) return;
     if (navigateWithFeedback) {
@@ -80,7 +80,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
   return createPortal(
     <div className="app-guide-backdrop" onClick={onClose}>
       <div className="app-guide-dialog" onClick={(e) => e.stopPropagation()}>
-        {/* En-tête de la modale */}
+        {/* En-tête */}
         <div className="app-guide-header">
           <div className="app-guide-header-title">
             <div className="app-guide-header-icon">
@@ -104,9 +104,9 @@ export default function AppGuideModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Disposition principale : Volet des Pages à gauche, Contenu à droite */}
+        {/* Disposition principale */}
         <div className="app-guide-content-layout">
-          {/* Colonne gauche : Sélecteur de page */}
+          {/* Navigation latérale */}
           <aside className="app-guide-pages-sidebar">
             <span className="app-guide-sidebar-label">Pages de l'application</span>
             {APP_PAGES_GUIDE.map((page) => {
@@ -137,9 +137,9 @@ export default function AppGuideModal({ isOpen, onClose }) {
             })}
           </aside>
 
-          {/* Colonne droite : Détail de ce qu'on peut faire sur la page sélectionnée */}
+          {/* Détails de la page */}
           <main className="app-guide-page-detail">
-            {/* Carte Hero de présentation de la page */}
+            {/* Présentation */}
             <div className="app-guide-hero-card">
               <div className="app-guide-hero-left">
                 <div className="app-guide-hero-icon">
@@ -163,7 +163,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Bouton de navigation directe si la page est navigable */}
+              {/* Accès direct */}
               {currentPage.pageKey && (
                 <button
                   type="button"
@@ -176,7 +176,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
               )}
             </div>
 
-            {/* CAS 1 : Page avec sous-onglets (Tableau de Bord CRUD) */}
+            {/* Page avec sous-onglets */}
             {currentPage.subTabs ? (
               <div className="app-guide-subtabs-section">
                 <span className="app-guide-subtabs-title">
@@ -184,7 +184,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
                   Choisissez un onglet de gestion :
                 </span>
 
-                {/* Pills horizontaux des sous-tables */}
+                {/* Onglets secondaires */}
                 <div className="app-guide-subtabs-pills">
                   {currentPage.subTabs.map((sub) => {
                     const SubIcon = ICONS[sub.icon] || Compass;
@@ -203,7 +203,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
                   })}
                 </div>
 
-                {/* Contenu de la sous-table sélectionnée */}
+                {/* Contenu du sous-onglet */}
                 {(() => {
                   const currentSub = currentPage.subTabs.find((s) => s.key === activeSubTabKey) || currentPage.subTabs[0];
                   const SubBoxIcon = ICONS[currentSub.icon] || Compass;
@@ -247,7 +247,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
                 })()}
               </div>
             ) : (
-              /* CAS 2 : Page avec liste d'actions directes */
+              /* Page simple */
               <div className="app-guide-actions-container">
                 <h4 className="app-guide-section-heading">
                   <Check size={16} />
@@ -270,7 +270,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
           </main>
         </div>
 
-        {/* Pied de page de la modale */}
+        {/* Pied de page */}
         <div className="app-guide-footer">
           <div className="app-guide-footer-hint">
             <Sparkles size={14} style={{ color: '#38bdf8' }} />

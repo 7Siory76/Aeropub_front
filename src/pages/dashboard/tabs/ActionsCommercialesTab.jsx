@@ -18,7 +18,7 @@ export default function ActionsCommercialesTab({
   const { user } = useAuth();
   const { showSuccess, showError, showInfo } = useFeedback();
 
-  // Permissions RBAC (Module 3)
+  // Permissions RBAC
   const canSendManualEmail = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
   const canEditEmailTemplate = hasRole(user, ['Admin']);
 
@@ -52,7 +52,7 @@ export default function ActionsCommercialesTab({
       : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: '#38bdf8', marginLeft: 4 }} />;
   };
 
-  // État des modèles d'email (Table Modele_Courriel)
+  // Modèles de courriel
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [selectedTemplateCode, setSelectedTemplateCode] = useState('PREAVIS_RECONDUCTION');
   const [loadingTemplate, setLoadingTemplate] = useState(false);
@@ -103,7 +103,7 @@ export default function ActionsCommercialesTab({
     }
   };
 
-  // Envoi relance manuelle (Contrats standards J-30)
+  // Relance manuelle (J-30)
   const handleSendManualEmail = async (targetInfo) => {
     const ref = targetInfo.reference || targetInfo.id_abonnement;
     const client = targetInfo.nom_client || targetInfo.raison_sociale || 'Client';
@@ -135,7 +135,7 @@ export default function ActionsCommercialesTab({
     }
   };
 
-  // Envoi préavis de résiliation / reconduction (Contrats reconduction tacite)
+  // Préavis de reconduction tacite
   const handleSendPreavisEmail = async (targetInfo) => {
     const ref = targetInfo.reference || targetInfo.id_abonnement;
     const client = targetInfo.nom_client || targetInfo.raison_sociale || 'Client';
@@ -396,7 +396,7 @@ export default function ActionsCommercialesTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      {/* Sélecteur d'onglets pour le suivi des alertes & actions : Côte à côte comme avant */}
+      {/* Onglets d'alertes */}
       <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <button
           type="button"
@@ -413,7 +413,7 @@ export default function ActionsCommercialesTab({
           onClick={() => setAlertSectionTab('preavis')}
         >
           <RotateCcw size={15} style={{ color: '#38bdf8' }} />
-          <span style={{ fontWeight: 600 }}>Préavis Reconduction Tacite</span>
+          <span style={{ fontWeight: 600 }}>Préavis de reconduction tacite</span>
           <span style={{
             fontSize: '0.72rem',
             padding: '0.1rem 0.45rem',
@@ -441,7 +441,7 @@ export default function ActionsCommercialesTab({
           onClick={() => setAlertSectionTab('j30')}
         >
           <Bell size={15} style={{ color: '#facc15' }} />
-          <span style={{ fontWeight: 600 }}>Échéances Standards (J-30)</span>
+          <span style={{ fontWeight: 600 }}>Échéances standards (J-30)</span>
           <span style={{
             fontSize: '0.72rem',
             padding: '0.1rem 0.45rem',
@@ -455,7 +455,7 @@ export default function ActionsCommercialesTab({
         </button>
       </div>
 
-      {/* 1. SECTION PRÉAVIS DE RECONDUCTION TACITE (Composant séparé sans createPortal) */}
+      {/* Préavis de reconduction tacite */}
       {alertSectionTab === 'preavis' && (
         <PreavisReconductionSection
           alertPreavisAbos={alertPreavisAbos}
@@ -471,7 +471,7 @@ export default function ActionsCommercialesTab({
         />
       )}
 
-      {/* 2. SECTION ÉCHÉANCES STANDARDS (J-30) & RELANCES */}
+      {/* Échéances standards (J-30) */}
       {alertSectionTab === 'j30' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Panneau Alerte : Échéances Standards J-30 */}
@@ -504,10 +504,10 @@ export default function ActionsCommercialesTab({
                       setSelectedTemplateCode('RELANCE_ECHEANCE');
                       setShowTemplateModal(true);
                     }}
-                    title="Modifier le modèle du courriel par défaut (Réservé Admin)"
+                    title="Modifier le modèle du courriel par défaut"
                   >
                     <Settings size={13} />
-                    <span>Modifier modèle courriel</span>
+                    <span>Modifier le modèle</span>
                   </button>
                 )}
 
@@ -554,7 +554,7 @@ export default function ActionsCommercialesTab({
                         style={{ fontSize: '0.74rem', padding: '0.2rem 0.55rem', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}
                         onClick={() => handleSendManualEmail(abo)}
                         disabled={sendingRef === abo.reference}
-                        title="Envoyer l'e-mail de relance manuel au client"
+                        title="Envoyer le courriel de relance manuel au client"
                       >
                         {sendingRef === abo.reference ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
                         <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer relance manuelle'}</span>
@@ -569,17 +569,17 @@ export default function ActionsCommercialesTab({
       {/* Historique des Relances d'Échéances Standards (J-30) */}
       <div>
         <h4 style={{ marginBottom: '0.75rem', color: 'var(--text-main)', fontSize: '1.05rem', fontWeight: 600 }}>
-          Historique des Relances d'Échéances (J-30)
+          Historique des relances d'échéance (J-30)
         </h4>
 
-        {/* Barre de Filtres Multicritères */}
+        {/* Filtres */}
         <div className="ts-filters-bar">
           <div className="ts-filter-group">
             <Search size={14} style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               className="ts-filter-input"
-              placeholder="Rechercher (Client, contrat...)"
+              placeholder="Rechercher (client, contrat...)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: '200px' }}
@@ -619,7 +619,7 @@ export default function ActionsCommercialesTab({
           </div>
 
           <div className="ts-filter-group">
-            <span>Email :</span>
+            <span>Courriel :</span>
             <select
               className="ts-filter-select"
               value={selectedEmailStatus}
@@ -662,10 +662,10 @@ export default function ActionsCommercialesTab({
                     Date {renderSortIcon('date_action')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('type_action')} style={{ cursor: 'pointer' }}>
-                    Type d'Action {renderSortIcon('type_action')}
+                    Type d'action {renderSortIcon('type_action')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('nom_client')} style={{ cursor: 'pointer' }}>
-                    Client & Contrat {renderSortIcon('nom_client')}
+                    Client et contrat {renderSortIcon('nom_client')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('nom_commercial')} style={{ cursor: 'pointer' }}>
                     Commercial {renderSortIcon('nom_commercial')}
@@ -674,7 +674,7 @@ export default function ActionsCommercialesTab({
                     Description {renderSortIcon('description')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('statut_envoi_email')} style={{ textAlign: 'center', cursor: 'pointer' }}>
-                    Statut Email {renderSortIcon('statut_envoi_email')}
+                    Statut du courriel {renderSortIcon('statut_envoi_email')}
                   </th>
                   {canSendManualEmail && <th className="table-head-cell" style={{ textAlign: 'center' }}>Action</th>}
                 </tr>
@@ -732,10 +732,10 @@ export default function ActionsCommercialesTab({
                           }}
                           onClick={() => handleSendManualEmail(act)}
                           disabled={(!act.id_abonnement && !act.reference) || sendingRef === (act.id_abonnement || act.reference)}
-                          title={(!act.id_abonnement && !act.reference) ? "Aucun contrat associé à cette action" : "Renvoyer l'e-mail de relance d'échéance (-30j) au client"}
+                          title={(!act.id_abonnement && !act.reference) ? "Aucun contrat associé à cette action" : "Renvoyer le courriel de relance d'échéance (J-30) au client"}
                         >
                           {sendingRef === (act.id_abonnement || act.reference) ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
-                          <span>{sendingRef === (act.id_abonnement || act.reference) ? 'Envoi...' : 'Renvoyer mail échéance'}</span>
+                          <span>{sendingRef === (act.id_abonnement || act.reference) ? 'Envoi...' : 'Renvoyer courriel'}</span>
                         </button>
                       </td>
                     )}
@@ -746,7 +746,7 @@ export default function ActionsCommercialesTab({
           </div>
         )}
 
-        {/* Pagination pour les actions commerciales */}
+        {/* Pagination */}
         <Pagination
           currentPage={currentPage}
           totalItems={sortedActions.length}
@@ -758,7 +758,7 @@ export default function ActionsCommercialesTab({
     </div>
   )}
 
-      {/* Modal Modification du Modèle de Courriel (Admin seul) */}
+      {/* Modale d'édition du modèle de courriel */}
       {showTemplateModal && (
         <div style={{
           position: 'fixed',

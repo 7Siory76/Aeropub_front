@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, ChevronDown, X, Check, SearchX } from 'lucide-react';
 import './SearchableSelect.css';
 
-/**
- * Normalise une chaîne de caractères pour une recherche insensible à la casse et aux accents.
- */
+// Normalise le texte pour la recherche (minuscules sans accents)
 function normalizeText(text) {
   return String(text || '')
     .normalize('NFD')
@@ -13,11 +11,7 @@ function normalizeText(text) {
     .trim();
 }
 
-/**
- * Composant de sélection avec moniteur de recherche en direct (SearchableSelect / Combobox).
- * Optimisé UX : support tactile mobile (>= 44px), police anti-zoom iOS (>= 16px),
- * navigation au clavier (flèches + Entrée + Echap), et compatibilité thèmes clair/sombre.
- */
+// Sélecteur avec recherche intégrée et navigation au clavier
 export default function SearchableSelect({
   options = [],
   value = '',
@@ -295,7 +289,7 @@ export default function SearchableSelect({
                 <SearchX size={24} style={{ opacity: 0.5, marginBottom: '0.25rem' }} />
                 <div>Aucun résultat pour « {searchTerm} »</div>
                 <div className="searchable-select-empty-sub">
-                  Vérifiez l'orthographe ou essayez un autre mot-clé
+                  Vérifiez l'orthographe ou essayez un autre mot-clé.
                 </div>
               </div>
             ) : (

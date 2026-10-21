@@ -8,13 +8,13 @@ export default function RoleGuideModal({ isOpen, onClose }) {
   const { user } = useAuth();
   const userNormRole = normalizeRole(user?.role);
 
-  // Rôle sélectionné dans la modale (par défaut, le rôle de l'utilisateur connecté s'il existe)
+  // Rôle sélectionné (par défaut, celui de l'utilisateur)
   const [selectedRoleCode, setSelectedRoleCode] = useState(() => {
     const found = ROLES_GUIDE.find(r => r.code === userNormRole);
-    return found ? found.code : ROLES_GUIDE[2].code; // default Commercial
+    return found ? found.code : ROLES_GUIDE[2].code;
   });
 
-  // Mettre à jour la sélection lorsque la modale s'ouvre
+  // Met à jour la sélection à l'ouverture
   useEffect(() => {
     if (isOpen) {
       const found = ROLES_GUIDE.find(r => r.code === userNormRole);
@@ -22,7 +22,7 @@ export default function RoleGuideModal({ isOpen, onClose }) {
     }
   }, [isOpen, userNormRole]);
 
-  // Fermeture par la touche Échap
+  // Ferme avec la touche Échap
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -245,10 +245,10 @@ export default function RoleGuideModal({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Tableau récapitulatif comparatif rapide */}
+        {/* Tableau comparatif des accès */}
         <div style={{ marginTop: '1rem' }}>
           <h4 style={{ margin: '0 0 0.6rem 0', fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
-            Comparatif rapide des modules :
+            Comparatif des accès par rôle :
           </h4>
           <div className="aeropub-table-wrapper" style={{ maxHeight: '280px' }}>
             <table className="aeropub-table" style={{ fontSize: '0.78rem' }}>

@@ -285,11 +285,11 @@ export default function ChangeEmplacementModal({
         className="change-emp-modal-box"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* EN-TÊTE DE LA MODALE */}
+        {/* En-tête de la modale */}
         <div className="change-emp-header">
           <h2 className="change-emp-title">
             <ArrowLeftRight size={22} style={{ color: 'var(--accent-primary)' }} />
-            <span>Changer les Emplacements</span>
+            <span>Changer les emplacements</span>
           </h2>
           <button
             type="button"
@@ -322,9 +322,9 @@ export default function ChangeEmplacementModal({
           </div>
         )}
 
-        {/* GRILLE 2 COLONNES KANBAN */}
+        {/* Grille à 2 colonnes */}
         <div className="kanban-transfer-grid">
-          {/* ================= COLONNE DE GAUCHE ================= */}
+          {/* Colonne de gauche */}
           <div
             className={`kanban-col ${isDragOverSource ? 'drag-over' : ''}`}
             onDragOver={(e) => { e.preventDefault(); setIsDragOverSource(true); }}
@@ -332,7 +332,7 @@ export default function ChangeEmplacementModal({
             onDrop={handleDropOnSource}
           >
             <div className="kanban-col-badge source">
-              <span>Zone Source</span>
+              <span>Zone d'origine</span>
             </div>
 
             {/* Carrousel 1 : Aéroport */}
@@ -400,7 +400,7 @@ export default function ChangeEmplacementModal({
                     title="Glissez vers la colonne de droite pour déplacer"
                   >
                     <span className="kanban-ref-text">
-                      REF : {emp.reference}
+                      Réf. : {emp.reference}
                     </span>
                     <span className="kanban-ref-sub">
                       {emp.nom_type_support || emp.nom_type || 'Standard'}
@@ -441,7 +441,7 @@ export default function ChangeEmplacementModal({
             </div>
           </div>
 
-          {/* ================= COLONNE DE DROITE ================= */}
+          {/* Colonne de droite */}
           <div
             className={`kanban-col ${isDragOverTarget ? 'drag-over' : ''}`}
             onDragOver={(e) => { e.preventDefault(); setIsDragOverTarget(true); }}
@@ -449,7 +449,7 @@ export default function ChangeEmplacementModal({
             onDrop={handleDropOnTarget}
           >
             <div className="kanban-col-badge target">
-              <span>Zone Destination (Déposer ici)</span>
+              <span>Zone de destination (déposer ici)</span>
             </div>
 
             {/* Carrousel 1 : Aéroport */}
@@ -463,7 +463,7 @@ export default function ChangeEmplacementModal({
                 <ChevronLeft size={16} />
               </button>
               <div className="kanban-nav-box">
-                <span className="kanban-nav-prefix">Aéro :</span>
+                <span className="kanban-nav-prefix">Aéroport :</span>
                 <span className="kanban-nav-value">{targetAero?.nom || 'Aucun'}</span>
               </div>
               <button
@@ -526,7 +526,7 @@ export default function ChangeEmplacementModal({
                     title="Glissez vers la colonne de gauche si souhaité"
                   >
                     <span className="kanban-ref-text">
-                      REF : {emp.reference}
+                      Réf. : {emp.reference}
                     </span>
                     <span className="kanban-ref-sub">
                       {emp.nom_type_support || emp.nom_type || 'Standard'}
@@ -568,15 +568,15 @@ export default function ChangeEmplacementModal({
           </div>
         </div>
 
-        {/* ================= BOÎTE DE CONFIRMATION (NON / OUI) ================= */}
+        {/* Boîte de confirmation */}
         {pendingTransfer && (
           <div className="confirm-overlay" onClick={() => setPendingTransfer(null)}>
             <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
               <h3 className="confirm-question">
-                Voulez vous vraiment effectuer le changement ?
+                Voulez-vous vraiment effectuer ce changement ?
               </h3>
               <p className="confirm-details">
-                Déplacer le support <strong>REF : {pendingTransfer.reference}</strong>
+                Déplacer le support <strong>Réf. : {pendingTransfer.reference}</strong>
                 <br />
                 vers la zone <strong>« {pendingTransfer.toZone?.nom_zone} »</strong>
                 {pendingTransfer.toZone?.nom_aeroport ? ` (${pendingTransfer.toZone.nom_aeroport})` : ''} ?
@@ -589,7 +589,7 @@ export default function ChangeEmplacementModal({
                   onClick={() => setPendingTransfer(null)}
                   disabled={loading}
                 >
-                  NON
+                  Non
                 </button>
                 <button
                   type="button"
@@ -604,7 +604,7 @@ export default function ChangeEmplacementModal({
                       <span>Enregistrement...</span>
                     </>
                   ) : (
-                    'OUI'
+                    'Oui'
                   )}
                 </button>
               </div>

@@ -44,7 +44,7 @@ export default function AbonnementsTab({
   const isRestrictedCommercial = !canViewGlobalFilter && hasRole(user, ['Commercial']);
   const canExport = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Commercial', 'Lecture_Seule']);
 
-  // Ensemble des contrats parents qui ont été renouvelés avec continuité
+  // Contrats parents renouvelés avec continuité
   const renewedParentRefs = useMemo(() => {
     const set = new Set();
     abonnements.forEach(c => {
@@ -55,7 +55,7 @@ export default function AbonnementsTab({
     return set;
   }, [abonnements]);
 
-  // Libellé explicatif pour la bannière de filtre KPI
+  // Libellé du filtre KPI actif
   const kpiFilterLabel = useMemo(() => {
     switch (kpiFilter) {
       case 'echeance_7': return 'Échéance imminente (≤ 7 jours non renouvelés)';
@@ -64,11 +64,11 @@ export default function AbonnementsTab({
       case 'echeance_90': return 'Échéance J-90 (61 à 90 jours non renouvelés)';
       case 'echus_non_renouveles': return 'Contrats échus non renouvelés (sans continuité -R)';
       case 'sans_action': return 'Contrats proches sans action commerciale planifiée';
-      case 'montant_actifs': return 'Contrats Actifs (dernier statut enregistré : Actif)';
-      case 'montant_renouveles': return 'Contrats Renouvelés (-R1, -R2...)';
-      case 'a_valider': return 'Contrats À Valider (en attente de validation)';
-      case 'brouillon': return 'Contrats Brouillons (non finalisés)';
-      case 'montant_a_renouveler': return 'Contrats À Renouveler (≤ 90 jours)';
+      case 'montant_actifs': return 'Contrats actifs (dernier statut enregistré : Actif)';
+      case 'montant_renouveles': return 'Contrats renouvelés (-R1, -R2...)';
+      case 'a_valider': return 'Contrats à valider (en attente de validation)';
+      case 'brouillon': return 'Contrats brouillons (non finalisés)';
+      case 'montant_a_renouveler': return 'Contrats à renouveler (≤ 90 jours)';
       default: return null;
     }
   }, [kpiFilter]);
@@ -85,7 +85,6 @@ export default function AbonnementsTab({
   const [selectedAbonnement, setSelectedAbonnement] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-
 
   useEffect(() => {
     if (initialSearchQuery !== undefined) {
@@ -358,14 +357,14 @@ export default function AbonnementsTab({
         </div>
       )}
 
-      {/* 1. BARRE DE FILTRES DESKTOP (Écran > 768px) */}
+      {/* Barre de filtres desktop */}
       <div className={`ts-filters-bar ${styles.desktopFiltersBar}`}>
         <div className="ts-filter-group">
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
             className="ts-filter-input"
-            placeholder="Rechercher (Contrat, Client...)"
+            placeholder="Rechercher (contrat, client...)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: '190px' }}
@@ -388,7 +387,7 @@ export default function AbonnementsTab({
           </select>
         </div>
 
-        {/* Filtre global Commercial : réservé à Admin, Direction, Resp_Com, Lecture_Seule */}
+        {/* Commercial attitré */}
         {canViewGlobalFilter ? (
           <div className="ts-filter-group">
             <span>Commercial :</span>
@@ -460,7 +459,6 @@ export default function AbonnementsTab({
           </button>
         )}
 
-        {/* Bouton Exporter en Excel / CSV via composant réutilisable */}
         <ExportExcelCsv
           data={filteredAbonnements}
           columns={exportColumns}
@@ -475,7 +473,7 @@ export default function AbonnementsTab({
         </div>
       </div>
 
-      {/* 2. BARRE D'OUTILS MOBILE ERGONOMIQUE (Écran <= 768px, Règle 1, 3 & 4) */}
+      {/* Barre d'outils mobile */}
       <div className={styles.mobileToolbar}>
         <div className={styles.mobileSearchRow}>
           <div className={styles.mobileSearchInputWrapper}>
@@ -542,14 +540,14 @@ export default function AbonnementsTab({
         )}
       </div>
 
-      {/* 3. MODALE PLEINE PAGE DES FILTRES SUR MOBILE (Règle 3) */}
+      {/* Modale des filtres mobile */}
       {isMobileFilterOpen && (
         <div className={styles.mobileFilterModalOverlay}>
           <div className={styles.mobileFilterModalContent}>
             <div className={styles.mobileFilterModalHeader}>
               <div className={styles.mobileFilterModalTitle}>
                 <SlidersHorizontal size={20} style={{ color: 'var(--accent-primary)' }} />
-                <span>Filtres des Contrats</span>
+                <span>Filtres des contrats</span>
               </div>
               <button
                 type="button"
@@ -562,7 +560,7 @@ export default function AbonnementsTab({
             </div>
 
             <div className={styles.mobileFilterField}>
-              <label className={styles.mobileFilterLabel}>Statut du Contrat</label>
+              <label className={styles.mobileFilterLabel}>Statut du contrat</label>
               <select
                 className={styles.mobileFilterSelect}
                 value={selectedStatus}
@@ -579,7 +577,7 @@ export default function AbonnementsTab({
 
             {canViewGlobalFilter && (
               <div className={styles.mobileFilterField}>
-                <label className={styles.mobileFilterLabel}>Commercial Attitré</label>
+                <label className={styles.mobileFilterLabel}>Commercial attitré</label>
                 <select
                   className={styles.mobileFilterSelect}
                   value={selectedCommercial}
@@ -613,7 +611,7 @@ export default function AbonnementsTab({
 
             {yearOptions.length > 0 && (
               <div className={styles.mobileFilterField}>
-                <label className={styles.mobileFilterLabel}>Année Contractuelle</label>
+                <label className={styles.mobileFilterLabel}>Année contractuelle</label>
                 <select
                   className={styles.mobileFilterSelect}
                   value={selectedYear}
@@ -657,7 +655,7 @@ export default function AbonnementsTab({
         </div>
       )}
 
-      {/* 4. VUE DESKTOP : TABLEAU COMPLET CLASSIQUE (Masqué sur mobile, Règle 2) */}
+      {/* Tableau complet (desktop) */}
       <div className={`aeropub-table-wrapper ${styles.desktopTableWrapper}`}>
         {filteredAbonnements.length === 0 ? (
           <p className="empty-msg">Aucun contrat d'abonnement ne correspond à ces critères.</p>
@@ -666,16 +664,16 @@ export default function AbonnementsTab({
             <thead>
               <tr className="table-head-row-emerald">
                 <th className="table-head-cell sortable" onClick={() => handleSort('reference')}>
-                  Réf Contrat {renderSortIcon('reference')}
+                  Réf. contrat {renderSortIcon('reference')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('client')}>
                   Client {renderSortIcon('client')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('commercial')}>
-                  Commercial Attitré {renderSortIcon('commercial')}
+                  Commercial attitré {renderSortIcon('commercial')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('supports')}>
-                  Supports Associés {renderSortIcon('supports')}
+                  Supports associés {renderSortIcon('supports')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('tarif')}>
                   Tarif / Périodicité {renderSortIcon('tarif')}
@@ -684,7 +682,7 @@ export default function AbonnementsTab({
                   Campagne / Annonceur {renderSortIcon('campagne')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('date_debut')}>
-                  Période Contractuelle {renderSortIcon('date_debut')}
+                  Période contractuelle {renderSortIcon('date_debut')}
                 </th>
                 <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('statut')}>
                   Statut {renderSortIcon('statut')}
@@ -775,7 +773,7 @@ export default function AbonnementsTab({
         )}
       </div>
 
-      {/* 5. VUE MOBILE : CARTES EMPILÉES VERTICALEMENT (Règles 2, 4 & 5) */}
+      {/* Cartes mobile */}
       <div className={styles.mobileCardsContainer}>
         {filteredAbonnements.length === 0 ? (
           <p className="empty-msg">Aucun contrat d'abonnement ne correspond à ces critères.</p>
@@ -788,7 +786,7 @@ export default function AbonnementsTab({
             const supportsList = rawSupports ? rawSupports.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
             const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
 
-            // Règle 5 : Calcul de l'urgence et bordure colorée gauche
+            // Calcul de l'urgence d'échéance
             const now = new Date();
             const echeanceDate = new Date(abo.date_echeance || abo.date_fin);
             const diffJours = Math.ceil((echeanceDate - now) / 86400000);
@@ -807,7 +805,7 @@ export default function AbonnementsTab({
                 className={`${styles.aboCard} ${borderClass}`}
                 onClick={() => setSelectedAbonnement(abo)}
               >
-                {/* En-tête : Référence + Nom Client + Pastille d'alerte en haut à droite */}
+                {/* En-tête : Référence + Client + Alertes */}
                 <div className={styles.cardHeader}>
                   <div className={styles.cardHeaderLeft}>
                     <div className={styles.cardRefBadge}>
@@ -828,7 +826,6 @@ export default function AbonnementsTab({
                     </div>
                   </div>
 
-                  {/* Pastilles d'état & Alertes d'échéance (Règle 5) */}
                   <div className={styles.cardBadgeTopRight}>
                     {isExpired && (
                       <span className={styles.badgeExpired}>
@@ -853,8 +850,7 @@ export default function AbonnementsTab({
                   </div>
                 </div>
 
-                {/* CONTRAINTE MÉTIER VISUELLE (Règle 2) : 
-                    Prix et identifiant commercial visuellement rattachés à l'en-tête de l'abonnement global */}
+                {/* Synthèse tarif et commercial */}
                 <div className={styles.cardGlobalHeaderInfo}>
                   <div className={styles.globalInfoItem}>
                     <span className={styles.globalInfoLabel}>Tarif & Périodicité</span>
@@ -862,7 +858,7 @@ export default function AbonnementsTab({
                     <span className={styles.globalInfoPricePeriod}>{abo.periodicite || 'Annuel'}</span>
                   </div>
                   <div className={styles.globalInfoItem}>
-                    <span className={styles.globalInfoLabel}>Commercial Attitré</span>
+                    <span className={styles.globalInfoLabel}>Commercial attitré</span>
                     <div className={styles.globalInfoCommercialValue}>
                       <User size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
                       <span>{abo.nom_commercial || 'Direction / Admin'}</span>
@@ -875,11 +871,10 @@ export default function AbonnementsTab({
                   </div>
                 </div>
 
-                {/* CONTRAINTE MÉTIER VISUELLE (Règle 2) : 
-                    Clairement séparée de la liste des supports publicitaires individuels inclus */}
+                {/* Supports associés */}
                 <div className={styles.cardSupportsSection}>
                   <div className={styles.supportsSectionHeader}>
-                    <span>📍 Supports Publicitaires Inclus ({supportsList.length})</span>
+                    <span>📍 Supports publicitaires inclus ({supportsList.length})</span>
                   </div>
                   <div className={styles.supportsChipsList}>
                     {supportsList.length > 0 ? (
@@ -902,7 +897,6 @@ export default function AbonnementsTab({
                   </span>
                 </div>
 
-                {/* RÈGLE 3 : Bouton d'action principal Bleu large à 100% en bas de carte */}
                 <button
                   type="button"
                   className={styles.cardActionBtn}
@@ -911,7 +905,7 @@ export default function AbonnementsTab({
                     setSelectedAbonnement(abo);
                   }}
                 >
-                  <span>Gérer & Renouveler le Contrat</span>
+                  <span>Gérer et renouveler le contrat</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -920,7 +914,7 @@ export default function AbonnementsTab({
         )}
       </div>
 
-      {/* Pagination pour les abonnements */}
+      {/* Pagination */}
       <Pagination
         currentPage={currentPage}
         totalItems={sortedAbonnements.length}
@@ -929,7 +923,7 @@ export default function AbonnementsTab({
         onPageSizeChange={setPageSize}
       />
 
-      {/* Bouton d'ajout / duplication de contrat (Règle 3 : Large à 100% sur mobile) */}
+      {/* Création ou duplication de contrat */}
       {canCreateOrDuplicate && (
         <div className={`add-support-bar ${styles.addContractBar}`}>
           <button
@@ -938,12 +932,12 @@ export default function AbonnementsTab({
             className={`btn-add-support ${styles.addContractBtnFull}`}
           >
             <Plus size={20} strokeWidth={2.6} />
-            <span>+ Créer un contrat / Dupliquer</span>
+            <span>Créer un contrat / Dupliquer</span>
           </button>
         </div>
       )}
 
-      {/* Modale createPortal des détails de l'abonnement */}
+      {/* Détails du contrat */}
       {selectedAbonnement && (
         <AbonnementDetailsModal
           abonnement={selectedAbonnement}
@@ -957,7 +951,7 @@ export default function AbonnementsTab({
         />
       )}
 
-      {/* Modale d'ajout ou duplication de contrat */}
+      {/* Ajout ou duplication de contrat */}
       {showAddModal && (
         <AddAbonnementModal
           onClose={() => setShowAddModal(false)}

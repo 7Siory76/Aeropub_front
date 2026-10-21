@@ -68,7 +68,7 @@ export default function AbonnementDocuments({ referenceAbonnement }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <FileText size={18} style={{ color: 'var(--accent-primary)' }} />
-                    <strong style={{ fontSize: '0.95rem' }}>Documents & Pièces Jointes ({documents.length})</strong>
+                    <strong style={{ fontSize: '0.95rem' }}>Documents et pièces jointes ({documents.length})</strong>
                 </div>
                 <button
                     type="button"
@@ -161,7 +161,7 @@ export default function AbonnementDocuments({ referenceAbonnement }) {
                                             {!doc.est_actuel && (
                                                 <span style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '3px' }}>
                                                     <History size={11} />
-                                                    <span>Hérité de {doc.id_abonnement}</span>
+                                                    <span>Hérité du contrat précédent ({doc.id_abonnement})</span>
                                                 </span>
                                             )}
                                         </div>

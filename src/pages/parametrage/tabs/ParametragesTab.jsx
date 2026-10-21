@@ -159,19 +159,19 @@ export default function ParametragesTab({ onCountChange }) {
       <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1.5rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.06)', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <PlusCircle size={18} style={{ color: '#10b981' }} />
-          Ajouter un Nouveau Paramètre
+          Ajouter un nouveau paramètre
         </h3>
 
         <form onSubmit={handleCreateParam} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', alignItems: 'end' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-              Nom du Paramètre (ex: DELAI_ALERTE_J_MOINS) :
+              Nom du paramètre (ex. : DELAI_ALERTE_J_MOINS) :
             </label>
             <input
               type="text"
               className="search-input"
               style={{ borderRadius: '10px', padding: '0.65rem 0.9rem' }}
-              placeholder="ex: PRIX_BASE_MENSUEL"
+              placeholder="Ex. : PRIX_BASE_MENSUEL"
               value={nomParametre}
               onChange={(e) => setNomParametre(e.target.value)}
             />
@@ -185,7 +185,7 @@ export default function ParametragesTab({ onCountChange }) {
               type="text"
               className="search-input"
               style={{ borderRadius: '10px', padding: '0.65rem 0.9rem' }}
-              placeholder="ex: 30"
+              placeholder="Ex. : 30"
               value={valeur}
               onChange={(e) => setValeur(e.target.value)}
             />
@@ -206,7 +206,7 @@ export default function ParametragesTab({ onCountChange }) {
               ) : (
                 <>
                   <PlusCircle size={16} />
-                  <span>Ajouter Paramètre</span>
+                  <span>Ajouter le paramètre</span>
                 </>
               )}
             </button>
@@ -261,7 +261,7 @@ export default function ParametragesTab({ onCountChange }) {
                     ID {renderSortIcon('id')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('nom_parametre')} style={{ cursor: 'pointer' }}>
-                    Nom du Paramètre {renderSortIcon('nom_parametre')}
+                    Nom du paramètre {renderSortIcon('nom_parametre')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('valeur')} style={{ cursor: 'pointer' }}>
                     Valeur {renderSortIcon('valeur')}

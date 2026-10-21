@@ -1,17 +1,9 @@
-/**
- * Utilitaire de gestion des erreurs utilisateur et journalisation développeur
- * Traduit précisément les erreurs techniques et contraintes (doublons, références, conflits)
- * en messages explicites pour l'utilisateur sans masquer la cause réelle.
- */
-
-/**
- * Traduit un message technique brut en message clair et précis pour l'utilisateur
- */
+// Traduction des erreurs techniques en messages clairs pour l'utilisateur
 export function translateTechnicalMessage(rawMsg) {
   if (!rawMsg || typeof rawMsg !== 'string') return null;
   const lower = rawMsg.toLowerCase();
 
-  // 1. Détection des doublons / clés uniques (ex: référence abonnement, support, email)
+  // Doublons et contraintes uniques (références, emails)
   const isDuplicate = 
     lower.includes('contrainte unique') || 
     lower.includes('unique constraint') || 
@@ -23,10 +15,10 @@ export function translateTechnicalMessage(rawMsg) {
 
   if (isDuplicate || lower.includes('existe déjà') || lower.includes('existe deja')) {
     if (lower.includes('abonnement') || lower.includes('abo') || lower.includes('contrat')) {
-      return "La référence de ce contrat (abonnement) existe déjà. Veuillez utiliser ou générer une autre référence.";
+      return "La référence de ce contrat existe déjà. Choisissez une autre référence.";
     }
     if (lower.includes('support') || lower.includes('emplacement')) {
-      return "La référence de ce support publicitaire existe déjà. Veuillez saisir une référence unique.";
+      return "La référence de ce support publicitaire existe déjà. Indiquez une référence unique.";
     }
     if (lower.includes('email') || lower.includes('mail') || lower.includes('utilisateur')) {
       return "Cette adresse email est déjà utilisée par un autre compte utilisateur.";
@@ -69,7 +61,7 @@ export function translateTechnicalMessage(rawMsg) {
 
   // 5. Champs obligatoires manquants
   if (lower.includes('obligatoire') || lower.includes('not-null') || lower.includes('null value in column') || lower.includes('23502')) {
-    return rawMsg.includes('obligatoire') ? rawMsg : "Veuillez renseigner tous les champs obligatoires du formulaire.";
+    return rawMsg.includes('obligatoire') ? rawMsg : "Remplissez tous les champs obligatoires.";
   }
 
   // 6. Droits et permissions
@@ -79,10 +71,10 @@ export function translateTechnicalMessage(rawMsg) {
 
   // 7. Base de données inaccessible
   if (lower.includes('econnrefused') || lower.includes('connect refused')) {
-    return "Connexion impossible au serveur de base de données PostgreSQL. Vérifiez que le service PostgreSQL est démarré.";
+    return "Connexion impossible à la base de données. Vérifiez que le service PostgreSQL est démarré.";
   }
 
-  // Si c'est un message clair formulé par le backend (sans syntaxe SQL brute)
+  // Message explicite du backend
   if (
     !lower.includes('syntax error') &&
     !lower.includes('select ') &&
@@ -97,26 +89,24 @@ export function translateTechnicalMessage(rawMsg) {
   return null;
 }
 
-export function sanitizeUserError(err, fallback = "Une erreur est survenue lors de l'opération. Veuillez vérifier les données saisies.") {
-  // 1. Journalisation technique uniquement en environnement de développement
+// Nettoie et formate les erreurs pour l'affichage utilisateur
+export function sanitizeUserError(err, fallback = "Une erreur est survenue. Vérifiez les données saisies.") {
   if (import.meta.env?.DEV) {
     console.error('[DEV LOG] Trace technique :', err);
   }
 
   if (!err) return fallback;
 
-  // Si c'est déjà une chaîne de caractères
   if (typeof err === 'string') {
     const translated = translateTechnicalMessage(err);
     return translated || err;
   }
 
-  // 2. Erreur HTTP / Axios (réponse du serveur)
+  // Réponse HTTP / API
   if (err.response) {
     const status = err.response.status;
     const serverMsg = err.response.data?.message || err.response.data?.error;
 
-    // Tentative de traduction précise du message renvoyé par le backend
     if (serverMsg) {
       const translated = translateTechnicalMessage(serverMsg);
       if (translated) {
@@ -125,7 +115,7 @@ export function sanitizeUserError(err, fallback = "Une erreur est survenue lors 
     }
 
     if (status === 401) {
-      return "Identifiants invalides ou session expirée. Veuillez vous reconnecter.";
+      return "Identifiants invalides ou session expirée. Reconnectez-vous.";
     }
     if (status === 403) {
       return "Action non autorisée pour votre profil utilisateur.";
@@ -134,15 +124,14 @@ export function sanitizeUserError(err, fallback = "Une erreur est survenue lors 
       return serverMsg || "La ressource demandée est introuvable ou a été supprimée.";
     }
     if (status === 409) {
-      return serverMsg || "Un élément identique ou un doublon existe déjà.";
+      return serverMsg || "Un élément identique existe déjà.";
     }
     if (status >= 500) {
-      // Si le serveur a fourni un message explicatif, on le priorise
       if (serverMsg && typeof serverMsg === 'string') {
         const translated = translateTechnicalMessage(serverMsg);
         if (translated) return translated;
       }
-      return "Une difficulté technique est survenue sur le serveur. Veuillez vérifier les informations saisies ou réessayer.";
+      return "Une erreur est survenue sur le serveur. Vérifiez les informations saisies ou réessayez.";
     }
 
     if (serverMsg && typeof serverMsg === 'string') {
@@ -150,11 +139,11 @@ export function sanitizeUserError(err, fallback = "Une erreur est survenue lors 
     }
   }
 
-  // 3. Erreur réseau ou locale côté client
+  // Erreur réseau ou client
   if (err.message) {
     const lower = err.message.toLowerCase();
     if (lower.includes('network error') || lower.includes('failed to fetch')) {
-      return "Connexion au serveur impossible. Vérifiez que le serveur back-end (port 5000) est bien démarré.";
+      return "Connexion au serveur impossible. Vérifiez que le serveur est bien démarré.";
     }
     if (lower.includes('timeout')) {
       return "Le délai de réponse du serveur a expiré.";

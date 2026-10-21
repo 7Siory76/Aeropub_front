@@ -1,15 +1,6 @@
-/**
- * Utilitaire de gestion des permissions et rôles (RBAC) AeroPub
- */
+// Gestion des rôles et permissions (RBAC) AeroPub
 
-/**
- * Normalise les dénominations de rôles issues de la base de données :
- * - 'Administrateur', 'admin', 'ADMIN' -> 'Admin'
- * - 'Resp_Com', 'Responsable Commercial', 'resp_com' -> 'Resp_Com'
- * - 'Direction', 'Directrice', 'Directeur' -> 'Direction'
- * - 'Commercial', 'commercial' -> 'Commercial'
- * - 'Lecture_Seule', 'Lecture Seule', 'lecture_seule' -> 'Lecture_Seule'
- */
+// Normalise les libellés de rôles
 export function normalizeRole(role) {
   if (!role) return '';
   const r = String(role).trim().toLowerCase();
@@ -21,14 +12,7 @@ export function normalizeRole(role) {
   return role;
 }
 
-/**
- * Vérifie si l'utilisateur possède l'un des rôles autorisés.
- * Exemple: hasRole(user, ['Admin', 'Resp_Com', 'Commercial'])
- * 
- * @param {Object} user - Objet utilisateur contenant la propriété role (ex: user.role)
- * @param {Array<string>} allowedRoles - Liste des rôles autorisés (ex: ['Admin', 'Resp_Com'])
- * @returns {boolean}
- */
+// Vérifie si l'utilisateur possède l'un des rôles autorisés
 export function hasRole(user, allowedRoles = []) {
   if (!user || !user.role) return false;
   const userNorm = normalizeRole(user.role);
@@ -37,9 +21,7 @@ export function hasRole(user, allowedRoles = []) {
   });
 }
 
-/**
- * Référentiel des rôles et matrice d'aide des permissions (RBAC)
- */
+// Référentiel des rôles et matrice d'aide (RBAC)
 export const ROLES_GUIDE = [
   {
     id: 1,
@@ -48,11 +30,11 @@ export const ROLES_GUIDE = [
     badgeColor: '#f87171',
     badgeBg: 'rgba(239, 68, 68, 0.15)',
     badgeBorder: 'rgba(239, 68, 68, 0.35)',
-    summary: 'Paramétrage global, utilisateurs, référentiels, modèles d’e-mails, accès à toutes les données et au journal.',
+    summary: 'Paramétrage global, utilisateurs, référentiels, modèles de courriels, accès à toutes les données et au journal.',
     permissions: [
       { text: 'Paramétrage global du système & gestion des comptes utilisateurs et rôles', allowed: true },
       { text: 'Gestion de tous les référentiels : Aéroports, Zones, Catégories, Types et Supports', allowed: true },
-      { text: 'Gestion des modèles d’e-mails et suivi des automatisations (CRON)', allowed: true },
+      { text: 'Gestion des modèles de courriels et suivi des automatisations (CRON)', allowed: true },
       { text: 'Importation de données multi-fichiers (Infrastructure, Inventaire, Contrats)', allowed: true },
       { text: 'Accès intégral à toutes les données de l\'entreprise et au Journal d\'Audit', allowed: true },
       { text: 'Contrats & Clients : Création, modification, affectation, validation, activation et suppression', allowed: true }
@@ -89,7 +71,7 @@ export const ROLES_GUIDE = [
       { text: 'Suivi d’équipe, pilotage des portefeuilles commerciaux et indicateurs d\'activité', allowed: true },
       { text: 'Validation des renouvellements et remises commerciales', allowed: true },
       { text: 'Importation de données et exports complets des tableaux (Excel / CSV)', allowed: true },
-      { text: 'Restrictions : Pas d\'accès au paramétrage global, aux utilisateurs ni aux modèles d\'e-mails', allowed: false }
+      { text: 'Restrictions : Pas d\'accès au paramétrage global, aux utilisateurs ni aux modèles de courriels', allowed: false }
     ]
   },
   {
@@ -99,7 +81,7 @@ export const ROLES_GUIDE = [
     badgeColor: '#60a5fa',
     badgeBg: 'rgba(59, 130, 246, 0.15)',
     badgeBorder: 'rgba(59, 130, 246, 0.35)',
-    summary: 'Gestion des dossiers qui lui sont attribués, recherche, relances et comptes rendus.',
+    summary: 'Gestion des dossiers attribués, recherche, relances et comptes rendus.',
     permissions: [
       { text: 'Gestion opérationnelle et activation de ses contrats attribués (passage direct au statut Actif)', allowed: true },
       { text: 'Recherche et consultation des supports disponibles dans le planning', allowed: true },
@@ -113,11 +95,11 @@ export const ROLES_GUIDE = [
   {
     id: 5,
     code: 'Lecture_Seule',
-    nom: 'Lecture Seule',
+    nom: 'Lecture seule',
     badgeColor: '#94a3b8',
     badgeBg: 'rgba(148, 163, 184, 0.15)',
     badgeBorder: 'rgba(148, 163, 184, 0.35)',
-    summary: 'Consultation et export selon périmètre autorisé, sans modification.',
+    summary: 'Consultation et export selon le périmètre autorisé, sans modification.',
     permissions: [
       { text: 'Consultation passive des contrats, clients et inventaires selon le périmètre autorisé', allowed: true },
       { text: 'Importation de données : Accès à l\'outil d\'importation de fichiers CSV', allowed: true },
@@ -128,11 +110,9 @@ export const ROLES_GUIDE = [
   }
 ];
 
-/**
- * Récupère les métadonnées et la liste des droits d'un rôle donné
- */
+// Récupère les métadonnées et la liste des droits d'un rôle
 export function getRoleGuide(roleOrId) {
-  if (roleOrId === undefined || roleOrId === null) return ROLES_GUIDE[2]; // Default Commercial
+  if (roleOrId === undefined || roleOrId === null) return ROLES_GUIDE[2];
   const norm = normalizeRole(roleOrId);
   const byCode = ROLES_GUIDE.find(r => r.code === norm);
   if (byCode) return byCode;

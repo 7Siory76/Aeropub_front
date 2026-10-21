@@ -401,7 +401,7 @@ export default function AddAbonnementModal({
                             </span>
                         </div>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                            Création d'un nouvel abonnement ou duplication à partir d'un contrat existant (base_v3.sql)
+                            Création d'un nouvel abonnement ou duplication à partir d'un contrat existant
                         </p>
                     </div>
                     <button type="button" className="close-btn" onClick={onClose}>
@@ -415,7 +415,7 @@ export default function AddAbonnementModal({
                         <span>{modalError}</span>
                     </div>
                 )}
-                {/* Onglets de sélection du mode : Fiche Vierge vs Dupliquer */}
+                {/* Sélection du mode de création */}
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.1rem', marginBottom: '0.5rem' }}>
                     <button
                         type="button"
@@ -436,7 +436,7 @@ export default function AddAbonnementModal({
                         <span>Dupliquer un contrat existant</span>
                     </button>
                 </div>
-                {/* Sélecteur de contrat en mode Duplication */}
+                {/* Sélection du contrat modèle */}
                 {creationMode === 'dupliquer' && (
                     <div style={{
                         background: 'rgba(6, 182, 212, 0.08)',
@@ -467,7 +467,7 @@ export default function AddAbonnementModal({
                 )}
                 {/* Formulaire de saisie */}
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginTop: '0.8rem' }}>
-                    {/* Alerte Visuelle de Continuité & Renouvellement */}
+                    {/* Dossier de renouvellement */}
                     {formData.id_abonnement_precedent && (
                         <div style={{
                             background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1))',
@@ -505,7 +505,7 @@ export default function AddAbonnementModal({
                         </div>
                     )}
 
-                    {/* Référence personnalisée optionnelle */}
+                    {/* Référence et campagne */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.9rem' }}>
                         <div className="modal-form-group">
                             <label className="modal-label">Référence (optionnel) :</label>
@@ -528,10 +528,10 @@ export default function AddAbonnementModal({
                             />
                         </div>
                     </div>
-                    {/* Client & Commercial */}
+                    {/* Client et commercial */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
                         <div className="modal-form-group">
-                            <label className="modal-label">Client (Raison Sociale) * :</label>
+                            <label className="modal-label">Client (raison sociale) * :</label>
                             <SearchableSelect
                                 required
                                 options={clientsList}
@@ -546,7 +546,7 @@ export default function AddAbonnementModal({
                             />
                         </div>
                         <div className="modal-form-group">
-                            <label className="modal-label">Commercial Attitré :</label>
+                            <label className="modal-label">Commercial attitré :</label>
                             <SearchableSelect
                                 options={commercialsList}
                                 value={formData.id_commercial}
@@ -559,7 +559,7 @@ export default function AddAbonnementModal({
                             />
                         </div>
                     </div>
-                    {/* Durée du contrat & Dates */}
+                    {/* Durée et dates */}
                     <div style={{ marginBottom: '1rem', background: 'rgba(255, 255, 255, 0.02)', padding: '0.8rem', borderRadius: '10px', border: '1px solid var(--border-glass)' }}>
                         <label className="modal-label" style={{ marginBottom: '0.4rem', color: '#06b6d4', fontWeight: 600 }}>
                             ⏱️ Durée du contrat :
@@ -601,7 +601,7 @@ export default function AddAbonnementModal({
                             />
                         </div>
                         <div className="modal-form-group">
-                            <label className="modal-label">Date d'échéance * (Calculée) :</label>
+                            <label className="modal-label">Date d'échéance * (calculée) :</label>
                             <input
                                 type="date"
                                 required
@@ -686,7 +686,7 @@ export default function AddAbonnementModal({
                             </button>
                         </div>
                     </div>
-                    {/* Tarif, Devise, Périodicité */}
+                    {/* Tarif, devise et périodicité */}
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 2fr', gap: '0.8rem' }}>
                         <div className="modal-form-group">
                             <label className="modal-label">Tarif :</label>
@@ -725,7 +725,7 @@ export default function AddAbonnementModal({
                             </select>
                         </div>
                     </div>
-                    {/* Statut & Probabilité */}
+                    {/* Statut */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
                         <div className="modal-form-group">
                             <label className="modal-label">Statut initial :</label>
@@ -750,7 +750,7 @@ export default function AddAbonnementModal({
                             </select>
                         </div>
                     </div>
-                    {/* Préavis & Reconduction tacite */}
+                    {/* Préavis et reconduction tacite */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', alignItems: 'center' }}>
                         <div className="modal-form-group">
                             <label className="modal-label">Préavis (jours) :</label>
@@ -778,7 +778,7 @@ export default function AddAbonnementModal({
                     <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '0.85rem', borderRadius: '10px', border: '1px solid var(--border-glass)' }}>
                         <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
                             <FileText size={15} style={{ color: 'var(--accent-primary)' }} />
-                            <span>Joindre le contrat signé / devis initial (Optionnel) :</span>
+                            <span>Joindre le contrat signé / devis initial (optionnel) :</span>
                         </label>
                         <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
                             <select
@@ -799,7 +799,7 @@ export default function AddAbonnementModal({
                         </div>
                     </div>
 
-                    {/* Boutons d'action */}
+                    {/* Actions */}
                     <div className="modal-footer" style={{ marginTop: '0.6rem' }}>
                         <button
                             type="button"
@@ -816,7 +816,7 @@ export default function AddAbonnementModal({
                             style={{ padding: '0.65rem 1.6rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
                         >
                             {loading && <Loader2 size={16} className="btn-spinner" />}
-                            <span>{loading ? 'Création en cours...' : '💾 Créer le contrat'}</span>
+                            <span>{loading ? 'Création en cours...' : 'Créer le contrat'}</span>
                         </button>
                     </div>
                 </form>

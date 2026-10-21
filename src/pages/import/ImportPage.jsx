@@ -66,7 +66,7 @@ export default function ImportPage({ onImportSuccess }) {
 
     const validateAndSetFile = (file) => {
         if (!file.name.toLowerCase().endsWith('.csv')) {
-            showError("Format invalide : Veuillez sélectionner un fichier avec l'extension .csv");
+            showError("Format non valide : veuillez sélectionner un fichier avec l'extension .csv.");
             return;
         }
         setSelectedFile(file);
@@ -81,7 +81,7 @@ export default function ImportPage({ onImportSuccess }) {
 
     const handleStartImport = async () => {
         if (!selectedFile) {
-            showInfo('Veuillez d’abord choisir un fichier CSV.');
+            showInfo("Veuillez d'abord choisir un fichier CSV.");
             return;
         }
 
@@ -100,7 +100,7 @@ export default function ImportPage({ onImportSuccess }) {
 
             if (activeModule === 'clients') {
                 if (data.clientsCrees > 0 || (data.contactsCrees || 0) > 0) {
-                    showSuccess(`Succès : ${data.clientsCrees} client(s) créé(s) et ${data.contactsCrees || 0} contact(s) associé(s).`);
+                    showSuccess(`${data.clientsCrees} client(s) créé(s) et ${data.contactsCrees || 0} contact(s) associé(s).`);
                     if (onImportSuccess) onImportSuccess();
                 } else if (data.erreursCount > 0) {
                     showError(`L'importation s'est terminée avec ${data.erreursCount} erreur(s).`);
@@ -109,16 +109,16 @@ export default function ImportPage({ onImportSuccess }) {
                 }
             } else if (activeModule === 'abonnements') {
                 if (data.abonnementsCrees > 0) {
-                    showSuccess(`Succès : ${data.abonnementsCrees} abonnement(s) créé(s) et ${data.supportsLies || 0} support(s) lié(s).`);
+                    showSuccess(`${data.abonnementsCrees} contrat(s) créé(s) et ${data.supportsLies || 0} support(s) lié(s).`);
                     if (onImportSuccess) onImportSuccess();
                 } else if (data.erreursCount > 0) {
                     showError(`L'importation s'est terminée avec ${data.erreursCount} erreur(s).`);
                 } else {
-                    showInfo('Aucune nouvelle ligne ajoutée (tous les abonnements existent déjà).');
+                    showInfo('Aucune nouvelle ligne ajoutée (tous les contrats existent déjà).');
                 }
             } else {
                 if (data.lignesImportees > 0) {
-                    showSuccess(`Succès : ${data.lignesImportees} support(s) importé(s) dans la base.`);
+                    showSuccess(`${data.lignesImportees} support(s) importé(s) avec succès.`);
                     if (onImportSuccess) onImportSuccess();
                 } else if (data.erreursCount > 0) {
                     showError(`L'importation s'est terminée avec ${data.erreursCount} erreur(s).`);
@@ -140,17 +140,17 @@ export default function ImportPage({ onImportSuccess }) {
                 <div>
                     <h1 className="import-page-title">
                         <Database size={26} className="title-icon" />
-                        Centre d'Importation & Synchronisation de Données
+                        Centre d'importation et synchronisation des données
                     </h1>
                     <p className="import-page-subtitle">
-                        Importez vos fichiers CSV en respectant les 4 niveaux de contrôle (Format, Structure, Doublons & Intégrité transactionnelle).
+                        Importez vos fichiers CSV avec contrôle de format, de structure, de doublons et d'intégrité transactionnelle.
                     </p>
                 </div>
                 <button
                     type="button"
                     className="btn-purge-trigger"
                     onClick={() => setShowPurgeModal(true)}
-                    title="Purger / Réinitialiser sélectivement les tables de données"
+                    title="Purger ou réinitialiser sélectivement les tables de données"
                 >
                     <Trash2 size={16} />
                     <span>Nettoyer les données</span>
@@ -158,7 +158,7 @@ export default function ImportPage({ onImportSuccess }) {
             </div>
 
             <div className="import-modules-grid">
-                {/* Module 1 : Infrastructure (Actif) */}
+                {/* Module 1 : Infrastructure */}
                 <div
                     className={`import-module-card ${activeModule === 'infrastructure' ? 'active' : ''}`}
                     onClick={() => setActiveModule('infrastructure')}
@@ -167,16 +167,16 @@ export default function ImportPage({ onImportSuccess }) {
                         <Database size={22} />
                     </div>
                     <div className="module-card-content">
-                        <div className="module-card-badge active-badge">Prêt pour import</div>
-                        <h3 className="module-card-title">1. Infrastructure & Inventaire</h3>
+                        <div className="module-card-badge active-badge">Prêt pour l'import</div>
+                        <h3 className="module-card-title">1. Infrastructure et inventaire</h3>
                         <p className="module-card-desc">
-                            Importe les Aéroports, Périmètres, Zones, Catégories, Types et Supports avec leur statut.
+                            Import des aéroports, périmètres, zones, catégories, types et supports avec leur état.
                         </p>
                     </div>
                     <ChevronRight size={18} className="module-arrow" />
                 </div>
 
-                {/* Module 2 : Clients & Contacts (Futur) */}
+                {/* Module 2 : Clients et contacts */}
                 <div
                     className={`import-module-card ${activeModule === 'clients' ? 'active' : ''}`}
                     onClick={() => { setActiveModule('clients'); handleReset(); }}
@@ -185,8 +185,8 @@ export default function ImportPage({ onImportSuccess }) {
                         <Users size={22} />
                     </div>
                     <div className="module-card-content">
-                        <div className="module-card-badge active-badge">Prêt pour import</div>
-                        <h3 className="module-card-title">2. Clients & Contacts</h3>
+                        <div className="module-card-badge active-badge">Prêt pour l'import</div>
+                        <h3 className="module-card-title">2. Clients et contacts</h3>
                         <p className="module-card-desc">
                             Import en masse des raisons sociales, adresses et contacts associés.
                         </p>
@@ -194,8 +194,7 @@ export default function ImportPage({ onImportSuccess }) {
                     <ChevronRight size={18} className="module-arrow" />
                 </div>
 
-
-                {/* Module 3 : Abonnements (Futur) */}
+                {/* Module 3 : Abonnements et contrats */}
                 <div
                     className={`import-module-card ${activeModule === 'abonnements' ? 'active' : ''}`}
                     onClick={() => { setActiveModule('abonnements'); handleReset(); }}
@@ -204,8 +203,8 @@ export default function ImportPage({ onImportSuccess }) {
                         <CalendarCheck size={22} />
                     </div>
                     <div className="module-card-content">
-                        <div className="module-card-badge active-badge">Prêt pour import</div>
-                        <h3 className="module-card-title">3. Abonnements & Contrats</h3>
+                        <div className="module-card-badge active-badge">Prêt pour l'import</div>
+                        <h3 className="module-card-title">3. Abonnements et contrats</h3>
                         <p className="module-card-desc">
                             Import des contrats, campagnes, tarifs, dates et liaisons aux supports physiques.
                         </p>
@@ -214,13 +213,14 @@ export default function ImportPage({ onImportSuccess }) {
                 </div>
 
             </div>
-            {/* Section Zone de Dépôt / Upload */}
 
-
+            {/* Zone de téléversement */}
             <div className="import-upload-section glass-panel">
                 <h2 className="section-title">
                     <FileSpreadsheet size={20} />
-                    Téléverser le fichier pour : <strong>{activeModule}</strong>
+                    Téléverser le fichier pour : <strong>
+                        {activeModule === 'infrastructure' ? 'Infrastructure et inventaire' : activeModule === 'clients' ? 'Clients et contacts' : 'Abonnements et contrats'}
+                    </strong>
                 </h2>
                 <div
                     className={`dropzone-box ${isDragging ? 'dragging' : ''} ${selectedFile ? 'has-file' : ''}`}
@@ -294,12 +294,12 @@ export default function ImportPage({ onImportSuccess }) {
                     </button>
                 </div>
             </div>
-            {/* Rapport d'Importation & Bilan Transactionnel */}
+            {/* Rapport d'importation et bilan transactionnel */}
             {rapport && (
                 <div ref={reportRef} className="import-report-section glass-panel">
                     <h2 className="section-title">
                         <CheckCircle2 size={20} style={{ color: '#10b981' }} />
-                        Rapport d'exécution & Contrôle des 4 Niveaux
+                        Rapport d'exécution et bilan transactionnel
                     </h2>
                     {/* Grille des KPI de l'import */}
                     <div className="report-kpi-grid">
@@ -338,10 +338,10 @@ export default function ImportPage({ onImportSuccess }) {
                         <div className="report-errors-box">
                             <h3 className="errors-box-title">
                                 <AlertTriangle size={18} />
-                                Détail des anomalies & doublons signalés ({rapport.erreurs.length})
+                                Détail des anomalies et doublons signalés ({rapport.erreurs.length})
                             </h3>
                             <p className="errors-box-desc">
-                                Ces lignes ont été identifiées comme des doublons (ignorés) ou des anomalies (isolées via SAVEPOINT) sans bloquer les lignes saines.
+                                Ces lignes ont été identifiées comme des doublons (ignorés) ou des anomalies sans bloquer les lignes saines.
                             </p>
                             <div className="table-wrapper">
                                 <table className="wireframe-table">
@@ -350,9 +350,9 @@ export default function ImportPage({ onImportSuccess }) {
                                             <th style={{ width: '90px', textAlign: 'center' }}>Ligne CSV</th>
                                             <th style={{ width: '120px', textAlign: 'center' }}>Statut</th>
                                             <th style={{ width: '220px' }}>
-                                                {activeModule === 'infrastructure' ? 'Référence Support' : activeModule === 'clients' ? 'Raison Sociale' : 'Réf. Abonnement'}
+                                                {activeModule === 'infrastructure' ? 'Référence support' : activeModule === 'clients' ? 'Raison sociale' : 'Réf. contrat'}
                                             </th>
-                                            <th>Motif / Raison</th>
+                                            <th>Motif</th>
                                         </tr>
                                     </thead>
                                     <tbody>

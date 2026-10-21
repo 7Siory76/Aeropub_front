@@ -51,10 +51,10 @@ export default function AlertesCritiquesWidget({
           <ShieldAlert size={20} style={{ color: '#f43f5e' }} />
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
-              Alertes Critiques
+              Alertes critiques
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Pertes potentielles & absences d'action
+              Pertes potentielles et absence d'action
             </span>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function AlertesCritiquesWidget({
             {alertesCritiques.echusNonRenouveles.length}
           </div>
           <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Aucun contrat successeur lié via <code>id_abonnement_precedent</code>
+            Aucun contrat successeur enregistré
           </p>
         </div>
 
@@ -115,7 +115,7 @@ export default function AlertesCritiquesWidget({
             {alertesCritiques.sansAction.length}
           </div>
           <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Zéro relance enregistrée pour ce contrat à terme
+            Aucune relance enregistrée pour ce contrat arrivant à terme
           </p>
         </div>
       </div>

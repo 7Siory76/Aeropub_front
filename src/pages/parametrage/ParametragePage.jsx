@@ -29,13 +29,13 @@ export default function ParametragePage({ initialTab = 'params' }) {
 
   useEffect(() => {
     const tabNames = {
-      params: 'Paramètres Généraux',
-      etats: 'États des Supports',
-      statuts: 'Statuts des Contrats',
-      audit: 'Journal d\'Audit & Sécurité'
+      params: 'Paramètres généraux',
+      etats: 'États des supports',
+      statuts: 'Statuts des contrats',
+      audit: "Journal d'audit et sécurité"
     };
     const tabName = tabNames[activeTab] || 'Administration';
-    document.title = `AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — ${tabName}`;
+    document.title = `AeroPub | Plateforme d'affichage et de publicités aéroportuaires — ${tabName}`;
     if (activeTab) {
       localStorage.setItem('aeropub_last_param_tab', activeTab);
     }
@@ -56,18 +56,18 @@ export default function ParametragePage({ initialTab = 'params' }) {
   if (!hasRole(user, ['Admin'])) {
     return (
       <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', margin: '2rem auto', maxWidth: '600px', borderRadius: '16px' }}>
-        <h3 style={{ color: '#ef4444', fontSize: '1.4rem', marginBottom: '0.75rem' }}>⛔ Accès Refusé</h3>
-        <p style={{ color: 'var(--text-muted)' }}>Le module d'Administration & Paramétrage est strictement réservé aux administrateurs.</p>
+        <h3 style={{ color: '#ef4444', fontSize: '1.4rem', marginBottom: '0.75rem' }}>⛔ Accès refusé</h3>
+        <p style={{ color: 'var(--text-muted)' }}>Le module d'administration et paramétrage est strictement réservé aux administrateurs.</p>
       </div>
     );
   }
 
   return (
     <section className="glass-panel dashboard-panel">
-      {/* Badge Super-Titre Plateforme */}
+      {/* Badge super-titre plateforme */}
       <div className="hero-badge-platform" style={{ marginBottom: '0.65rem' }}>
         <Plane size={14} className="hero-badge-icon" />
-        <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
+        <span>Plateforme d'affichage et de publicités aéroportuaires</span>
       </div>
 
       {/* En-tête de la page avec H1 */}
@@ -75,8 +75,8 @@ export default function ParametragePage({ initialTab = 'params' }) {
         <div>
           <h1 className="dashboard-title" style={{ fontSize: '1.85rem' }}>
             {activeTab === 'audit'
-              ? <>📜 Journal Technique d'Audit &amp; <span className="gradient-text">Sécurité</span></>
-              : <>⚙️ Configuration &amp; Paramétrage du <span className="gradient-text">Système AeroPub</span></>
+              ? <>📜 Journal d'audit et <span className="gradient-text">sécurité</span></>
+              : <>⚙️ Configuration et paramétrage du <span className="gradient-text">système AeroPub</span></>
             }
           </h1>
           <p className="dashboard-desc">
@@ -108,7 +108,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
           <Sliders size={15} />
-          <span>Paramètres Généraux</span>
+          <span>Paramètres généraux</span>
           <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({counts.params})</span>
         </button>
 
@@ -119,7 +119,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
           <Tag size={15} />
-          <span>États des Supports</span>
+          <span>États des supports</span>
           <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({counts.etats})</span>
         </button>
 
@@ -130,7 +130,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
           <FileText size={15} />
-          <span>Statuts des Abonnements</span>
+          <span>Statuts des contrats</span>
           <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({counts.statuts})</span>
         </button>
 
@@ -141,7 +141,7 @@ export default function ParametragePage({ initialTab = 'params' }) {
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
           <ScrollText size={15} />
-          <span>Journal & Audit Log</span>
+          <span>Journal d'audit et sécurité</span>
           <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({counts.audit})</span>
         </button>
       </div>

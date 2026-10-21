@@ -144,7 +144,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                     <Trophy size={20} style={{ color: '#f59e0b' }} />
                     <div>
                         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
-                            Top 10 Clients (Valeur Marchande)
+                            Top 10 des clients (valeur marchande)
                         </h3>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                             {modePeriode === 'mois'
@@ -291,14 +291,14 @@ export default function TopClientsWidget({ userContracts = [] }) {
                                         </span>
                                         <strong style={{ color: '#fff' }}>{client.nom}</strong>
                                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                                            ({client.nbContrats} contrat{client.nbContrats > 1 ? 's' : ''}{modePeriode !== 'general' ? ` · ${client.totalJoursActifs}j` : ''})
+                                            ({client.nbContrats} contrat{client.nbContrats > 1 ? 's' : ''}{modePeriode !== 'general' ? ` · ${client.totalJoursActifs} j` : ''})
                                         </span>
                                     </div>
 
                                     <strong style={{ color: isPodium ? podiumColor : '#06b6d4', fontSize: '0.85rem' }}>
                                         {formatDevise(client.total)}
                                         {modePeriode === 'mois' ? (
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 400 }}> (sur {client.totalJoursActifs}j)</span>
+                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 400 }}> (sur {client.totalJoursActifs} j)</span>
                                         ) : modePeriode === 'annee' ? (
                                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 400 }}> /an</span>
                                         ) : (
@@ -307,7 +307,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                                     </strong>
                                 </div>
 
-                                {/* Bâton horizontal */}
+                                {/* Barre de progression */}
                                 <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '999px', overflow: 'hidden' }}>
                                     <div style={{
                                         width: `${client.pourcentageRelatif}%`,

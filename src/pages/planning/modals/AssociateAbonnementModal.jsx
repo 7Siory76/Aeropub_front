@@ -96,7 +96,7 @@ export default function AssociateAbonnementModal({
             (a) => String(a.reference || '').trim().toLowerCase() === cleanRef.toLowerCase()
         );
         if (isRefTaken) {
-            setModalError(`La référence "${cleanRef}" existe déjà. Veuillez en choisir une autre.`);
+            setModalError(`La référence « ${cleanRef} » existe déjà. Veuillez en choisir une autre.`);
             return;
         }
 
@@ -132,7 +132,7 @@ export default function AssociateAbonnementModal({
 
                 if (isNaN(existStart) || isNaN(existEnd)) return false;
 
-                //verifier le chevauchement
+                // Vérifier le chevauchement
                 return newStart <= existEnd && newEnd >= existStart;
             });
 
@@ -166,7 +166,7 @@ export default function AssociateAbonnementModal({
 
             onClose();
             if (onSuccess) onSuccess();
-            navigateWithFeedback('dashboard', 'abonnements', `Nouvel abonnement "${cleanRef}" associé à ${targetEmp.reference} avec succès.`);
+            navigateWithFeedback('dashboard', 'abonnements', `Contrat « ${cleanRef} » associé au support ${targetEmp.reference} avec succès !`);
         } catch (err) {
             const userMsg = sanitizeUserError(err, "Erreur lors de la création de l'abonnement.");
             setModalError(userMsg);
@@ -174,7 +174,7 @@ export default function AssociateAbonnementModal({
             setLoanding(false);
         }
     };
-    // 3. Téléportation dans le <body> avec createPortal
+    // Téléportation dans le <body> avec createPortal
     return createPortal(
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" style={{ maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
@@ -182,10 +182,10 @@ export default function AssociateAbonnementModal({
                     <X size={20} />
                 </button>
                 <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                    📝 Associer un Abonnement
+                    📝 Associer un contrat d'affichage
                 </h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                    Emplacement sélectionné : <strong style={{ color: '#6366f1' }}>{targetEmp.reference}</strong> ({targetEmp.nom_type_support || 'Support Standard'} - {targetEmp.ref_format || targetEmp.caracteristiques || 'Format N/A'})
+                    Emplacement sélectionné : <strong style={{ color: '#6366f1' }}>{targetEmp.reference}</strong> ({targetEmp.nom_type_support || 'Support standard'} - {targetEmp.ref_format || targetEmp.caracteristiques || 'Format non renseigné'})
                 </p>
 
                 {modalError && (
@@ -195,16 +195,16 @@ export default function AssociateAbonnementModal({
                     </div>
                 )}
                 <form onSubmit={handleSubmit}>
-                    {/* Référence de l'Abonnement */}
+                    {/* Référence du contrat */}
                     <div style={{ marginBottom: '1.25rem' }}>
                         <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
-                            Référence du Contrat / Abonnement : <span style={{ color: '#ef4444' }}>*</span>
+                            Référence du contrat : <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <input
                             type="text"
                             className="search-input"
                             style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
-                            placeholder="ex: ABO-2026-005"
+                            placeholder="Ex. : ABO-2026-005"
                             value={referenceAbo}
                             onChange={(e) => setReferenceAbo(e.target.value)}
                             required
@@ -214,7 +214,7 @@ export default function AssociateAbonnementModal({
                     {/* Sélection Client */}
                     <div style={{ marginBottom: '1.25rem' }}>
                         <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
-                            Sélectionner un Client : <span style={{ color: '#ef4444' }}>*</span>
+                            Client souscripteur : <span style={{ color: '#ef4444' }}>*</span>
                         </label>
                         <SearchableSelect
                             options={clients}
@@ -228,14 +228,13 @@ export default function AssociateAbonnementModal({
                             getOptionBadge={(c) => c.etat_client || null}
                         />
                     </div>
-                    {/* Durée & Périodicité */}
+                    {/* Durée et périodicité */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
                         <div>
                             <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
                                 Durée du contrat :
                             </label>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                {/* Choix du nombre : 1, 2, 3, etc. */}
                                 <input
                                     type="number"
                                     min="1"
@@ -245,14 +244,13 @@ export default function AssociateAbonnementModal({
                                     value={dureeValeur}
                                     onChange={(e) => setDureeValeur(Math.max(1, parseInt(e.target.value, 10) || 1))}
                                 />
-                                {/* Choix de l'unité : An(s) ou Mois */}
                                 <select
                                     className="search-input"
                                     style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', flex: 1 }}
                                     value={dureeUnite}
                                     onChange={(e) => setDureeUnite(e.target.value)}
                                 >
-                                    <option value="an">An(s)</option>
+                                    <option value="an">Année(s)</option>
                                     <option value="mois">Mois</option>
                                 </select>
                             </div>
@@ -303,16 +301,16 @@ export default function AssociateAbonnementModal({
                             />
                         </div>
                     </div>
-                    {/* Référence Facture / Cde */}
+                    {/* Référence Facture / Commande */}
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
-                            Référence Facture / Cde (optionnel) :
+                            Référence de facture ou bon de commande (facultatif) :
                         </label>
                         <input
                             type="text"
                             className="search-input"
                             style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
-                            placeholder="ex: FA 240"
+                            placeholder="Ex. : FA 240"
                             value={facture}
                             onChange={(e) => setFacture(e.target.value)}
                         />
@@ -329,7 +327,7 @@ export default function AssociateAbonnementModal({
                                     <span>Validation en cours...</span>
                                 </>
                             ) : (
-                                "Valider l'Abonnement"
+                                "Valider le contrat"
                             )}
                         </button>
                     </div>

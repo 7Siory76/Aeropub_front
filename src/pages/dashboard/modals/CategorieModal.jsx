@@ -119,10 +119,10 @@ export default function CategorieModal({
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                {isEditing ? 'Modifier la Catégorie' : 'Nouvelle Catégorie'}
+                {isEditing ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
               </h3>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {isEditing ? `ID: #${category?.id}` : 'Référentiel des formats publicitaires'}
+                {isEditing ? `Identifiant : #${category?.id}` : 'Référentiel des formats publicitaires'}
               </span>
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function CategorieModal({
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--text-main)' }}>
-              Nom de la Catégorie * :
+              Nom de la catégorie * :
             </label>
             <input
               type="text"
@@ -178,7 +178,7 @@ export default function CategorieModal({
                 outline: 'none',
                 boxSizing: 'border-box'
               }}
-              placeholder="Ex : Prestige, Standard, Dynamique, Événementiel..."
+              placeholder="Ex. : Prestige, Standard, Dynamique, Événementiel..."
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               autoFocus

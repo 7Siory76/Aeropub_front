@@ -130,7 +130,7 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
               <span>{isEditing ? `Modifier l'utilisateur #${userToEdit.id}` : 'Créer un nouvel utilisateur'}</span>
             </h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-              Attribution des rôles et hachage sécurisé du mot de passe
+              Attribution des rôles et des autorisations d'accès
             </p>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
@@ -149,23 +149,23 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
           <div className="modal-form-group">
             <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <User size={15} style={{ color: 'var(--accent-primary)' }} />
-              <span>Nom Complet * :</span>
+              <span>Nom complet * :</span>
             </label>
             <input
               type="text"
               required
               className="modal-input"
-              placeholder="ex: Jean Dupont"
+              placeholder="Ex. : Jean Dupont"
               value={formData.nom}
               onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
             />
           </div>
 
-          {/* Email */}
+          {/* Adresse courriel */}
           <div className="modal-form-group">
             <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <Mail size={15} style={{ color: 'var(--accent-secondary)' }} />
-              <span>Adresse Email professionnelle * :</span>
+              <span>Adresse courriel professionnelle * :</span>
             </label>
             <input
               type="email"
@@ -177,12 +177,12 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
             />
           </div>
 
-          {/* Rôle & Statut */}
+          {/* Rôle et statut */}
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
             <div className="modal-form-group">
               <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Shield size={14} style={{ color: '#60a5fa' }} />
-                <span>Rôle & Permissions * :</span>
+                <span>Rôle et permissions * :</span>
               </label>
               <select
                 className="modal-select"
@@ -248,15 +248,15 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
             );
           })()}
 
-          {/* Mot de passe avec indication de hachage */}
+          {/* Mot de passe */}
           <div className="modal-form-group">
             <label className="modal-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Lock size={15} style={{ color: 'var(--accent-warning)' }} />
-                <span>{isEditing ? 'Nouveau Mot de Passe (optionnel) :' : 'Mot de Passe Initial * :'}</span>
+                <span>{isEditing ? 'Nouveau mot de passe (facultatif) :' : 'Mot de passe initial * :'}</span>
               </span>
               <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
-                🔒 Haché avec bcrypt
+                🔒 Chiffrement sécurisé
               </span>
             </label>
             <input
@@ -269,7 +269,7 @@ export default function UserModal({ userToEdit, onClose, onRefresh }) {
             />
             {isEditing && (
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                Si vous saisissez un nouveau mot de passe, il sera immédiatement haché et mis à jour.
+                Si vous saisissez un nouveau mot de passe, il remplacera l'ancien de manière sécurisée.
               </span>
             )}
           </div>

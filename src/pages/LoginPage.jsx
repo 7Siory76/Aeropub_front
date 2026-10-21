@@ -27,7 +27,7 @@ export default function LoginPage() {
         e.preventDefault();
         setErrorMessage('');
         if (!email.trim() || !motDePasse) {
-            setErrorMessage('Veuillez renseigner votre email et mot de passe.');
+            setErrorMessage('Renseignez votre email et votre mot de passe.');
             return;
         }
 
@@ -62,7 +62,7 @@ export default function LoginPage() {
                     <h1 className={styles.loginTitle}>
                         AeroPub <span className={styles.gradientText}>Connexion</span>
                     </h1>
-                    <p className={styles.loginSubtitle}>Portail d'Authentification Professionnelle &amp; Régie Publicitaire</p>
+                    <p className={styles.loginSubtitle}>Portail d'authentification et de régie publicitaire</p>
                 </div>
 
                 {errorMessage && (
@@ -74,14 +74,14 @@ export default function LoginPage() {
 
                 {isExpired && (
                     <div className={styles.expiredAlert}>
-                        <span>⏱️ Votre session a expiré après 24h d'inactivité. Veuillez vous reconnecter pour reprendre votre travail.</span>
+                        <span>⏱️ Votre session a expiré après 24 h d'inactivité. Reconnectez-vous pour continuer.</span>
                     </div>
                 )}
 
                 {/* Formulaire de connexion */}
                 <form onSubmit={handleSubmit} className={styles.loginForm}>
                     <div className={styles.loginField}>
-                        <label className={styles.loginLabel}>Adresse Email Professionnelle</label>
+                        <label className={styles.loginLabel}>Adresse email professionnelle</label>
                         <div className={styles.loginInputWrapper}>
                             <Mail size={18} className={styles.loginInputIcon} />
                             <input
@@ -96,7 +96,7 @@ export default function LoginPage() {
                         </div>
                     </div>
                     <div className={styles.loginField}>
-                        <label className={styles.loginLabel}>Mot de Passe</label>
+                        <label className={styles.loginLabel}>Mot de passe</label>
                         <div className={styles.loginInputWrapper}>
                             <Lock size={18} className={styles.loginInputIcon} />
                             <input
@@ -124,7 +124,7 @@ export default function LoginPage() {
                         ) : (
                             <>
                                 <LogIn size={18} />
-                                <span>Se Connecter</span>
+                                <span>Se connecter</span>
                             </>
                         )}
                     </button>

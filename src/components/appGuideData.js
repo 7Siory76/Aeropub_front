@@ -1,6 +1,4 @@
-// Structure simple du Guide par Page d'AeroPub
-// Chaque page décrit son rôle, ce qu'on peut y faire et permet d'y aller directement.
-
+// Guide d'utilisation par page d'AeroPub
 export const APP_PAGES_GUIDE = [
   {
     id: 'planning',
@@ -62,7 +60,7 @@ export const APP_PAGES_GUIDE = [
     id: 'dashboard',
     pageKey: 'dashboard',
     tabKey: 'abonnements',
-    name: 'Tableau de Bord (Gestion des Données)',
+    name: 'Tableau de bord (Gestion des données)',
     icon: 'LayoutDashboard',
     badge: '8 Tables de gestion',
     badgeColor: '#3b82f6',
@@ -118,7 +116,7 @@ export const APP_PAGES_GUIDE = [
       },
       {
         key: 'typesupports',
-        name: 'Types de Support',
+        name: 'Types de supports',
         icon: 'Layers',
         desc: 'Typologies techniques d’affichage publicitaire.',
         actions: [
@@ -215,26 +213,26 @@ export const APP_PAGES_GUIDE = [
     id: 'outils',
     pageKey: null,
     tabKey: null,
-    name: 'Outils Généraux (Bandeau supérieur)',
+    name: 'Outils généraux (Bandeau supérieur)',
     icon: 'Compass',
     badge: 'Accessible partout',
     badgeColor: '#f59e0b',
     description: 'Actions rapides disponibles en permanence dans l’en-tête, quel que soit l’écran où vous vous trouvez.',
     actions: [
       {
-        title: 'Mode Nuit 🌙 / Jour ☀️',
+        title: 'Mode sombre / clair',
         desc: 'Cliquez sur le bouton Jour/Nuit en haut à droite pour adapter l’affichage à votre confort visuel.'
       },
       {
-        title: 'Actualiser 🔄',
+        title: 'Actualisation',
         desc: 'Rechargez instantanément toutes les données fraîches depuis les serveurs sans recharger la page.'
       },
       {
-        title: 'Cloche de notifications 🔔',
+        title: 'Notifications',
         desc: 'Consultez les dernières alertes temps réel (nouvelles créations, modifications de contrats, alertes J-30).'
       },
       {
-        title: 'Guide des Rôles 💡',
+        title: 'Guide des rôles',
         desc: 'Consultez le récapitulatif détaillé des droits et permissions selon votre profil (Admin, Commercial, etc.).'
       }
     ]

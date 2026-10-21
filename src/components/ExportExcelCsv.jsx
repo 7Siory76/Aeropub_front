@@ -2,30 +2,18 @@ import React from 'react';
 import { Download } from 'lucide-react';
 import { useFeedback } from '../context/FeedbackContext';
 
-/**
- * Composant universel et réutilisable d'exportation Excel / CSV pour les tableaux de données
- * @param {Array} data - Tableau d'objets à exporter
- * @param {Array} columns - Définition des colonnes [{ header: 'Nom Colonne', key: 'champ' | accessor: (row) => ... }]
- * @param {string} filename - Nom du fichier exporté (sans extension)
- * @param {string} buttonText - Libellé affiché sur le bouton
- * @param {string} emptyMessage - Message d'information si aucune donnée n'est disponible
- * @param {string} successMessage - Message de confirmation après l'exportation
- * @param {boolean} canExport - Droit RBAC autorisant l'exportation
- * @param {string} className - Classe CSS du bouton
- * @param {object} style - Styles inline optionnels
- * @param {string} title - Infobulle (title) du bouton
- */
+// Bouton d'exportation des données au format CSV
 export default function ExportExcelCsv({
   data = [],
   columns = [],
   filename = 'export_aeropub',
-  buttonText = 'Exporter (Excel / CSV)',
+  buttonText = 'Exporter (CSV)',
   emptyMessage = 'Aucune donnée à exporter.',
-  successMessage = 'Exportation réussie !',
+  successMessage = 'Exportation réussie.',
   canExport = true,
   className = 'btn-secondary',
   style,
-  title = 'Exporter les données en fichier CSV / Excel'
+  title = 'Exporter les données au format CSV'
 }) {
   const { showSuccess, showInfo } = useFeedback();
 
@@ -37,7 +25,7 @@ export default function ExportExcelCsv({
       return;
     }
 
-    // Si aucune colonne n'est explicitement fournie, déduire des clés du premier objet
+    // Déduit les colonnes depuis le premier objet si non fournies
     const effectiveColumns = columns.length > 0
       ? columns
       : Object.keys(data[0] || {}).map(key => ({ header: key, key }));

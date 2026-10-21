@@ -16,11 +16,7 @@ export default function DashboardKpisOverview({
     const [periodeOccupation, setPeriodeOccupation] = useState('mois'); // 'mois' | 'trimestre' | 'annee'
     const now = new Date();
 
-    // =========================================================================
-    // 1. DÉTECTION DES RENOUVELLEMENTS VIA id_abonnement_precedent
-    // =========================================================================
-    // Tout contrat enfant possède le champ id_abonnement_precedent qui pointe vers son parent.
-    // L'ensemble renewedParentRefs contient toutes les références de contrats ayant déjà été renouvelés.
+    // 1. Détection des contrats renouvelés via id_abonnement_precedent
     const renewedParentRefs = useMemo(() => {
         const set = new Set();
         userContracts.forEach(c => {
@@ -31,24 +27,22 @@ export default function DashboardKpisOverview({
         return set;
     }, [userContracts]);
 
-    // Un contrat est renouvelé s'il a été référencé comme parent par un autre contrat
+    // Vérifie si un contrat a été renouvelé
     const isContratRenouvele = (c) => renewedParentRefs.has(String(c.reference).trim());
 
-    // Helper calcul écart en jours
+    // Calcul de l'écart en jours
     const getDiffJours = (dateStr) => {
         if (!dateStr) return -9999;
         const target = new Date(dateStr);
         return Math.ceil((target - now) / 86400000);
     };
 
-    // =========================================================================
-    // 2. ÉCHÉANCES DANS 7, 30, 60 ET 90 JOURS (Contrats actifs non encore renouvelés)
-    // =========================================================================
+    // 2. Échéances à 7, 30, 60 et 90 jours (contrats actifs non renouvelés)
     const echeances = useMemo(() => {
         const actifsNonRenouveles = userContracts.filter(c => {
             const statut = (c.nom_statut || c.statut || '').toLowerCase();
             if (statut === 'résilié' || statut === 'resilie') return false;
-            if (isContratRenouvele(c)) return false; // Déjà renouvelé -> pas besoin d'alerte
+            if (isContratRenouvele(c)) return false;
             const diff = getDiffJours(c.date_echeance || c.date_fin);
             return diff >= 0 && diff <= 90;
         });
@@ -76,12 +70,9 @@ export default function DashboardKpisOverview({
         return { j7, j30, j60, j90, total: actifsNonRenouveles.length };
     }, [userContracts, renewedParentRefs]);
 
-    // =========================================================================
-    // 3. ALERTES CRITIQUES : Échus non renouvelés & Sans action commerciale
-    // =========================================================================
+    // 3. Alertes critiques : échus non renouvelés et sans action commerciale
     const alertesCritiques = useMemo(() => {
-        // A. Contrats échus non renouvelés
-        // Date dépassée ET non présent dans renewedParentRefs ET non résilié explicitement
+        // Contrats échus non renouvelés et non résiliés
         const echusNonRenouveles = userContracts.filter(c => {
             const diff = getDiffJours(c.date_echeance || c.date_fin);
             const statut = (c.nom_statut || c.statut || '').toLowerCase();
@@ -91,7 +82,7 @@ export default function DashboardKpisOverview({
             return estEchu && !aEteRenouvele && !estResilie;
         });
 
-        // B. Contrats sans action commerciale planifiée (à échéance <= 90j ou actifs)
+        // Contrats sans action commerciale planifiée (échéance sous 90 j)
         const sansAction = userContracts.filter(c => {
             const diff = getDiffJours(c.date_echeance || c.date_fin);
             const statut = (c.nom_statut || c.statut || '').toLowerCase();
@@ -111,9 +102,7 @@ export default function DashboardKpisOverview({
         return { echusNonRenouveles, sansAction };
     }, [userContracts, actionsCommerciales, renewedParentRefs]);
 
-    // =========================================================================
-    // 4. TAUX D'OCCUPATION DES SUPPORTS SUR UNE PÉRIODE DONNÉE
-    // =========================================================================
+    // 4. Taux d'occupation des supports sur la période sélectionnée
     const statsOccupation = useMemo(() => {
         const totalSupports = emplacements.length || 1;
         const currentYear = now.getFullYear();
@@ -131,7 +120,7 @@ export default function DashboardKpisOverview({
             dateFinPeriode = new Date(currentYear, 11, 31, 23, 59, 59);
         }
 
-        // Identifier tous les supports uniques occupés pendant cette fenêtre
+        // Supports uniques occupés pendant cette fenêtre
         const occupiedRefs = new Set();
         userContracts.forEach(c => {
             const statut = (c.nom_statut || c.statut || '').toLowerCase();
@@ -145,9 +134,8 @@ export default function DashboardKpisOverview({
             const cDebut = new Date(c.date_debut);
             const cFin = new Date(c.date_echeance || c.date_fin);
 
-            // Vérifie s'il y a intersection temporelle entre le contrat et la période choisie
+            // Vérifie l'intersection temporelle
             if (cDebut <= dateFinPeriode && cFin >= dateDebutPeriode) {
-                // Extraire supports associés
                 if (c.supports_associes) {
                     c.supports_associes.split(/[,;]+/).forEach(s => {
                         const ref = s.trim();
@@ -171,9 +159,7 @@ export default function DashboardKpisOverview({
         };
     }, [emplacements, userContracts, periodeOccupation]);
 
-    // =========================================================================
-    // 5. MONTANTS FINANCIERS : Actifs, Renouvelés, À renouveler, Perdus
-    // =========================================================================
+    // 5. Montants financiers par statut
     const montants = useMemo(() => {
         let actifs = 0;
         let renouveles = 0;
@@ -317,7 +303,7 @@ export default function DashboardKpisOverview({
                     className="kpi-card-hover"
                     onClick={() => triggerFilter('montant_actifs')}
                     style={{
-                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.02))',
+                        background: 'linear-gradient(135deg, rgba(160, 185, 129, 0.12), rgba(16, 185, 129, 0.02))',
                         border: '1px solid rgba(16, 185, 129, 0.35)',
                         borderRadius: '12px',
                         padding: '1.1rem 1.15rem',
@@ -328,13 +314,13 @@ export default function DashboardKpisOverview({
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Contrats Actifs
+                            Contrats actifs
                         </span>
                         <div style={{ background: 'rgba(16, 185, 129, 0.18)', padding: '0.45rem', borderRadius: '8px', color: '#10b981' }}>
                             <DollarSign size={18} />
                         </div>
                     </div>
-                    {/* 1ER PLAN : NOMBRE */}
+                    {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
                         <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
                             {montants.nbActifs}
@@ -343,7 +329,7 @@ export default function DashboardKpisOverview({
                             contrat{montants.nbActifs > 1 ? 's' : ''}
                         </span>
                     </div>
-                    {/* 2E PLAN : MONTANT */}
+                    {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
                         <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.actifs)}</strong>
@@ -368,13 +354,13 @@ export default function DashboardKpisOverview({
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '0.78rem', color: '#c084fc', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Contrats Renouvelés
+                            Contrats renouvelés
                         </span>
                         <div style={{ background: 'rgba(168, 85, 247, 0.18)', padding: '0.45rem', borderRadius: '8px', color: '#c084fc' }}>
                             <RefreshCw size={18} />
                         </div>
                     </div>
-                    {/* 1ER PLAN : NOMBRE */}
+                    {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
                         <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
                             {montants.nbRenouveles}
@@ -383,7 +369,7 @@ export default function DashboardKpisOverview({
                             reconduit{montants.nbRenouveles > 1 ? 's' : ''}
                         </span>
                     </div>
-                    {/* 2E PLAN : MONTANT */}
+                    {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(168, 85, 247, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
                         <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.renouveles)}</strong>
@@ -408,13 +394,13 @@ export default function DashboardKpisOverview({
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '0.78rem', color: '#eab308', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Contrats À Valider
+                            Contrats à valider
                         </span>
                         <div style={{ background: 'rgba(234, 179, 8, 0.18)', padding: '0.45rem', borderRadius: '8px', color: '#eab308' }}>
                             <FileCheck size={18} />
                         </div>
                     </div>
-                    {/* 1ER PLAN : NOMBRE */}
+                    {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
                         <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
                             {montants.nbAValider}
@@ -423,7 +409,7 @@ export default function DashboardKpisOverview({
                             contrat{montants.nbAValider > 1 ? 's' : ''}
                         </span>
                     </div>
-                    {/* 2E PLAN : MONTANT */}
+                    {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(234, 179, 8, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
                         <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.aValider)}</strong>
@@ -448,13 +434,13 @@ export default function DashboardKpisOverview({
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '0.78rem', color: '#06b6d4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            Contrats Brouillons
+                            Contrats brouillons
                         </span>
                         <div style={{ background: 'rgba(6, 182, 212, 0.18)', padding: '0.45rem', borderRadius: '8px', color: '#06b6d4' }}>
                             <FileEdit size={18} />
                         </div>
                     </div>
-                    {/* 1ER PLAN : NOMBRE */}
+                    {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
                         <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
                             {montants.nbBrouillons}
@@ -463,7 +449,7 @@ export default function DashboardKpisOverview({
                             brouillon{montants.nbBrouillons > 1 ? 's' : ''}
                         </span>
                     </div>
-                    {/* 2E PLAN : MONTANT */}
+                    {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(6, 182, 212, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
                         <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.brouillons)}</strong>
@@ -488,7 +474,7 @@ export default function DashboardKpisOverview({
                 >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            À Renouveler (≤ 90j)
+                            À renouveler (≤ 90 j)
                         </span>
                         <div style={{ background: 'rgba(245, 158, 11, 0.18)', padding: '0.45rem', borderRadius: '8px', color: '#f59e0b' }}>
                             <Clock size={18} />
@@ -556,7 +542,7 @@ export default function DashboardKpisOverview({
                                 {echeances.j7.length}
                             </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                                Urgence Max
+                                Urgence maximale
                             </span>
                         </div>
 
@@ -643,7 +629,7 @@ export default function DashboardKpisOverview({
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <ShieldAlert size={18} style={{ color: '#f43f5e' }} />
                             <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: '#fff' }}>
-                                Alertes Commerciales Critiques
+                                Alertes commerciales critiques
                             </h3>
                         </div>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

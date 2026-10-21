@@ -147,7 +147,7 @@ export default function StatutsContratsTab({ onCountChange }) {
   const getBadgeClass = (nom) => {
     const nomMinuscule = String(nom || '').toLowerCase();
     if (nomMinuscule.includes('disponible') || nomMinuscule.includes('actif')) return 'badge-active';
-    if (nomMinuscule.includes('réservé') || nomMinuscule.includes('attente') || nomMinuscule.includes('bientôt')) return 'badge-warning';
+    if (nomMinuscule.includes('réservé') || nomMinuscule.includes('attente') || nomMinuscule.includes('bientôt') || nomMinuscule.includes('bientot')) return 'badge-warning';
     if (nomMinuscule.includes('occupé') || nomMinuscule.includes('expiré') || nomMinuscule.includes('résilié') || nomMinuscule.includes('indisponible')) return 'badge-expired';
     return 'badge-neutral';
   };
@@ -158,22 +158,22 @@ export default function StatutsContratsTab({ onCountChange }) {
       <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1.5rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.06)', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <PlusCircle size={18} style={{ color: '#facc15' }} />
-          Ajouter un Nouveau Statut de Contrat / Abonnement
+          Ajouter un nouveau statut de contrat
         </h3>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-          Définit les statuts légaux et commerciaux applicables aux contrats (ex: brouillon, à valider, actif, bientôt échu, renouvelé, expiré, résilié, archivé).
+          Définit les statuts légaux et commerciaux applicables aux contrats (ex. : brouillon, à valider, actif, bientôt échu, renouvelé, expiré, résilié, archivé).
         </p>
 
         <form onSubmit={handleCreateStatut} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem', alignItems: 'end', maxWidth: '600px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-              Nom du statut (ex: suspendu temporairement) :
+              Nom du statut (ex. : suspendu temporairement) :
             </label>
             <input
               type="text"
               className="search-input"
               style={{ borderRadius: '10px', padding: '0.65rem 0.9rem' }}
-              placeholder="ex: suspendu"
+              placeholder="Ex. : suspendu"
               value={newNomStatut}
               onChange={(e) => setNewNomStatut(e.target.value)}
             />
@@ -194,7 +194,7 @@ export default function StatutsContratsTab({ onCountChange }) {
               ) : (
                 <>
                   <PlusCircle size={16} />
-                  <span>Ajouter Statut</span>
+                  <span>Ajouter le statut</span>
                 </>
               )}
             </button>
@@ -206,10 +206,10 @@ export default function StatutsContratsTab({ onCountChange }) {
       {loadingStatuts ? (
         <div className="loading-container">
           <RefreshCw size={28} className="spinner-icon" />
-          <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Chargement des statuts d'abonnements...</p>
+          <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Chargement des statuts de contrat...</p>
         </div>
       ) : typesStatuts.length === 0 ? (
-        <div className="empty-msg">Aucun statut d'abonnement enregistré.</div>
+        <div className="empty-msg">Aucun statut de contrat enregistré.</div>
       ) : (
         <>
           {/* Barre de recherche et filtre */}
@@ -249,9 +249,9 @@ export default function StatutsContratsTab({ onCountChange }) {
                     ID {renderSortIcon('id')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('nom_statut')} style={{ cursor: 'pointer' }}>
-                    Nom du Statut (Référentiel) {renderSortIcon('nom_statut')}
+                    Nom du statut (référentiel) {renderSortIcon('nom_statut')}
                   </th>
-                  <th className="table-head-cell">Aperçu du Badge</th>
+                  <th className="table-head-cell">Aperçu du badge</th>
                   <th className="table-head-cell" style={{ textAlign: 'right', width: '150px' }}>Actions</th>
                 </tr>
               </thead>

@@ -312,10 +312,10 @@ export default function TypeSupportsTab({
         </div>
       </div>
 
-      {/* COLONNE 2 (DROITE) : Vue détaillée du Type de Support sélectionné */}
+      {/* Détails du type de support sélectionné */}
       <div className="ts-panel-box">
         {!activeTS ? (
-          <p className="empty-msg">Veuillez sélectionner un type de support.</p>
+          <p className="empty-msg">Sélectionnez un type de support.</p>
         ) : (
           <div>
             {/* Titre du Type de Support sélectionné */}

@@ -93,7 +93,7 @@ export default function OccupationParZoneWidget({
                 boxSizing: 'border-box'
             }}
         >
-            {/* En-tête et Bascule d'affichage responsive */}
+            {/* En-tête et bascule d'affichage responsive */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: '1 1 200px' }}>
                     {vueOnglet === 'occupation' ? (
@@ -103,7 +103,7 @@ export default function OccupationParZoneWidget({
                     )}
                     <div>
                         <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-main)', lineHeight: 1.3 }}>
-                            {vueOnglet === 'occupation' ? "Taux d'Occupation par Zone" : "Indice de Popularité des Zones"}
+                            {vueOnglet === 'occupation' ? "Taux d'occupation par zone" : "Indice de popularité des zones"}
                         </h3>
                         <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, display: 'block' }}>
                             {vueOnglet === 'occupation'

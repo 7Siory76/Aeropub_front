@@ -24,7 +24,7 @@ export default function ActionsPrioritairesWidget({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: '#fff' }}>
-            Dossiers Nécessitant une Action Commerciale
+            Dossiers nécessitant une action commerciale
           </h3>
           <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             Contrats échus non renouvelés et échéances imminentes à traiter en priorité
@@ -38,7 +38,7 @@ export default function ActionsPrioritairesWidget({
             onClick={onViewAll}
             style={{ fontSize: '0.82rem', padding: '0.45rem 0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
           >
-            <span>Voir la liste complète dans les Contrats</span>
+            <span>Voir la liste complète des contrats</span>
             <ChevronRight size={15} />
           </button>
         )}
@@ -54,7 +54,7 @@ export default function ActionsPrioritairesWidget({
           <table className="aeropub-table">
             <thead>
               <tr className="table-head-row-emerald">
-                <th className="table-head-cell">Réf Contrat</th>
+                <th className="table-head-cell">Réf. contrat</th>
                 <th className="table-head-cell">Client</th>
                 <th className="table-head-cell">Commercial</th>
                 <th className="table-head-cell">Échéance</th>
@@ -107,7 +107,7 @@ export default function ActionsPrioritairesWidget({
                           fontSize: '0.75rem',
                           fontWeight: 700
                         }}>
-                          Échéance ≤ 7j ({diff}j)
+                          Échéance ≤ 7 j ({diff} j)
                         </span>
                       ) : (
                         <span style={{
@@ -119,7 +119,7 @@ export default function ActionsPrioritairesWidget({
                           fontSize: '0.75rem',
                           fontWeight: 700
                         }}>
-                          Échéance J-30 ({diff}j)
+                          Échéance J-30 ({diff} j)
                         </span>
                       )}
                     </td>

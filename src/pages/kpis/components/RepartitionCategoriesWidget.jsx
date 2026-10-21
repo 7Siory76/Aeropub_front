@@ -89,7 +89,7 @@ export default function RepartitionCategoriesWidget({
                 <PieChart size={20} style={{ color: 'var(--accent-primary, #2563eb)', flexShrink: 0 }} />
                 <div>
                     <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, color: 'var(--text-main)', lineHeight: 1.3 }}>
-                        Répartition par Catégorie de Support
+                        Répartition par catégorie de support
                     </h3>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, display: 'block' }}>
                         Inventaire des faces publicitaires selon leur nature

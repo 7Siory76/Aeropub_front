@@ -14,11 +14,7 @@ import {
 } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
 
-/**
- * Section complète dédiée aux Préavis de Reconduction Tacite (rendue côte à côte dans ActionsCommercialesTab) :
- * 1. Panneau des contrats actifs actuellement sous préavis de reconduction tacite
- * 2. Historique des préavis transmis avec réexpédition de mail de reconduction
- */
+// Gestion des préavis de reconduction tacite et historique des notifications
 export default function PreavisReconductionSection({
   alertPreavisAbos = [],
   actions = [],
@@ -141,10 +137,10 @@ export default function PreavisReconductionSection({
             </div>
             <div>
               <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '1.05rem', fontWeight: 700 }}>
-                Préavis de Reconduction Tacite ({alertPreavisAbos.length} contrat{alertPreavisAbos.length > 1 ? 's' : ''} actif{alertPreavisAbos.length > 1 ? 's' : ''} sous préavis)
+                Préavis de reconduction tacite ({alertPreavisAbos.length} contrat{alertPreavisAbos.length > 1 ? 's' : ''} actif{alertPreavisAbos.length > 1 ? 's' : ''} sous préavis)
               </h4>
               <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Contrats soumis à reconduction automatique sans renouvellement enregistré. Informez les clients avant la date limite de notification s'ils souhaitent résilier.
+                Contrats soumis à reconduction automatique sans renouvellement enregistré. Informez les clients avant la date limite s'ils souhaitent résilier.
               </p>
             </div>
           </div>
@@ -155,17 +151,17 @@ export default function PreavisReconductionSection({
               className="pill-btn"
               style={{ fontSize: '0.8rem', padding: '0.35rem 0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
               onClick={onOpenTemplateModal}
-              title="Modifier le modèle du courriel de préavis (Réservé Admin)"
+              title="Modifier le modèle de courriel de préavis (Administrateur)"
             >
               <Settings size={14} />
-              <span>Modèle préavis</span>
+              <span>Modèle de préavis</span>
             </button>
           )}
         </div>
 
         {alertPreavisAbos.length === 0 ? (
           <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-            🎉 Aucun contrat actif à reconduction tacite sous délai de préavis actuellement.
+            Aucun contrat actif soumis à préavis actuellement.
           </p>
         ) : (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', marginTop: '0.85rem' }}>
@@ -212,7 +208,7 @@ export default function PreavisReconductionSection({
                     ⏱️ Préavis : <strong>{abo.preavisJours} jours</strong>
                   </div>
                   <div style={{ color: abo.diffDaysPreavis > 0 ? '#38bdf8' : '#fca5a5', fontWeight: 600 }}>
-                    ⚠️ Date limite résiliation : {abo.dateLimitePreavis.toLocaleDateString('fr-FR')}
+                    ⚠️ Date limite de résiliation : {abo.dateLimitePreavis.toLocaleDateString('fr-FR')}
                   </div>
                 </div>
 
@@ -233,10 +229,10 @@ export default function PreavisReconductionSection({
                     }}
                     onClick={() => onSendPreavisEmail(abo)}
                     disabled={sendingRef === abo.reference}
-                    title="Envoyer le courriel de préavis de reconduction / résiliation au client"
+                    title="Envoyer le courriel de préavis au client"
                   >
                     {sendingRef === abo.reference ? <Loader2 size={12} className="btn-spinner" /> : <Send size={12} />}
-                    <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer préavis résiliation'}</span>
+                    <span>{sendingRef === abo.reference ? 'Envoi en cours...' : 'Envoyer le préavis de résiliation'}</span>
                   </button>
                 )}
               </div>
@@ -250,10 +246,10 @@ export default function PreavisReconductionSection({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.6rem' }}>
           <div>
             <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.05rem', fontWeight: 600 }}>
-              Historique des Préavis de Reconduction ({filteredActions.length})
+              Historique des préavis de reconduction ({filteredActions.length})
             </h4>
             <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Historique des notifications de reconduction tacite et réexpédition des courriels de reconduction.
+              Historique des notifications de reconduction tacite et réexpédition des courriels.
             </p>
           </div>
 
@@ -278,7 +274,7 @@ export default function PreavisReconductionSection({
                 value={selectedStatus}
                 onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
               >
-                <option value="all">Tous statuts</option>
+                <option value="all">Tous les statuts</option>
                 <option value="Envoyé">Envoyé</option>
                 <option value="En attente">En attente</option>
                 <option value="Échec">Échec</option>
@@ -302,7 +298,7 @@ export default function PreavisReconductionSection({
                   <th className="table-head-cell sortable" onClick={() => handleSort('date_action')} style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>
                     Date {renderSortIcon('date_action')}
                   </th>
-                  <th className="table-head-cell">Type d'Action</th>
+                  <th className="table-head-cell">Type d'action</th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('nom_client')} style={{ cursor: 'pointer' }}>
                     Client & Contrat {renderSortIcon('nom_client')}
                   </th>
@@ -313,7 +309,7 @@ export default function PreavisReconductionSection({
                     Description {renderSortIcon('description')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('statut_envoi_email')} style={{ textAlign: 'center', cursor: 'pointer' }}>
-                    Statut Email {renderSortIcon('statut_envoi_email')}
+                    Statut du courriel {renderSortIcon('statut_envoi_email')}
                   </th>
                   {canSendManualEmail && <th className="table-head-cell" style={{ textAlign: 'center' }}>Action</th>}
                 </tr>
@@ -339,14 +335,14 @@ export default function PreavisReconductionSection({
                           fontWeight: 600,
                           fontSize: '0.78rem'
                         }}>
-                          {act.type_action || 'Préavis Reconduction'}
+                          {act.type_action || 'Préavis de reconduction'}
                         </span>
                       </td>
                       <td className="cell-bold-white">
                         <div>{act.nom_client || (act.id_client ? `Client #${act.id_client}` : 'Général')}</div>
                         {aboRef && (
                           <div style={{ fontSize: '0.78rem', color: '#38bdf8' }}>
-                            Réf: {aboRef}
+                            Réf. : {aboRef}
                           </div>
                         )}
                       </td>
@@ -382,7 +378,7 @@ export default function PreavisReconductionSection({
                             title={!aboRef ? "Aucun contrat associé à cette action" : "Renvoyer le courriel de préavis de reconduction tacite au client"}
                           >
                             {isSending ? <Loader2 size={11} className="btn-spinner" /> : <Send size={11} />}
-                            <span>{isSending ? 'Envoi...' : 'Renvoyer mail reconduction'}</span>
+                            <span>{isSending ? 'Envoi...' : 'Renvoyer le courriel'}</span>
                           </button>
                         </td>
                       )}

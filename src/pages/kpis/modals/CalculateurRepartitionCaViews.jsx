@@ -32,11 +32,11 @@ export default function CalculateurRepartitionCaViews({
           {activeTab === 'client' && <Users size={18} style={{ color: '#f59e0b' }} />}
           {activeTab === 'contrats' && <FileSpreadsheet size={18} style={{ color: '#38bdf8' }} />}
           <span>
-            {activeTab === 'aeroport' && "Répartition du Chiffre d'Affaires par Aéroport"}
-            {activeTab === 'categorie' && "Répartition du Chiffre d'Affaires par Catégorie de Support"}
-            {activeTab === 'type' && "Répartition du Chiffre d'Affaires par Type de Support Physique"}
-            {activeTab === 'client' && "Classement du Chiffre d'Affaires par Client & Annonceur"}
-            {activeTab === 'contrats' && "Inventaire Détaillé des Contrats Actifs Filtrés"}
+            {activeTab === 'aeroport' && "Répartition du chiffre d'affaires par aéroport"}
+            {activeTab === 'categorie' && "Répartition du chiffre d'affaires par catégorie de support"}
+            {activeTab === 'type' && "Répartition du chiffre d'affaires par type de support physique"}
+            {activeTab === 'client' && "Classement du chiffre d'affaires par client et annonceur"}
+            {activeTab === 'contrats' && "Inventaire détaillé des contrats actifs filtrés"}
           </span>
         </h4>
 
@@ -100,10 +100,10 @@ export default function CalculateurRepartitionCaViews({
                   <thead>
                     <tr>
                       <th>Aéroport</th>
-                      <th style={{ textAlign: 'center' }}>Contrats Actifs</th>
-                      <th style={{ textAlign: 'center' }}>Supports Mobilisés</th>
-                      <th style={{ textAlign: 'right' }}>CA Contractuel</th>
-                      <th style={{ textAlign: 'right' }}>CA Période (Prorata)</th>
+                      <th style={{ textAlign: 'center' }}>Contrats actifs</th>
+                      <th style={{ textAlign: 'center' }}>Supports mobilisés</th>
+                      <th style={{ textAlign: 'right' }}>CA contractuel</th>
+                      <th style={{ textAlign: 'right' }}>CA période (prorata)</th>
                       <th style={{ textAlign: 'right' }}>Part (%)</th>
                     </tr>
                   </thead>
@@ -124,7 +124,7 @@ export default function CalculateurRepartitionCaViews({
                       </tr>
                     ))}
                     <tr className="total-row">
-                      <td>TOTAL AÉROPORTS</td>
+                      <td>Total aéroports</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalContrats}</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalSupports}</td>
                       <td style={{ textAlign: 'right' }}>{formatMGA(calculationResults.totalCaContractuel)}</td>
@@ -186,8 +186,8 @@ export default function CalculateurRepartitionCaViews({
                       <th>Catégorie</th>
                       <th style={{ textAlign: 'center' }}>Contrats</th>
                       <th style={{ textAlign: 'center' }}>Supports</th>
-                      <th style={{ textAlign: 'right' }}>CA Contractuel</th>
-                      <th style={{ textAlign: 'right' }}>CA Période (Prorata)</th>
+                      <th style={{ textAlign: 'right' }}>CA contractuel</th>
+                      <th style={{ textAlign: 'right' }}>CA période (prorata)</th>
                       <th style={{ textAlign: 'right' }}>Part (%)</th>
                     </tr>
                   </thead>
@@ -208,7 +208,7 @@ export default function CalculateurRepartitionCaViews({
                       </tr>
                     ))}
                     <tr className="total-row">
-                      <td>TOTAL CATÉGORIES</td>
+                      <td>Total catégories</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalContrats}</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalSupports}</td>
                       <td style={{ textAlign: 'right' }}>{formatMGA(calculationResults.totalCaContractuel)}</td>
@@ -267,11 +267,11 @@ export default function CalculateurRepartitionCaViews({
                 <table className="ca-table">
                   <thead>
                     <tr>
-                      <th>Type de Support</th>
+                      <th>Type de support</th>
                       <th style={{ textAlign: 'center' }}>Contrats</th>
                       <th style={{ textAlign: 'center' }}>Supports</th>
-                      <th style={{ textAlign: 'right' }}>CA Contractuel</th>
-                      <th style={{ textAlign: 'right' }}>CA Période (Prorata)</th>
+                      <th style={{ textAlign: 'right' }}>CA contractuel</th>
+                      <th style={{ textAlign: 'right' }}>CA période (prorata)</th>
                       <th style={{ textAlign: 'right' }}>Part (%)</th>
                     </tr>
                   </thead>
@@ -292,7 +292,7 @@ export default function CalculateurRepartitionCaViews({
                       </tr>
                     ))}
                     <tr className="total-row">
-                      <td>TOTAL TYPES DE SUPPORT</td>
+                      <td>Total types de support</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalContrats}</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalSupports}</td>
                       <td style={{ textAlign: 'right' }}>{formatMGA(calculationResults.totalCaContractuel)}</td>
@@ -351,11 +351,11 @@ export default function CalculateurRepartitionCaViews({
                 <table className="ca-table">
                   <thead>
                     <tr>
-                      <th>Client / Entreprise</th>
+                      <th>Client / entreprise</th>
                       <th style={{ textAlign: 'center' }}>Contrats</th>
                       <th style={{ textAlign: 'center' }}>Supports</th>
-                      <th style={{ textAlign: 'right' }}>CA Contractuel</th>
-                      <th style={{ textAlign: 'right' }}>CA Période (Prorata)</th>
+                      <th style={{ textAlign: 'right' }}>CA contractuel</th>
+                      <th style={{ textAlign: 'right' }}>CA période (prorata)</th>
                       <th style={{ textAlign: 'right' }}>Part (%)</th>
                     </tr>
                   </thead>
@@ -376,7 +376,7 @@ export default function CalculateurRepartitionCaViews({
                       </tr>
                     ))}
                     <tr className="total-row">
-                      <td>TOTAL CLIENTS</td>
+                      <td>Total clients</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalContrats}</td>
                       <td style={{ textAlign: 'center' }}>{calculationResults.totalSupports}</td>
                       <td style={{ textAlign: 'right' }}>{formatMGA(calculationResults.totalCaContractuel)}</td>
@@ -402,14 +402,14 @@ export default function CalculateurRepartitionCaViews({
             <table className="ca-table">
               <thead>
                 <tr>
-                  <th>Réf. Contrat</th>
+                  <th>Réf. contrat</th>
                   <th>Client</th>
                   <th>Campagne</th>
                   <th style={{ textAlign: 'center' }}>Périodicité</th>
                   <th>Période d'activité</th>
                   <th>Supports rattachés</th>
-                  <th style={{ textAlign: 'right' }}>Tarif Contrat</th>
-                  <th style={{ textAlign: 'right' }}>CA Période</th>
+                  <th style={{ textAlign: 'right' }}>Tarif contrat</th>
+                  <th style={{ textAlign: 'right' }}>CA période</th>
                   <th style={{ textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>

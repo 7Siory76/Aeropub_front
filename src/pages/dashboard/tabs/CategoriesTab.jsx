@@ -308,10 +308,10 @@ export default function CategoriesTab({
         </div>
       </div>
 
-      {/* COLONNE 2 (DROITE) : Vue détaillée de la Catégorie sélectionnée */}
+      {/* Détails de la catégorie sélectionnée */}
       <div className="ts-panel-box">
         {!activeCategory ? (
-          <p className="empty-msg">Veuillez sélectionner une catégorie.</p>
+          <p className="empty-msg">Sélectionnez une catégorie.</p>
         ) : (
           <div>
             {/* En-tête de la Catégorie sélectionnée */}

@@ -119,7 +119,7 @@ export default function EmplacementDetailsModal({
         caracteristiques: formData.caracteristiques,
         observation: formData.observation
       });
-      showSuccess(`Support "${emplacement.reference}" mis à jour avec succès !`);
+      showSuccess(`Support « ${emplacement.reference} » mis à jour avec succès !`);
       setIsEditing(false);
       onClose();
       if (onRefresh) onRefresh();
@@ -150,19 +150,19 @@ export default function EmplacementDetailsModal({
         style={{ maxWidth: '720px', maxHeight: '92vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* En-tête de la Modale */}
+        {/* En-tête de la boîte de dialogue */}
         <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <h3 className="client-modal-title" style={{ fontSize: '1.4rem' }}>
-                📍 REF : {emplacement.reference}
+                📍 Réf. : {emplacement.reference}
               </h3>
               <span className={`wireframe-badge ${getBadgeClass()}`}>
                 {emplacement.etat || emplacement.statut || 'Disponible'}
               </span>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-              Fiche technique complète et gestion du support publicitaire (base_v3.sql)
+              Fiche technique complète et gestion du support publicitaire
             </p>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
@@ -205,10 +205,10 @@ export default function EmplacementDetailsModal({
         {/* Mode Édition (Formulaire) */}
         {isEditing ? (
           <form onSubmit={handleSaveUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginTop: '1.25rem' }}>
-            {/* Ligne 1 : État et Type de Support */}
+            {/* Ligne 1 : État et Type de support */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="modal-form-group">
-                <label className="modal-label">État du Support :</label>
+                <label className="modal-label">État du support :</label>
                 <select
                   className="modal-select"
                   value={formData.etat}
@@ -232,7 +232,7 @@ export default function EmplacementDetailsModal({
               </div>
 
               <div className="modal-form-group">
-                <label className="modal-label">Type de Support :</label>
+                <label className="modal-label">Type de support :</label>
                 <SearchableSelect
                   options={typesList}
                   value={formData.id_type}
@@ -245,7 +245,7 @@ export default function EmplacementDetailsModal({
               </div>
             </div>
 
-            {/* Ligne 2 : Catégorie et Zone Terminale */}
+            {/* Ligne 2 : Catégorie et Zone aéroportuaire */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="modal-form-group">
                 <label className="modal-label">Catégorie :</label>
@@ -261,7 +261,7 @@ export default function EmplacementDetailsModal({
               </div>
 
               <div className="modal-form-group">
-                <label className="modal-label">Zone Terminale :</label>
+                <label className="modal-label">Zone aéroportuaire :</label>
                 <SearchableSelect
                   options={zonesList}
                   value={formData.id_zone}
@@ -283,13 +283,13 @@ export default function EmplacementDetailsModal({
                 className="modal-input"
                 value={formData.caracteristiques}
                 onChange={(e) => setFormData({ ...formData, caracteristiques: e.target.value })}
-                placeholder="ex: 1.60 x 2.40, Bâche 12m², Pack 8 écrans..."
+                placeholder="Ex. : 1,60 x 2,40 m, bâche 12 m², pack 8 écrans..."
               />
             </div>
 
-            {/* Ligne 4 : Observation & Remarques */}
+            {/* Ligne 4 : Observations et remarques */}
             <div className="modal-form-group">
-              <label className="modal-label">Observation & Remarques :</label>
+              <label className="modal-label">Observations et remarques :</label>
               <textarea
                 className="modal-input"
                 style={{ height: '80px', resize: 'vertical' }}
@@ -315,7 +315,7 @@ export default function EmplacementDetailsModal({
                 style={{ padding: '0.65rem 1.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
               >
                 {loading && <Loader2 size={15} className="btn-spinner" />}
-                <span>{loading ? 'Enregistrement...' : '💾 Sauvegarder'}</span>
+                <span>{loading ? 'Enregistrement...' : 'Enregistrer'}</span>
               </button>
             </div>
           </form>
@@ -324,7 +324,7 @@ export default function EmplacementDetailsModal({
           <div style={{ marginTop: '1rem' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.2rem' }}>
               <div className="client-abo-card">
-                <span className="client-abo-label">Type de Support :</span>
+                <span className="client-abo-label">Type de support :</span>
                 <div className="client-abo-value" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
                   {emplacement.nom_type_support || emplacement.nom_type || 'N/A'}
                 </div>
@@ -336,13 +336,13 @@ export default function EmplacementDetailsModal({
                 </div>
               </div>
               <div className="client-abo-card">
-                <span className="client-abo-label">Zone Terminale :</span>
+                <span className="client-abo-label">Zone aéroportuaire :</span>
                 <div className="client-abo-value">
                   {emplacement.nom_zone || emplacement.nom_lieu || 'N/A'}
                 </div>
               </div>
               <div className="client-abo-card">
-                <span className="client-abo-label">Aéroport & Périmètre :</span>
+                <span className="client-abo-label">Aéroport et périmètre :</span>
                 <div className="client-abo-value">
                   {emplacement.nom_aeroport || 'Ivato'} ({emplacement.nom_perimetre || emplacement.type_zone || 'National'})
                 </div>
@@ -354,7 +354,7 @@ export default function EmplacementDetailsModal({
                 </div>
               </div>
               <div className="client-abo-card">
-                <span className="client-abo-label">Dernière Observation :</span>
+                <span className="client-abo-label">Dernière observation :</span>
                 <div className="client-abo-value" style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>
                   {emplacement.observation || 'Aucune observation'}
                 </div>

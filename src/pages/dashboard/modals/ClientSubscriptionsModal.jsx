@@ -57,14 +57,14 @@ export default function ClientSubscriptionsModal({ selectedClient, onClose, abon
           </button>
         </div>
 
-        {/* Barre de Filtre Multicritère */}
+        {/* Barre de recherche */}
         <div className="search-input-wrapper client-modal-search" style={{ margin: '1rem 0' }}>
           <Search size={16} className="search-icon" />
           <input
             type="text"
             className="search-input"
             style={{ paddingLeft: '2.5rem', borderRadius: '10px', width: '100%' }}
-            placeholder="Filtrer les contrats (Réf, Support, Campagne, Date)..."
+            placeholder="Filtrer les contrats (référence, support, campagne, date)..."
             value={clientSearchQuery}
             onChange={(e) => setClientSearchQuery(e.target.value)}
           />
@@ -79,11 +79,11 @@ export default function ClientSubscriptionsModal({ selectedClient, onClose, abon
           )}
         </div>
 
-        {/* Liste scrollable des Abonnements du Client */}
+        {/* Liste des contrats du client */}
         <div className="client-abos-list" style={{ maxHeight: '420px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
           {selectedClientAbos.length === 0 ? (
             <p className="empty-msg" style={{ padding: '2rem' }}>
-              Aucun abonnement trouvé pour ce client {clientSearchQuery ? `correspondant à « ${clientSearchQuery} »` : ''}.
+              Aucun contrat trouvé pour ce client{clientSearchQuery ? ` correspondant à « ${clientSearchQuery} »` : ''}.
             </p>
           ) : (
             selectedClientAbos.map((abo) => {
@@ -95,7 +95,7 @@ export default function ClientSubscriptionsModal({ selectedClient, onClose, abon
                 <div key={abo.reference || abo.id} className="client-abo-card" style={{ padding: '1rem', borderRadius: '10px', background: 'rgba(15, 23, 42, 0.65)', border: '1px solid var(--border-glass)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                     <span style={{ fontWeight: 800, color: 'var(--accent-primary)', fontSize: '1rem' }}>
-                      CONTRAT : {abo.reference || `#${abo.id}`}
+                      Contrat : {abo.reference || `#${abo.id}`}
                     </span>
                     <span className={`wireframe-badge ${statutStr.toLowerCase() === 'actif' ? 'badge-available' : 'badge-occupied'}`}>
                       {statutStr}
@@ -118,16 +118,16 @@ export default function ClientSubscriptionsModal({ selectedClient, onClose, abon
                     </div>
 
                     <div>
-                      <span className="client-abo-label">📅 Période Contractuelle :</span>
+                      <span className="client-abo-label">📅 Période contractuelle :</span>
                       <div className="client-abo-value">
                         Du {abo.date_debut ? new Date(abo.date_debut).toLocaleDateString('fr-FR') : '-'} au {abo.date_echeance || abo.date_fin ? new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR') : '-'}
                       </div>
                     </div>
 
                     <div>
-                      <span className="client-abo-label">👤 Commercial :</span>
+                      <span className="client-abo-label">👤 Commercial attitré :</span>
                       <div className="client-abo-value">
-                        {abo.nom_commercial || 'Admin / Direction'}
+                        {abo.nom_commercial || 'Direction commerciale'}
                       </div>
                     </div>
                   </div>

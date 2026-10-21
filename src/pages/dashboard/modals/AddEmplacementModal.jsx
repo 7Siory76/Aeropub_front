@@ -58,7 +58,7 @@ export default function AddEmplacementModal({
     setModalError('');
     const cleanRef = formData.reference.trim();
     if (!cleanRef) {
-      setModalError('Veuillez saisir une référence unique (ex: 4A3, NLB2, A2...).');
+      setModalError('Veuillez saisir une référence unique (ex. : 4A3, NLB2, A2...).');
       return;
     }
 
@@ -77,7 +77,7 @@ export default function AddEmplacementModal({
 
       onClose();
       if (onRefresh) onRefresh();
-      navigateWithFeedback('dashboard', 'emplacements', `Support "${cleanRef.toUpperCase()}" créé avec succès !`);
+      navigateWithFeedback('dashboard', 'emplacements', `Support « ${cleanRef.toUpperCase()} » créé avec succès !`);
     } catch (err) {
       const msg = sanitizeUserError(err, 'Erreur lors de la création du support. La référence existe peut-être déjà.');
       setModalError(msg);
@@ -93,15 +93,15 @@ export default function AddEmplacementModal({
         style={{ maxWidth: '620px', maxHeight: '90vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* En-tête de la Modale */}
+        {/* En-tête */}
         <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 className="client-modal-title" style={{ fontSize: '1.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <PlusCircle size={20} style={{ color: 'var(--accent-primary)' }} />
-              <span>Nouveau Support Publicitaire</span>
+              <span>Nouveau support publicitaire</span>
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-              Ajouter un espace publicitaire dans l'infrastructure aéroportuaire (base_v3.sql)
+              Ajouter un espace publicitaire dans l'infrastructure aéroportuaire
             </p>
           </div>
           <button type="button" className="close-btn" onClick={onClose}>
@@ -121,26 +121,26 @@ export default function AddEmplacementModal({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             {/* Référence */}
             <div className="modal-form-group">
-              <label className="modal-label">Référence (ex: NLB2, 4A2) * :</label>
+              <label className="modal-label">Référence (ex. : NLB2, 4A2) * :</label>
               <input
                 type="text"
                 required
                 className="modal-input"
-                placeholder="ex: NLB2"
+                placeholder="Ex. : NLB2"
                 value={formData.reference}
                 onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
               />
             </div>
 
-            {/* Type de Support */}
+            {/* Type de support */}
             <div className="modal-form-group">
-              <label className="modal-label">Type de Support :</label>
+              <label className="modal-label">Type de support :</label>
               <SearchableSelect
                 options={typeSupports}
                 value={formData.id_type}
                 onChange={(selectedTypeId) => setFormData(prev => ({ ...prev, id_type: selectedTypeId }))}
-                placeholder="-- Choisir un type de support --"
-                searchPlaceholder="Rechercher un type (Panneau, Caisson...)..."
+                placeholder="-- Sélectionner un type de support --"
+                searchPlaceholder="Rechercher un type (panneau, caisson...)..."
                 getOptionValue={(ts) => ts.id}
                 getOptionLabel={(ts) => ts.nom || ts.nom_type}
               />
@@ -155,21 +155,21 @@ export default function AddEmplacementModal({
                 options={categories}
                 value={formData.id_categorie}
                 onChange={(selectedCategorieId) => setFormData(prev => ({ ...prev, id_categorie: selectedCategorieId }))}
-                placeholder="-- Choisir une catégorie --"
+                placeholder="-- Sélectionner une catégorie --"
                 searchPlaceholder="Rechercher une catégorie..."
                 getOptionValue={(c) => c.id}
                 getOptionLabel={(c) => c.nom || c.nom_categorie}
               />
             </div>
 
-            {/* Zone Terminale */}
+            {/* Zone aéroportuaire */}
             <div className="modal-form-group">
-              <label className="modal-label">Zone Terminale :</label>
+              <label className="modal-label">Zone aéroportuaire :</label>
               <SearchableSelect
                 options={zones}
                 value={formData.id_zone}
                 onChange={(selectedZoneId) => setFormData(prev => ({ ...prev, id_zone: selectedZoneId }))}
-                placeholder="-- Choisir une zone terminale --"
+                placeholder="-- Sélectionner une zone --"
                 searchPlaceholder="Rechercher une zone, un aéroport..."
                 getOptionValue={(z) => z.id}
                 getOptionLabel={(z) => z.nom_zone || z.nom_lieu || z.type_zone}
@@ -184,7 +184,7 @@ export default function AddEmplacementModal({
             <input
               type="text"
               className="modal-input"
-              placeholder="ex: 1.60 x 2.40, 4x3 face route..."
+              placeholder="Ex. : 1,60 x 2,40 m, 4x3 face route..."
               value={formData.caracteristiques}
               onChange={(e) => setFormData({ ...formData, caracteristiques: e.target.value })}
             />
@@ -193,7 +193,7 @@ export default function AddEmplacementModal({
           {/* État initial & Observation */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '1.25rem' }}>
             <div className="modal-form-group">
-              <label className="modal-label">État Initial :</label>
+              <label className="modal-label">État initial :</label>
               <select
                 className="modal-select"
                 value={formData.etat}
@@ -218,11 +218,11 @@ export default function AddEmplacementModal({
               </select>
             </div>
             <div className="modal-form-group">
-              <label className="modal-label">Observation / Remarques :</label>
+              <label className="modal-label">Observations / Remarques :</label>
               <input
                 type="text"
                 className="modal-input"
-                placeholder="Optionnel..."
+                placeholder="Facultatif..."
                 value={formData.observation}
                 onChange={(e) => setFormData({ ...formData, observation: e.target.value })}
               />
@@ -253,7 +253,7 @@ export default function AddEmplacementModal({
               ) : (
                 <>
                   <Check size={16} />
-                  <span>Enregistrer le Support</span>
+                  <span>Enregistrer le support</span>
                 </>
               )}
             </button>

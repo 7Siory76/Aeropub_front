@@ -191,13 +191,13 @@ export default function PlanningPage() {
     return isNaN(dateObjet.getTime()) ? dateStr : dateObjet.toLocaleDateString('fr-FR');
   };
 
-  //ASSOSIATION UN REF A UN ABONNEMENT PAS ENCORE CONFIRMER
-  //1 Normalisation de la date cible sélectionnée à midi (évite les décalages de fuseau horaire)
+  // Association d'un support à un abonnement en attente
+  // 1. Normalisation de la date cible sélectionnée à midi (évite les décalages de fuseau horaire)
   const targetTime = new Date(selectedDate + 'T12:00:00').getTime();
 
-  //2 Filtrage des abonnements éligibles
+  // 2. Filtrage des abonnements éligibles
   const eligibleAbonnements = abonnements.filter((abo) => {
-    // A. Vérification du statut : PAS "actif", "archivé", "résilié" ou "annulé"
+    // Statut : exclure les abonnements actifs, archivés, résiliés ou annulés
     const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
     const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -207,30 +207,28 @@ export default function PlanningPage() {
       cleanSt.includes('resili') || 
       cleanSt.includes('annul')
     ) {
-      return false; // On élimine les abonnements actifs, archivés ou résiliés
+      return false;
     }
-    // B. Vérification de la date : la date doit être comprise entre date_debut et date_fin / date_echeance
+    // Date : la date doit être comprise entre date_debut et date_fin / date_echeance
     const startStr = String(abo.date_debut || '').trim().replace(' ', 'T');
     const endStr = String(abo.date_fin || abo.date_echeance || '').trim().replace(' ', 'T');
     const startTime = new Date(startStr).getTime();
     const endTime = new Date(endStr).getTime();
-    // Si l'une des dates est invalide, on l'ignore
     if (isNaN(startTime) || isNaN(endTime)) return false;
-    // La date du planning doit être comprise dans la période de l'abonnement
     return targetTime >= startTime && targetTime <= endTime;
   });
 
   return (
     <>
-      {/* En-tête Héroïque Multi-Pages avec Titre Précis */}
+      {/* En-tête */}
       <section className="hero-container planning-hero-banner">
         <div className="hero-badge-platform">
           <Plane size={14} className="hero-badge-icon" />
-          <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
+          <span>Plateforme d'affichage publicitaire aéroportuaire</span>
         </div>
 
         <h1 className="hero-title">
-          <span className="hero-title-main">Planning d'Occupation &amp; Disponibilité des Supports</span>
+          <span className="hero-title-main">Planning d'occupation et disponibilité des supports</span>
         </h1>
 
         <p className="hero-subtitle">
@@ -239,11 +237,11 @@ export default function PlanningPage() {
       </section>
 
       <section className="glass-panel planning-container">
-      {/* 1. BARRE SUPÉRIEURE : DATE ET BOUTON GLOBAL CHANGER LES EMPLACEMENTS */}
+      {/* Sélecteur de date et action globale */}
       <div className="planning-header-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div className="planning-header-center" style={{ margin: 0 }}>
           <div className="date-picker-box">
-            <span className="date-label">DATE :</span>
+            <span className="date-label">Date :</span>
             <input
               type="date"
               className="date-input-field"
@@ -266,25 +264,25 @@ export default function PlanningPage() {
         </button>
       </div>
 
-      {/* 2. NAVIGATION AÉROPORT : [ ◀ ] Aéroport : [Nom] [ ▶ ] */}
+      {/* Navigation aéroport : [ ◀ ] Aéroport : [Nom] [ ▶ ] */}
       <div className="nav-carousel-row">
-        <button onClick={handlePrevAero} className="carousel-arrow-btn" title="Aéroport Précédent">
+        <button onClick={handlePrevAero} className="carousel-arrow-btn" title="Aéroport précédent">
           <ChevronLeft size={22} />
         </button>
 
         <div className="carousel-title-box">
           <span className="carousel-prefix">Aéroport :</span>
-          <span className="carousel-value-text">{currentAero?.nom || 'Aucun Aéroport'}</span>
+          <span className="carousel-value-text">{currentAero?.nom || 'Aucun aéroport'}</span>
         </div>
 
-        <button onClick={handleNextAero} className="carousel-arrow-btn" title="Aéroport Suivant">
+        <button onClick={handleNextAero} className="carousel-arrow-btn" title="Aéroport suivant">
           <ChevronRight size={22} />
         </button>
       </div>
 
-      {/* 3. NAVIGATION ZONE : [ ◀ ] Zone : [Nom] [ ▶ ] */}
+      {/* Navigation zone : [ ◀ ] Zone : [Nom] [ ▶ ] */}
       <div className="nav-carousel-row nav-carousel-sub">
-        <button onClick={handlePrevZone} className="carousel-arrow-btn" title="Zone Précédente">
+        <button onClick={handlePrevZone} className="carousel-arrow-btn" title="Zone précédente">
           <ChevronLeft size={20} />
         </button>
 
@@ -295,16 +293,16 @@ export default function PlanningPage() {
               currentZone.nom_perimetre
                 ? `${currentZone.nom_zone} (${currentZone.nom_perimetre})`
                 : (currentZone.nom_zone || currentZone.nom_lieu || 'Zone')
-            ) : 'Aucune Zone'}
+            ) : 'Aucune zone'}
           </span>
         </div>
 
-        <button onClick={handleNextZone} className="carousel-arrow-btn" title="Zone Suivante">
+        <button onClick={handleNextZone} className="carousel-arrow-btn" title="Zone suivante">
           <ChevronRight size={20} />
         </button>
       </div>
 
-      {/* 4. GRAND CADRE DE CONTENU AVEC CARTES D'EMPLACEMENT ROTATIVES (3D FLIP) */}
+      {/* Grille des supports avec cartes rotatives (3D) */}
       <div className="planning-main-frame">
         {loading ? (
           <p className="empty-msg">Chargement des emplacements et abonnements...</p>
@@ -322,14 +320,14 @@ export default function PlanningPage() {
               return (
                 <div key={emp.reference} className="flip-card-container">
                   <div className={`flip-card-inner ${isFlipped ? 'is-flipped' : ''}`}>
-                    {/* FACE AVANT (RECTO) - STATUT ET ABONNEMENT */}
+                    {/* Recto : Statut et contrat */}
                     <div className={`wireframe-card flip-card-front ${isOccupied ? 'card-status-occupied' : 'card-status-available'}`}>
                       <div className="wireframe-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>REF : {emp.reference}</span>
+                        <span>Réf. : {emp.reference}</span>
                         <button
                           onClick={() => toggleFlip(emp.reference)}
                           className="flip-icon-btn"
-                          title="Retourner la carte pour voir le Type de Support, le Format et la Catégorie"
+                          title="Retourner la carte pour voir les caractéristiques techniques"
                         >
                           <RotateCw size={15} />
                         </button>
@@ -338,7 +336,7 @@ export default function PlanningPage() {
                       <div className="wireframe-status-badge-container">
                         {isOccupied ? (
                           <span className="wireframe-badge badge-occupied">
-                            <XCircle size={14} /> (RESERVÉ)
+                            <XCircle size={14} /> (RÉSERVÉ)
                           </span>
                         ) : (
                           <span className="wireframe-badge badge-available">
@@ -354,7 +352,7 @@ export default function PlanningPage() {
                           </div>
 
                           <div className="wireframe-info-row">
-                            <strong>Du :</strong> {formatDateFr(activeSub.date_debut)} <strong>jusqu'au</strong> {formatDateFr(activeSub.date_fin || activeSub.date_echeance)}
+                            <strong>Du :</strong> {formatDateFr(activeSub.date_debut)} <strong>au</strong> {formatDateFr(activeSub.date_fin || activeSub.date_echeance)}
                           </div>
 
                           {activeSub.secteur_activite && (
@@ -379,14 +377,14 @@ export default function PlanningPage() {
                             className="wireframe-action-btn"
                           >
                             <PlusCircle size={16} />
-                            <span>Associer à un abonnement pas encore actif</span>
+                            <span>Associer à un contrat en attente</span>
                           </button>
                           <button
                             onClick={() => openAssociateModal(emp)}
                             className="wireframe-action-btn"
                           >
                             <PlusCircle size={16} />
-                            <span>Associer un nouveau Abonnement</span>
+                            <span>Associer un nouveau contrat</span>
                           </button>
                         </div>
                       )}
@@ -397,18 +395,18 @@ export default function PlanningPage() {
                         className="flip-toggle-link"
                       >
                         <RotateCw size={13} />
-                        <span>Voir détails (Type Support, Format, Catégorie)</span>
+                        <span>Voir les détails (type, format, catégorie)</span>
                       </button>
                     </div>
 
-                    {/* FACE ARRIÈRE (VERSO) - TYPE SUPPORT, FORMAT ET CATÉGORIE */}
+                    {/* Verso : Caractéristiques techniques */}
                     <div className="wireframe-card flip-card-back">
                       <div className="wireframe-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>REF : {emp.reference}</span>
+                        <span>Réf. : {emp.reference}</span>
                         <button
                           onClick={() => toggleFlip(emp.reference)}
                           className="flip-icon-btn"
-                          title="Retourner au statut d'abonnement"
+                          title="Retourner au statut du contrat"
                         >
                           <RotateCw size={15} />
                         </button>
@@ -418,10 +416,10 @@ export default function PlanningPage() {
                         <div className="wireframe-info-row" style={{ marginBottom: '0.75rem' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                             <Layers size={15} style={{ color: '#6366f1' }} />
-                            <strong>Type de Support :</strong>
+                            <strong>Type de support :</strong>
                           </span>
                           <div style={{ paddingLeft: '1.4rem', color: 'var(--text-main)', fontWeight: 700 }}>
-                            {emp.nom_type_support || 'Support Standard'}
+                            {emp.nom_type_support || 'Support standard'}
                           </div>
                         </div>
 
@@ -462,7 +460,7 @@ export default function PlanningPage() {
         )}
       </div>
 
-      {/* MODAL : Associer un nouveau Abonnement */}
+      {/* Modale : associer un nouveau contrat */}
       {showAboModal && targetEmp && (
         <AssociateAbonnementModal
           targetEmp={targetEmp}
@@ -474,7 +472,7 @@ export default function PlanningPage() {
         />
       )}
 
-      {/* MODAL : Changer les Emplacements (Kanban Drag & Drop 2 Colonnes) */}
+      {/* Modale : réaffectation des emplacements */}
       {showChangeModal && (
         <ChangeEmplacementModal
           aeroports={aeroports}
@@ -485,7 +483,7 @@ export default function PlanningPage() {
         />
       )}
 
-      {/* MODAL : Associer à un abonnement existant pas encore actif */}
+      {/* Modale : associer à un contrat en attente */}
       {showExistingAboModal && targetEmp && (
         <AssociateExistingAbonnementModal
           targetEmp={targetEmp}

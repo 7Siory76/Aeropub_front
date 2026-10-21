@@ -123,7 +123,7 @@ export default function TauxOccupationWidget({
               Taux d'occupation des supports
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Rapport supports actifs / capacité totale
+              Rapport supports occupés / capacité totale
             </span>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function TauxOccupationWidget({
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
             <span>Occupés : <strong style={{ color: '#fff' }}>{statsOccupation.occupesCount}</strong></span>
             <span>Disponibles : <strong style={{ color: '#10b981' }}>{statsOccupation.disponiblesCount}</strong></span>
-            <span>Total : <strong>{statsOccupation.totalSupports}</strong></span>
+            <span>Capacité totale : <strong>{statsOccupation.totalSupports}</strong></span>
           </div>
         </div>
       </div>

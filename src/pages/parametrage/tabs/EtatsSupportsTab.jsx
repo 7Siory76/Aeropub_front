@@ -158,22 +158,22 @@ export default function EtatsSupportsTab({ onCountChange }) {
       <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1.5rem', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.06)', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <PlusCircle size={18} style={{ color: '#3b82f6' }} />
-          Ajouter un Nouvel État de Support
+          Ajouter un nouvel état de support
         </h3>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-          Définit les états techniques et d'occupation possibles pour les supports publicitaires (ex: disponible, réservé, occupé, en maintenance, archivé).
+          Définit les états techniques et d'occupation possibles pour les supports publicitaires (ex. : disponible, réservé, occupé, en maintenance, archivé).
         </p>
 
         <form onSubmit={handleCreateEtat} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem', alignItems: 'end', maxWidth: '600px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-              Nom de l'état (ex: en rénovation) :
+              Nom de l'état (ex. : en rénovation) :
             </label>
             <input
               type="text"
               className="search-input"
               style={{ borderRadius: '10px', padding: '0.65rem 0.9rem' }}
-              placeholder="ex: en rénovation"
+              placeholder="Ex. : en rénovation"
               value={newNomEtat}
               onChange={(e) => setNewNomEtat(e.target.value)}
             />
@@ -194,7 +194,7 @@ export default function EtatsSupportsTab({ onCountChange }) {
               ) : (
                 <>
                   <PlusCircle size={16} />
-                  <span>Ajouter État</span>
+                  <span>Ajouter l'état</span>
                 </>
               )}
             </button>
@@ -249,9 +249,9 @@ export default function EtatsSupportsTab({ onCountChange }) {
                     ID {renderSortIcon('id')}
                   </th>
                   <th className="table-head-cell sortable" onClick={() => handleSort('nom_etat')} style={{ cursor: 'pointer' }}>
-                    Nom de l'État (Référentiel) {renderSortIcon('nom_etat')}
+                    Nom de l'état (référentiel) {renderSortIcon('nom_etat')}
                   </th>
-                  <th className="table-head-cell">Aperçu du Badge</th>
+                  <th className="table-head-cell">Aperçu du badge</th>
                   <th className="table-head-cell" style={{ textAlign: 'right', width: '150px' }}>Actions</th>
                 </tr>
               </thead>

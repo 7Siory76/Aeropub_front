@@ -40,7 +40,7 @@ export default function App() {
   const [kpiFilter, setKpiFilter] = useState(null);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Enregistrer le gestionnaire de navigation pour les redirections logiques
+  // Redirections internes
   useEffect(() => {
     registerNavigationHandler((page, tab) => {
       if (page) setActivePage(page);
@@ -48,18 +48,18 @@ export default function App() {
     });
   }, [registerNavigationHandler]);
 
-  // État du thème Nuit (dark) ou Jour (light)
+  // Thème sombre ou clair
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('aeropub_theme') || 'dark';
   });
 
-  // Appliquer l'attribut data-theme à l'élément <html>
+  // Applique data-theme sur l'élément racine
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('aeropub_theme', theme);
   }, [theme]);
 
-  // Mise à jour dynamique du titre du document (<title>) pour chaque page et recherche
+  // Titre dynamique de l'onglet du navigateur
   useEffect(() => {
     if (!user) {
       document.title = "AeroPub | Plateforme d'Affichage & Publicités Aéroportuaires — Connexion Sécurisée";
@@ -116,15 +116,15 @@ export default function App() {
     setRefreshKey(prev => prev + 1);
   };
 
-  // Pour enregistrer ou l utilisateur est
+  // Synchronise la page active avec l'URL et le localStorage
   useEffect(() => {
     if (!activePage) return;
 
-    // 1. Sauvegarder dans localStorage
+    // Sauvegarde locale
     localStorage.setItem('aeropub_last_page', activePage);
     if (activeTab) localStorage.setItem('aeropub_last_tab', activeTab);
 
-    // 2. Mettre à jour l'URL sans recharger la page
+    // Synchronisation de l'URL
     const newHash = activePage === 'dashboard'
       ? `#/dashboard/${activeTab}`
       : `#/${activePage}`;
@@ -134,7 +134,7 @@ export default function App() {
     }
   }, [activePage, activeTab]);
 
-  // quand on fait precedant et suivant dans l url
+  // Gestion de l'historique de navigation
   useEffect(() => {
     const handleHashChange = () => {
       const { page, tab } = parseHash();
@@ -153,7 +153,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* 1. Navbar latérale gauche avec poche accordéon pour les tables CRUD */}
+      {/* Barre latérale de navigation */}
       <Sidebar
         activePage={activePage}
         setActivePage={(page) => {
@@ -174,7 +174,7 @@ export default function App() {
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
-      {/* Arrière-plan flou sombre sur mobile quand la Sidebar est ouverte (comme Facebook) */}
+      {/* Fond sombre sur mobile */}
       {isMobileSidebarOpen && (
         <div
           className="sidebar-mobile-backdrop"
@@ -182,7 +182,7 @@ export default function App() {
         />
       )}
 
-      {/* Bouton Flottant d'accès immédiat à la Sidebar sur Smartphone */}
+      {/* Menu mobile */}
       {!isMobileSidebarOpen && (
         <button
           type="button"
@@ -196,7 +196,7 @@ export default function App() {
         </button>
       )}
 
-      {/* 2. Zone Principale (Header supérieur + Contenu de page + Footer) */}
+      {/* Zone principale */}
       <div className="app-main-wrapper">
         <Header
           isBackendOnline={isBackendOnline}
@@ -209,11 +209,9 @@ export default function App() {
         />
 
         <main className="main-content">
-          {/* Bannière de feedback discrète globale */}
           <DiscreetBanner feedback={feedback} onDismiss={clearFeedback} />
 
           {activePage === 'kpis' ? (
-            /* Nouvelle Page Dédiée : KPI & Statistiques de Pilotage */
             <KpiStatsPage
               key={refreshKey}
               onNavigateToAbonnements={(filterKey) => {
@@ -223,7 +221,6 @@ export default function App() {
               }}
             />
           ) : activePage === 'dashboard' ? (
-            /* Tableau de Bord Général AeroPub (avec recherche & HeroBanner) */
             <DashboardPage
               key={refreshKey}
               searchQuery={searchQuery}
@@ -235,21 +232,19 @@ export default function App() {
               onClearKpiFilter={() => setKpiFilter(null)}
             />
           ) : activePage === 'planning' ? (
-            /* Page de Planning & Occupation des Emplacements par Zone */
             <PlanningPage key={refreshKey} />
           ) : activePage === 'import' ? (
             <ImportPage
               onImportSuccess={handleRefresh}
             />
           ) : (activePage === 'settings' || activePage === 'audit') ? (
-            /* Module 5 : Administration & Paramétrage (Strictement réservé à Admin) */
             hasRole(user, ['Admin']) ? (
               <ParametragePage key={`${refreshKey}-${activePage}`} initialTab={activePage === 'audit' ? 'audit' : 'params'} />
             ) : (
               <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', margin: '2rem auto', maxWidth: '600px', borderRadius: '16px' }}>
-                <h3 style={{ color: '#ef4444', fontSize: '1.4rem', marginBottom: '0.75rem' }}>⛔ Accès Refusé</h3>
+                <h3 style={{ color: '#ef4444', fontSize: '1.4rem', marginBottom: '0.75rem' }}>⛔ Accès refusé</h3>
                 <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                  Le module <strong>Administration & Paramétrage</strong> est strictement réservé aux utilisateurs ayant le rôle <strong>Administrateur</strong>.
+                  Le module <strong>Administration & Paramétrage</strong> est réservé aux utilisateurs ayant le rôle <strong>Administrateur</strong>.
                 </p>
                 <button
                   type="button"
@@ -257,7 +252,7 @@ export default function App() {
                   onClick={() => setActivePage('planning')}
                   style={{ padding: '0.65rem 1.5rem', borderRadius: '8px' }}
                 >
-                  Retourner au Planning
+                  Retourner au planning
                 </button>
               </div>
             )

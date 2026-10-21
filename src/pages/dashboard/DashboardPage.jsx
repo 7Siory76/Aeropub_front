@@ -148,7 +148,7 @@ export default function DashboardPage({
         {loading ? (
           <div className="loading-container">
             <Loader2 size={32} className="spinner-icon" />
-            <p className="dashboard-desc" style={{ marginTop: '0.75rem' }}>Chargement des données PostgreSQL base_v3...</p>
+            <p className="dashboard-desc" style={{ marginTop: '0.75rem' }}>Chargement des données...</p>
           </div>
         ) : (
           <div>
@@ -226,9 +226,9 @@ export default function DashboardPage({
                 />
               ) : (
                 <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', color: '#f87171' }}>
-                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>🛡️ Accès réservé aux Administrateurs</h3>
+                  <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>🛡️ Accès réservé aux administrateurs</h3>
                   <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                    Seuls les comptes avec le rôle Administrateur ont l'autorisation de consulter et gérer les utilisateurs, rôles et mots de passe.
+                    Seuls les comptes disposant du rôle Administrateur peuvent consulter et gérer les utilisateurs et leurs accès.
                   </p>
                 </div>
               )
@@ -244,7 +244,7 @@ export default function DashboardPage({
           </div>
         )}
 
-        {/* Modale de consultation des abonnements d'un client */}
+        {/* Modale des abonnements client */}
         {selectedClientModal && (
           <ClientSubscriptionsModal
             selectedClient={selectedClientModal}
@@ -253,7 +253,7 @@ export default function DashboardPage({
           />
         )}
 
-        {/* Modale de consultation et modification d'un emplacement / support */}
+        {/* Modale de détail du support */}
         {selectedEmplacementModal && (
           <EmplacementDetailsModal
             emplacement={selectedEmplacementModal}
@@ -267,7 +267,7 @@ export default function DashboardPage({
           />
         )}
 
-        {/* Modale d'ajout d'un nouvel emplacement / support */}
+        {/* Modale de création d'un support */}
         {showAddEmplacementModal && (
           <AddEmplacementModal
             onClose={() => setShowAddEmplacementModal(false)}

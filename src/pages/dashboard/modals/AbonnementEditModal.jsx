@@ -183,19 +183,19 @@ export default function AbonnementEditModal({
   // Charger les listes nécessaires si non passées en props
   useEffect(() => {
     if (emplacements?.length) setAvailableEmplacements(emplacements);
-    else emplacementsApi.getAll().then(data => setAvailableEmplacements(data || [])).catch(() => {});
+    else emplacementsApi.getAll().then(data => setAvailableEmplacements(data || [])).catch(() => { });
 
     if (allAbonnements?.length) setAbonnementsList(allAbonnements);
-    else abonnementsApi.getAll().then(data => setAbonnementsList(data || [])).catch(() => {});
+    else abonnementsApi.getAll().then(data => setAbonnementsList(data || [])).catch(() => { });
 
     if (clients?.length) setClientsList(clients);
-    else clientsApi.getAll().then(data => setClientsList(data || [])).catch(() => {});
+    else clientsApi.getAll().then(data => setClientsList(data || [])).catch(() => { });
 
     if (utilisateurs?.length) setCommercialsList(utilisateurs);
-    else utilisateursApi.getAll().then(data => setCommercialsList(data || [])).catch(() => {});
+    else utilisateursApi.getAll().then(data => setCommercialsList(data || [])).catch(() => { });
 
     if (typeStatut?.length) setTypeStatutList(typeStatut);
-    else typeStatutAbonnementApi.getAll().then(data => setTypeStatutList(data || [])).catch(() => {});
+    else typeStatutAbonnementApi.getAll().then(data => setTypeStatutList(data || [])).catch(() => { });
   }, [emplacements, allAbonnements, clients, utilisateurs, typeStatut]);
 
   if (!abonnement) return null;
@@ -371,11 +371,11 @@ export default function AbonnementEditModal({
         style={{ maxWidth: '840px', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* En-tête de la modale d'édition */}
+        {/* En-tête */}
         <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 className="client-modal-title" style={{ fontSize: '1.35rem' }}>
-              ✏️ Modifier le Contrat : {abonnement.reference || `#${abonnement.id}`}
+              ✏️ Modifier le contrat : {abonnement.reference || `#${abonnement.id}`}
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
               Client : <strong>{abonnement.raison_sociale || abonnement.nom_client || 'Client standard'}</strong>
@@ -395,10 +395,10 @@ export default function AbonnementEditModal({
 
         <form onSubmit={handleSaveUpdate} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem', marginTop: '1.2rem' }}>
 
-          {/* Ligne 1 : Client & Commercial */}
+          {/* Client et commercial */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.9rem' }}>
             <div className="modal-form-group">
-              <label className="modal-label">Client (Raison Sociale) :</label>
+              <label className="modal-label">Client (raison sociale) :</label>
               <SearchableSelect
                 options={clientsList}
                 value={formData.id_client}
@@ -413,7 +413,7 @@ export default function AbonnementEditModal({
             </div>
 
             <div className="modal-form-group">
-              <label className="modal-label">Commercial Attitré :</label>
+              <label className="modal-label">Commercial attitré :</label>
               <SearchableSelect
                 options={commercialsList}
                 value={formData.id_commercial}
@@ -562,7 +562,7 @@ export default function AbonnementEditModal({
             )}
           </div>
 
-          {/* Ligne 3 : Tarif, Devise & Périodicité */}
+          {/* Tarif, devise et périodicité */}
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 2fr', gap: '0.8rem' }}>
             <div className="modal-form-group">
               <label className="modal-label">Tarif :</label>
@@ -602,7 +602,7 @@ export default function AbonnementEditModal({
             </div>
           </div>
 
-          {/* Sélecteur de durée du contrat */}
+          {/* Durée du contrat */}
           <div style={{ marginBottom: '0.8rem', background: 'rgba(255, 255, 255, 0.02)', padding: '0.7rem', borderRadius: '8px', border: '1px solid var(--border-glass)' }}>
             <label className="modal-label" style={{ marginBottom: '0.35rem', color: '#06b6d4', fontWeight: 600 }}>
               ⏱️ Durée du contrat :
@@ -632,7 +632,7 @@ export default function AbonnementEditModal({
             </div>
           </div>
 
-          {/* Ligne 4 : Date Début et Date Échéance */}
+          {/* Date de début et d'échéance */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
             <div className="modal-form-group">
               <label className="modal-label">Date de début :</label>
@@ -644,7 +644,7 @@ export default function AbonnementEditModal({
               />
             </div>
             <div className="modal-form-group">
-              <label className="modal-label">Date d'échéance (Calculée) :</label>
+              <label className="modal-label">Date d'échéance (calculée) :</label>
               <input
                 type="date"
                 className="modal-input"
@@ -654,7 +654,7 @@ export default function AbonnementEditModal({
             </div>
           </div>
 
-          {/* Ligne 5 : Statut */}
+          {/* Statut */}
           <div className="modal-form-group">
             <label className="modal-label">Statut du contrat :</label>
             <select
@@ -687,7 +687,7 @@ export default function AbonnementEditModal({
             </select>
           </div>
 
-          {/* Ligne 6 : Préavis & Reconduction tacite */}
+          {/* Préavis et reconduction tacite */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', alignItems: 'center' }}>
             <div className="modal-form-group">
               <label className="modal-label">Préavis de résiliation (en jours) :</label>
@@ -714,10 +714,10 @@ export default function AbonnementEditModal({
             </div>
           </div>
 
-          {/* Ligne 7 : Contrat Précédent & Motif de non-renouvellement */}
+          {/* Contrat précédent et motif de non-renouvellement */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
             <div className="modal-form-group">
-              <label className="modal-label">Contrat précédent (Remplacement/Avenant) :</label>
+              <label className="modal-label">Contrat précédent (remplacement ou avenant) :</label>
               <SearchableSelect
                 options={abonnementsList.filter(a => a.reference !== abonnement.reference)}
                 value={formData.id_abonnement_precedent}
@@ -742,10 +742,10 @@ export default function AbonnementEditModal({
             </div>
           </div>
 
-          {/* Documents & Pièces Jointes en mode Édition */}
+          {/* Documents joints */}
           <AbonnementDocuments referenceAbonnement={abonnement.reference} />
 
-          {/* Pied du formulaire : Boutons */}
+          {/* Actions */}
           <div className="modal-footer" style={{ marginTop: '0.5rem' }}>
             <button
               type="button"
@@ -762,7 +762,7 @@ export default function AbonnementEditModal({
               style={{ padding: '0.65rem 1.4rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
             >
               {loading && <Loader2 size={15} className="btn-spinner" />}
-              <span>{loading ? 'Enregistrement...' : '💾 Sauvegarder'}</span>
+              <span>{loading ? 'Enregistrement...' : 'Sauvegarder'}</span>
             </button>
           </div>
         </form>

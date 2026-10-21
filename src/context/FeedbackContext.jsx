@@ -71,7 +71,7 @@ export function FeedbackProvider({ children }) {
       message: userMessage,
       id: Date.now()
     });
-    // Les erreurs restent affichées un peu plus longtemps (7s) pour être lues calmement
+    // Délai étendu pour les erreurs (7 s)
     setAutoDismiss(7000);
   }, [setAutoDismiss, scrollToTop]);
 
@@ -85,16 +85,12 @@ export function FeedbackProvider({ children }) {
     if (autoDismiss) setAutoDismiss(4000);
   }, [setAutoDismiss, scrollToTop]);
 
-  /**
-   * Enregistre la fonction de navigation interne de l'application
-   */
+  // Enregistre le gestionnaire de navigation
   const registerNavigationHandler = useCallback((handler) => {
     navigationHandlerRef.current = handler;
   }, []);
 
-  /**
-   * Redirige vers la page / onglet logique avec message de succès ou d'erreur
-   */
+  // Redirige avec un message de notification
   const navigateWithFeedback = useCallback((page, tab, feedbackObj) => {
     if (navigationHandlerRef.current) {
       navigationHandlerRef.current(page, tab);
@@ -128,7 +124,7 @@ export function FeedbackProvider({ children }) {
 export function useFeedback() {
   const context = useContext(FeedbackContext);
   if (!context) {
-    // Repli de secours pour éviter tout crash si un composant l'utilise hors provider
+    // Valeur par défaut hors provider
     return {
       feedback: null,
       showSuccess: () => {},

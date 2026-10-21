@@ -115,7 +115,7 @@ export default function AddClientModal({ onClose, onRefresh }) {
           <div>
             <h3 className="client-modal-title" style={{ fontSize: '1.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <UserPlus size={22} style={{ color: 'var(--accent-primary)' }} />
-              <span>Nouveau Client Partenaire</span>
+              <span>Nouveau client partenaire</span>
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
               Ajouter une nouvelle entreprise ou annonceur publicitaire
@@ -133,23 +133,23 @@ export default function AddClientModal({ onClose, onRefresh }) {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', marginTop: '1.25rem' }}>
-          {/* Raison Sociale */}
+          {/* Raison sociale */}
           <div className="modal-form-group">
             <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <Building2 size={15} style={{ color: 'var(--accent-primary)' }} />
-              <span>Raison Sociale / Nom de l'Entreprise * :</span>
+              <span>Raison sociale / Nom de l'entreprise * :</span>
             </label>
             <input
               type="text"
               required
               className="modal-input"
-              placeholder="ex: Orange Madagascar, Air France, Telma..."
+              placeholder="Ex. : Orange Madagascar, Air France, Telma..."
               value={formData.raison_sociale}
               onChange={(e) => setFormData({ ...formData, raison_sociale: e.target.value })}
             />
           </div>
 
-          {/* Section Contacts Multiples avec Type (Téléphone, Mail, WhatsApp, etc.) */}
+          {/* Contacts multiples */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             padding: '1rem',
@@ -163,10 +163,10 @@ export default function AddClientModal({ onClose, onRefresh }) {
               <div>
                 <label className="modal-label" style={{ fontWeight: 600, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.15rem' }}>
                   <Users size={16} />
-                  <span>Contacts de l'Entreprise ({contacts.length})</span>
+                  <span>Contacts de l'entreprise ({contacts.length})</span>
                 </label>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  Sélectionnez le canal (Téléphone, Mail, WhatsApp...), indiquez le libellé et la valeur. Cochez le contact principal.
+                  Sélectionnez le canal (téléphone, courriel, WhatsApp...), indiquez le libellé et la valeur. Cochez le contact principal.
                 </p>
               </div>
               <button
@@ -291,31 +291,31 @@ export default function AddClientModal({ onClose, onRefresh }) {
             <div className="modal-form-group">
               <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <MapPin size={14} style={{ color: 'var(--text-muted)' }} />
-                <span>Adresse Postale / Siège :</span>
+                <span>Adresse postale / Siège :</span>
               </label>
               <input
                 type="text"
                 className="modal-input"
-                placeholder="ex: Ankorondrano, Antananarivo"
+                placeholder="Ex. : Ankorondrano, Antananarivo"
                 value={formData.adresse_postale}
                 onChange={(e) => setFormData({ ...formData, adresse_postale: e.target.value })}
               />
             </div>
             <div className="modal-form-group">
-              <label className="modal-label">Adresse Facturation :</label>
+              <label className="modal-label">Adresse de facturation :</label>
               <input
                 type="text"
                 className="modal-input"
-                placeholder="ex: BP 1234, Antananarivo 101"
+                placeholder="Ex. : BP 1234, Antananarivo 101"
                 value={formData.adresse_facturation}
                 onChange={(e) => setFormData({ ...formData, adresse_facturation: e.target.value })}
               />
             </div>
           </div>
 
-          {/* Statut Initial */}
+          {/* Statut initial */}
           <div className="modal-form-group">
-            <label className="modal-label">Statut Initial :</label>
+            <label className="modal-label">Statut initial :</label>
             <select
               className="modal-select"
               value={formData.etat_client}
@@ -327,7 +327,7 @@ export default function AddClientModal({ onClose, onRefresh }) {
             </select>
           </div>
 
-          {/* Boutons d'action */}
+          {/* Actions */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
             <button
               type="button"
@@ -351,7 +351,7 @@ export default function AddClientModal({ onClose, onRefresh }) {
               ) : (
                 <>
                   <Check size={16} />
-                  <span>Créer le Client</span>
+                  <span>Créer le client</span>
                 </>
               )}
             </button>

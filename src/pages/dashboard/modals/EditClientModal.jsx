@@ -171,7 +171,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
           <div>
             <h3 className="client-modal-title" style={{ fontSize: '1.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Edit3 size={22} style={{ color: 'var(--accent-primary)' }} />
-              <span>Modifier le Client #{client.id}</span>
+              <span>Modifier le client #{client.id}</span>
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
               Mettre à jour les coordonnées et le statut de l'entreprise
@@ -189,11 +189,11 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', marginTop: '1.25rem' }}>
-          {/* Raison Sociale */}
+          {/* Raison sociale */}
           <div className="modal-form-group">
             <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <Building2 size={15} style={{ color: 'var(--accent-primary)' }} />
-              <span>Raison Sociale / Nom de l'Entreprise * :</span>
+              <span>Raison sociale ou nom de l'entreprise * :</span>
             </label>
             <input
               type="text"
@@ -204,7 +204,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
             />
           </div>
 
-          {/* Section Contacts Multiples avec Type (Téléphone, Mail, WhatsApp, etc.) */}
+          {/* Contacts multiples */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             padding: '1rem',
@@ -218,10 +218,10 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
               <div>
                 <label className="modal-label" style={{ fontWeight: 600, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.15rem' }}>
                   <Users size={16} />
-                  <span>Contacts de l'Entreprise ({contacts.length})</span>
+                  <span>Contacts de l'entreprise ({contacts.length})</span>
                 </label>
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  Gérez les coordonnées du client (Téléphone, Mail, WhatsApp...). Définissez le contact principal.
+                  Gérez les coordonnées du client (téléphone, courriel, WhatsApp...). Définissez le contact principal.
                 </p>
               </div>
               <button
@@ -241,7 +241,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
                 }}
               >
                 <Plus size={14} />
-                <span>Ajouter contact</span>
+                <span>Ajouter un contact</span>
               </button>
             </div>
 
@@ -280,7 +280,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
                     type="text"
                     className="modal-input"
                     style={{ padding: '0.42rem 0.55rem', fontSize: '0.84rem' }}
-                    placeholder={c.type === 'Email' ? "Nom (ou vide pour 'email')" : "Nom/Rôle (ex: Direction)"}
+                    placeholder={c.type === 'Email' ? "Nom (ou vide pour 'courriel')" : "Nom ou fonction (ex. : Direction)"}
                     value={c.nom_contact}
                     onChange={(e) => handleContactChange(c.id, 'nom_contact', e.target.value)}
                   />
@@ -346,7 +346,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
             <div className="modal-form-group">
               <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <MapPin size={14} style={{ color: 'var(--text-muted)' }} />
-                <span>Adresse Postale / Siège :</span>
+                <span>Adresse postale / Siège :</span>
               </label>
               <input
                 type="text"
@@ -356,7 +356,7 @@ export default function EditClientModal({ client, onClose, onRefresh }) {
               />
             </div>
             <div className="modal-form-group">
-              <label className="modal-label">Adresse Facturation :</label>
+              <label className="modal-label">Adresse de facturation :</label>
               <input
                 type="text"
                 className="modal-input"

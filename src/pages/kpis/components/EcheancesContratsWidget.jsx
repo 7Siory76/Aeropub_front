@@ -67,7 +67,7 @@ export default function EcheancesContratsWidget({
           fontSize: '0.78rem',
           fontWeight: 700
         }}>
-          {echeances.total} total
+          {echeances.total} au total
         </span>
       </div>
 

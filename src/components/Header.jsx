@@ -21,7 +21,7 @@ export default function Header({
     emplacements: 'Supports & Emplacements',
     abonnements: 'Abonnements & Contrats',
     clients: 'Clients & Contacts',
-    typesupports: 'Types de Support',
+    typesupports: 'Types de supports',
     zones: 'Aéroports & Zones',
     formats: 'Catégories',
     utilisateurs: 'Équipe & Rôles',
@@ -62,7 +62,7 @@ export default function Header({
           <Settings size={16} className="breadcrumb-icon" />
           <span className="breadcrumb-root">AeroPub</span>
           <ChevronRight size={14} className="breadcrumb-separator" />
-          <span className="breadcrumb-active">Paramètres / Configuration</span>
+          <span className="breadcrumb-active">Paramètres & Configuration</span>
         </div>
       );
     }
@@ -72,7 +72,7 @@ export default function Header({
           <ScrollText size={16} className="breadcrumb-icon" />
           <span className="breadcrumb-root">AeroPub</span>
           <ChevronRight size={14} className="breadcrumb-separator" />
-          <span className="breadcrumb-active">Journal technique & Audit Log</span>
+          <span className="breadcrumb-active">Journal technique & Audit</span>
         </div>
       );
     }
@@ -81,7 +81,7 @@ export default function Header({
         <LayoutDashboard size={16} className="breadcrumb-icon" />
         <span className="breadcrumb-root">AeroPub</span>
         <ChevronRight size={14} className="breadcrumb-separator" />
-        <span className="breadcrumb-sub">Tableau de Bord</span>
+        <span className="breadcrumb-sub">Tableau de bord</span>
         <ChevronRight size={14} className="breadcrumb-separator" />
         <span className="breadcrumb-active">{tabLabels[activeTab] || 'Référentiel'}</span>
       </div>
@@ -91,7 +91,7 @@ export default function Header({
   return (
     <header className="header-glass">
       <div className="header-inner">
-        {/* Partie gauche : Hamburger mobile + Fil d'ariane dynamique */}
+        {/* Menu mobile et fil d'Ariane */}
         <div className="header-left">
           {onToggleMobileSidebar && (
             <button
@@ -108,20 +108,19 @@ export default function Header({
           {getBreadcrumb()}
         </div>
 
-        {/* API Status Badge, Theme Toggle & Refresh */}
+        {/* Actions et profil utilisateur */}
         <div className="header-actions">
           <div className="api-status-badge desktop-only-header-item">
             <span className={`status-dot ${isBackendOnline ? 'status-online' : 'status-offline'}`}></span>
-            <span>{isBackendOnline ? 'API En Ligne' : 'API Hors Ligne'}</span>
+            <span>{isBackendOnline ? 'API en ligne' : 'API hors ligne'}</span>
           </div>
 
-          {/* notifications */}
           <NotificationBell />
-          {/* Mode Nuit / Jour */}
+
           <button
             onClick={toggleTheme}
             className="btn-secondary btn-refresh"
-            title={theme === 'dark' ? 'Passer en Mode Jour' : 'Passer en Mode Nuit'}
+            title={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
           >
             {theme === 'dark' ? (
               <>
@@ -148,37 +147,35 @@ export default function Header({
             }}
             disabled={refreshing}
             className="btn-secondary btn-refresh desktop-only-header-item"
-            title="Rafraîchir les données API"
+            title="Actualiser les données"
           >
             <RefreshCw size={16} className={refreshing ? 'btn-spinner' : ''} />
             <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
           </button>
 
-          {/* Bouton Guide des Rôles accessible à TOUS les utilisateurs */}
           <button
             type="button"
             onClick={() => setShowRoleGuide(true)}
             className="btn-secondary desktop-only-header-item"
-            title="Consulter le Guide des Rôles & Permissions (Qui peut faire quoi ?)"
+            title="Consulter le guide des rôles et des permissions"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem' }}
           >
             <ShieldCheck size={16} style={{ color: 'var(--accent-secondary)' }} />
-            <span>Guide Rôles 💡</span>
+            <span>Guide des rôles</span>
           </button>
 
-          {/* Bouton Guide de l'Application accessible à TOUS les utilisateurs */}
           <button
             type="button"
             onClick={() => setShowAppGuide(true)}
             className="btn-secondary desktop-only-header-item"
-            title="Consulter le Guide complet de l'Application (Où et comment tout faire ?)"
+            title="Consulter le guide complet de l'application"
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', borderColor: 'rgba(56, 189, 248, 0.3)' }}
           >
             <BookOpen size={16} style={{ color: '#38bdf8' }} />
-            <span>Guide de l'App 📖</span>
+            <span>Guide d'utilisation</span>
           </button>
 
-          {/* Profil utilisateur & Rôle */}
+          {/* Profil utilisateur */}
           {user && (
             <div className="user-header-badge">
               <div className="user-avatar">
@@ -189,7 +186,7 @@ export default function Header({
                 <span
                   className={`user-role-pill role-${user.role?.toLowerCase()}`}
                   onClick={() => setShowRoleGuide(true)}
-                  title="Cliquez pour consulter le Guide des Rôles & Droits"
+                  title="Consulter le guide des rôles et des droits"
                   style={{ cursor: 'pointer' }}
                 >
                   {user.role}
@@ -207,13 +204,11 @@ export default function Header({
         </div>
       </div>
 
-      {/* Modale d'aide globale sur les rôles accessible à tout le monde */}
       <RoleGuideModal
         isOpen={showRoleGuide}
         onClose={() => setShowRoleGuide(false)}
       />
 
-      {/* Modale du Guide complet de l'application */}
       <AppGuideModal
         isOpen={showAppGuide}
         onClose={() => setShowAppGuide(false)}

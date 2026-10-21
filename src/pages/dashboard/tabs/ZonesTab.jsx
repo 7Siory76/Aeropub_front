@@ -73,12 +73,12 @@ export default function ZonesTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-      {/* 1. Ligne Aéroports & Périmètres */}
+      {/* Aéroports et périmètres */}
       <div className="two-col-grid">
         <div>
           <h4 className="col-title-cyan" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <Plane size={16} />
-            <span>Aéroports Rattachés ({aeroList.length})</span>
+            <span>Aéroports rattachés ({aeroList.length})</span>
           </h4>
           {aeroList.map((a) => (
             <div key={a.id} className="zone-card-cyan">
@@ -90,7 +90,7 @@ export default function ZonesTab({
         <div>
           <h4 className="col-title-pink" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <Compass size={16} />
-            <span>Périmètres d'Exploitation ({periList.length})</span>
+            <span>Périmètres d'exploitation ({periList.length})</span>
           </h4>
           {periList.map((p) => (
             <div key={p.id} className="zone-card-pink">
@@ -100,23 +100,23 @@ export default function ZonesTab({
         </div>
       </div>
 
-      {/* 2. Zones Terminales Aéroportuaires avec Filtres Multicritères */}
+      {/* Zones terminales */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
           <h4 className="col-title-indigo" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <MapPin size={16} />
-            <span>Zones Terminales d'Affichage</span>
+            <span>Zones terminales d'affichage</span>
           </h4>
         </div>
 
-        {/* Barre de Filtres Multicritères */}
+        {/* Filtres */}
         <div className="ts-filters-bar">
           <div className="ts-filter-group">
             <Search size={14} style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               className="ts-filter-input"
-              placeholder="Rechercher zone..."
+              placeholder="Rechercher une zone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ width: '180px' }}
@@ -168,7 +168,7 @@ export default function ZonesTab({
           )}
 
           <div className="ts-filter-badge-count">
-            {filteredZones.length} / {zones.length} zones
+            {filteredZones.length} / {zones.length} zone{filteredZones.length > 1 ? 's' : ''}
           </div>
         </div>
 

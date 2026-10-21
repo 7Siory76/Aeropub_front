@@ -79,10 +79,10 @@ export default function AssociateExistingAbonnementModal({
             navigateWithFeedback(
                 'dashboard',
                 'abonnements',
-                `L'emplacement ${targetEmp.reference} a été associé avec succès à l'abonnement ${selectedAboRef}.`
+                `Le support ${targetEmp.reference} a été associé avec succès au contrat ${selectedAboRef}.`
             );
         } catch (err) {
-            const msg = sanitizeUserError(err, "Erreur lors de l'association de l'abonnement.");
+            const msg = sanitizeUserError(err, "Erreur lors de l'association du contrat.");
             setModalError(msg);
         } finally {
             setLoading(false);
@@ -102,7 +102,7 @@ export default function AssociateExistingAbonnementModal({
                     <X size={20} />
                 </button>
                 <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
-                    🔗 Associer à un abonnement non actif
+                    🔗 Associer à un contrat en attente
                 </h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
                     Emplacement cible : <strong style={{ color: '#6366f1' }}>{targetEmp?.reference}</strong> ({targetEmp?.nom_type_support || 'Support'}) — Date : <strong>{formatDateFr(selectedDate)}</strong>
@@ -114,7 +114,7 @@ export default function AssociateExistingAbonnementModal({
                     </div>
                 )}
                 {eligibleAbonnements.length === 0 ? (
-                    /* Cas où aucun abonnement ne correspond */
+                    /* Cas où aucun contrat ne correspond */
                     <div style={{
                         padding: '1.5rem',
                         borderRadius: '12px',
@@ -125,10 +125,10 @@ export default function AssociateExistingAbonnementModal({
                     }}>
                         <AlertTriangle size={32} style={{ color: '#ef4444', margin: '0 auto 0.5rem' }} />
                         <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0 }}>
-                            Aucun abonnement en attente trouvé
+                            Aucun contrat en attente trouvé
                         </p>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.4rem' }}>
-                            Il n'existe aucun contrat non actif et non archivé couvrant la date du <strong>{formatDateFr(selectedDate)}</strong>.
+                            Aucun contrat en attente ne couvre la date du <strong>{formatDateFr(selectedDate)}</strong>.
                         </p>
                         <button
                             type="button"
@@ -140,24 +140,24 @@ export default function AssociateExistingAbonnementModal({
                         </button>
                     </div>
                 ) : (
-                    /* Formulaire de sélection de l'abonnement */
+                    /* Formulaire de sélection du contrat */
                     <form onSubmit={handleSubmit}>
                         <div style={{ marginBottom: '1.25rem' }}>
                             <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.88rem', marginBottom: '0.4rem' }}>
-                                Choisir l'abonnement ({eligibleAbonnements.length} disponible{eligibleAbonnements.length > 1 ? 's' : ''}) :
+                                Sélectionner le contrat ({eligibleAbonnements.length} disponible{eligibleAbonnements.length > 1 ? 's' : ''}) :
                             </label>
                             <SearchableSelect
                                 options={eligibleAbonnements}
                                 value={selectedAboRef}
                                 onChange={(selectedAboReference) => setSelectedAboRef(selectedAboReference)}
-                                placeholder="-- Choisir un contrat d'abonnement --"
+                                placeholder="-- Sélectionner un contrat --"
                                 searchPlaceholder="Rechercher par référence, client..."
                                 getOptionValue={(abo) => abo.reference}
                                 getOptionLabel={(abo) => `${abo.reference} — ${abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}`}
                                 getOptionBadge={(abo) => abo.statut_abonnement || abo.statut || 'En attente'}
                             />
                         </div>
-                        {/* Fiche récapitulative de l'abonnement sélectionné */}
+                        {/* Fiche récapitulative du contrat sélectionné */}
                         {currentSelectedAbo && (
                             <div style={{
                                 padding: '1rem',
@@ -175,7 +175,7 @@ export default function AssociateExistingAbonnementModal({
                                     <strong>{currentSelectedAbo.raison_sociale || currentSelectedAbo.nom_client}</strong>
                                 </div>
                                 <div>
-                                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Statut actuel :</span>
+                                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Statut :</span>
                                     <span style={{ color: '#f59e0b', fontWeight: 700 }}>
                                         {currentSelectedAbo.statut_abonnement || currentSelectedAbo.statut || 'En attente'}
                                     </span>

@@ -252,14 +252,14 @@ export default function EmplacementsTab({
 
   return (
     <div className={styles.container}>
-      {/* 1. BARRE DE FILTRES DESKTOP (Écrans > 768px) */}
+      {/* Barre de filtres desktop */}
       <div className={`ts-filters-bar ${styles.desktopFiltersBar}`}>
         <div className={styles.filterGroup}>
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
             className={styles.filterInput}
-            placeholder="Rechercher (Réf, dimensions...)"
+            placeholder="Rechercher (réf., dimensions...)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: '190px' }}
@@ -375,7 +375,7 @@ export default function EmplacementsTab({
         </div>
       </div>
 
-      {/* 2. BARRE D'OUTILS MOBILE ERGONOMIQUE (< 768px) */}
+      {/* Barre d'outils mobile */}
       <div className={styles.mobileToolbar}>
         <div className={styles.mobileSearchRow}>
           <div className={styles.mobileSearchInputWrapper}>
@@ -401,12 +401,12 @@ export default function EmplacementsTab({
           </button>
         </div>
 
-        {/* Chips de filtres actifs avec suppression 1-clic */}
+        {/* Badges de filtres actifs */}
         {activeFilterCount > 0 && (
           <div className={styles.mobileActiveFiltersChips}>
             {selectedType !== 'all' && (
               <span className={styles.mobileFilterChip}>
-                Type: {selectedType}
+                Type : {selectedType}
                 <button
                   type="button"
                   className={styles.mobileFilterChipClear}
@@ -419,7 +419,7 @@ export default function EmplacementsTab({
             )}
             {selectedCategory !== 'all' && (
               <span className={styles.mobileFilterChip}>
-                Cat: {selectedCategory}
+                Catégorie : {selectedCategory}
                 <button
                   type="button"
                   className={styles.mobileFilterChipClear}
@@ -432,7 +432,7 @@ export default function EmplacementsTab({
             )}
             {selectedAeroport !== 'all' && (
               <span className={styles.mobileFilterChip}>
-                Aéroport: {selectedAeroport}
+                Aéroport : {selectedAeroport}
                 <button
                   type="button"
                   className={styles.mobileFilterChipClear}
@@ -448,7 +448,7 @@ export default function EmplacementsTab({
             )}
             {selectedZone !== 'all' && (
               <span className={styles.mobileFilterChip}>
-                Zone: {selectedZone}
+                Zone : {selectedZone}
                 <button
                   type="button"
                   className={styles.mobileFilterChipClear}
@@ -461,7 +461,7 @@ export default function EmplacementsTab({
             )}
             {selectedStatus !== 'all' && (
               <span className={styles.mobileFilterChip}>
-                Statut: {selectedStatus}
+                Statut : {selectedStatus}
                 <button
                   type="button"
                   className={styles.mobileFilterChipClear}
@@ -476,7 +476,7 @@ export default function EmplacementsTab({
         )}
       </div>
 
-      {/* 3. MODALE PLEINE PAGE DES FILTRES MOBILE (< 768px) */}
+      {/* Modale des filtres mobile */}
       {isMobileFilterOpen && (
         <div className={styles.mobileFilterModalOverlay} onClick={() => setIsMobileFilterOpen(false)}>
           <div className={styles.mobileFilterModalContent} onClick={(e) => e.stopPropagation()}>
@@ -496,7 +496,7 @@ export default function EmplacementsTab({
             </div>
 
             <div className={styles.mobileFilterField}>
-              <label className={styles.mobileFilterLabel}>Type de Support</label>
+              <label className={styles.mobileFilterLabel}>Type de support</label>
               <select
                 className={styles.mobileFilterSelect}
                 value={selectedType}
@@ -543,7 +543,7 @@ export default function EmplacementsTab({
             </div>
 
             <div className={styles.mobileFilterField}>
-              <label className={styles.mobileFilterLabel}>Zone d'Affichage</label>
+              <label className={styles.mobileFilterLabel}>Zone d'affichage</label>
               <select
                 className={styles.mobileFilterSelect}
                 value={selectedZone}
@@ -600,7 +600,7 @@ export default function EmplacementsTab({
         </div>
       )}
 
-      {/* 4. VUE DESKTOP : TABLEAU COMPLET (> 768px) */}
+      {/* Tableau desktop */}
       <div className={`aeropub-table-wrapper ${styles.desktopTableWrapper}`}>
         {filteredEmplacements.length === 0 ? (
           <p className="empty-msg">Aucun support ou emplacement ne correspond à ces critères.</p>
@@ -612,7 +612,7 @@ export default function EmplacementsTab({
                   Référence {renderSortIcon('reference')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('type')}>
-                  Type de Support {renderSortIcon('type')}
+                  Type de support {renderSortIcon('type')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('categorie')}>
                   Catégorie {renderSortIcon('categorie')}
@@ -670,7 +670,7 @@ export default function EmplacementsTab({
         )}
       </div>
 
-      {/* 5. VUE MOBILE : FLUX DE CARTES EMPILÉES STYLE FACEBOOK (< 768px) */}
+      {/* Cartes mobile */}
       <div className={styles.mobileCardsContainer}>
         {filteredEmplacements.length === 0 ? (
           <p className="empty-msg">Aucun support ne correspond à ces critères.</p>
@@ -701,7 +701,7 @@ export default function EmplacementsTab({
                 className={`${styles.empCard} ${borderClass}`}
                 onClick={() => onSelectEmplacement && onSelectEmplacement(emp)}
               >
-                {/* En-tête : Référence + Type + Badge statut */}
+                {/* En-tête : Référence + Type + Statut */}
                 <div className={styles.empCardHeader}>
                   <div className={styles.empCardHeaderLeft}>
                     <div className={styles.empRefTitle}>
@@ -724,7 +724,7 @@ export default function EmplacementsTab({
                   <div className={styles.empDetailRow}>
                     <MapPin size={15} className={styles.empDetailIcon} />
                     <div>
-                      <span className={styles.empDetailLabel}>Emplacement:</span>
+                      <span className={styles.empDetailLabel}>Emplacement :</span>
                       <strong>{zoneDisplay}</strong>
                       <span style={{ color: 'var(--text-muted)' }}>{aeroDisplay}</span>
                     </div>
@@ -733,7 +733,7 @@ export default function EmplacementsTab({
                   <div className={styles.empDetailRow}>
                     <Maximize2 size={15} className={styles.empDetailIcon} />
                     <div>
-                      <span className={styles.empDetailLabel}>Dimensions:</span>
+                      <span className={styles.empDetailLabel}>Dimensions :</span>
                       <span>{emp.caracteristiques || emp.ref_format || 'Format standard'}</span>
                     </div>
                   </div>
@@ -741,7 +741,7 @@ export default function EmplacementsTab({
                   <div className={styles.empDetailRow}>
                     <Layers size={15} className={styles.empDetailIcon} />
                     <div>
-                      <span className={styles.empDetailLabel}>Catégorie:</span>
+                      <span className={styles.empDetailLabel}>Catégorie :</span>
                       <span>{emp.nom_categorie || 'Général'}</span>
                     </div>
                   </div>
@@ -753,7 +753,6 @@ export default function EmplacementsTab({
                   )}
                 </div>
 
-                {/* Bouton d'action tactile 100% largeur */}
                 <button
                   type="button"
                   className={styles.empCardActionBtn}
@@ -763,7 +762,7 @@ export default function EmplacementsTab({
                   }}
                 >
                   <FileText size={16} />
-                  <span>Détails &amp; Historique du Support</span>
+                  <span>Détails et historique du support</span>
                 </button>
               </div>
             );
@@ -771,7 +770,7 @@ export default function EmplacementsTab({
         )}
       </div>
 
-      {/* 6. PAGINATION POUR LES SUPPORTS */}
+      {/* Pagination */}
       <Pagination
         currentPage={currentPage}
         totalItems={sortedEmplacements.length}
@@ -780,7 +779,7 @@ export default function EmplacementsTab({
         onPageSizeChange={setPageSize}
       />
 
-      {/* 7. BOUTON D'AJOUT DE SUPPORT (Mobile-First 100% largeur & Desktop) */}
+      {/* Ajout de support */}
       <div className={`add-support-bar ${styles.addSupportBar}`}>
         <button
           type="button"

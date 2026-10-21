@@ -150,7 +150,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
 
   return (
     <div className="kpi-page-container" style={{ maxWidth: '1600px', margin: '0 auto' }}>
-      {/* 1. En-tête Dynamique avec Adaptabilité de Rôle */}
+      {/* En-tête */}
       <KpiHeroHeader
         user={user}
         roleName={roleName}
@@ -160,7 +160,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         loading={loading}
       />
 
-      {/* 2. Module Montants Financiers (Actifs, Renouvelés, À Renouveler, Perdus) */}
+      {/* Montants financiers */}
       <MontantsFinanciersWidget
         userContracts={userContracts}
         renewedParentRefs={renewedParentRefs}
@@ -168,7 +168,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         onOpenCaCalculator={() => setShowCaCalculatorModal(true)}
       />
 
-      {/* 3. Grille des Indicateurs Opérationnels (Échéances, Alertes, Taux d'occupation global) */}
+      {/* Indicateurs opérationnels */}
       <div className="kpi-operations-grid" style={{ marginBottom: '1.5rem' }}>
         <EcheancesContratsWidget
           userContracts={userContracts}
@@ -189,15 +189,15 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         />
       </div>
 
-      {/* 4. NOUVELLE GRILLE ANALYTIQUE : Graphiques & Diagrammes en Bâtons */}
+      {/* Graphiques analytiques */}
       <div className="kpi-analytics-grid" style={{ marginBottom: '2rem' }}>
-        {/* Graphique Donut : Répartition par Catégorie de Support */}
+        {/* Répartition par catégorie */}
         <RepartitionCategoriesWidget
           emplacements={emplacements}
           onSelectCategory={(cat) => handleFilterClick(`categorie_${cat}`)}
         />
 
-        {/* Diagramme en bâton : Taux d'Occupation par Zone & Popularité */}
+        {/* Taux d'occupation par zone */}
         <OccupationParZoneWidget
           emplacements={emplacements}
           userContracts={userContracts}
@@ -205,14 +205,14 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         />
       </div>
 
-      {/* 5. Diagramme en Bâton Complet : Top 10 Clients (Mois sélectionné / Général) */}
+      {/* Classement des clients */}
       <div style={{ marginBottom: '2rem' }}>
         <TopClientsWidget
           userContracts={userContracts}
         />
       </div>
 
-      {/* 6. Module des Dossiers Prioritaires (Échus non renouvelés & J-7 / J-30) */}
+      {/* Dossiers prioritaires */}
       <ActionsPrioritairesWidget
         alertesCritiques={alertesCritiques}
         echeances={echeances}
@@ -220,7 +220,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         onViewAll={() => handleFilterClick('echus_non_renouveles')}
       />
 
-      {/* 7. Modale Détails Abonnement */}
+      {/* Détails de l'abonnement */}
       {selectedAbonnement && (
         <AbonnementDetailsModal
           abonnement={selectedAbonnement}
@@ -232,7 +232,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
         />
       )}
 
-      {/* 8. Modale Moniteur & Répartition du Chiffre d'Affaires Contractuel */}
+      {/* Répartition du chiffre d'affaires */}
       {showCaCalculatorModal && (
         <CalculateurRepartitionCaModal
           isOpen={showCaCalculatorModal}

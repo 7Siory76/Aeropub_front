@@ -178,7 +178,7 @@ export default function AuditLogsTab({ onCountChange }) {
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', margin: '0 0 0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <ScrollText size={18} style={{ color: 'var(--accent-secondary)' }} />
-              Journal Technique & Piste d'Audit
+              Journal technique et piste d'audit
             </h3>
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
               Traçabilité complète des actions : créations de contrats, modifications de statuts, ajouts de clients et relances.
@@ -224,11 +224,11 @@ export default function AuditLogsTab({ onCountChange }) {
               <option value="CREATION">Création</option>
               <option value="MODIFICATION">Modification</option>
               <option value="SUPPRESSION">Suppression</option>
-              <option value="STATUT">Changement Statut</option>
+              <option value="STATUT">Changement de statut</option>
               <option value="RENOUVELLEMENT">Renouvellement</option>
-              <option value="ECHEANCE">Alerte Échéance</option>
-              <option value="EMAIL_ECHEANCE">Email Échéance</option>
-              <option value="EMAIL_MANUEL_RELANCE">Email Manuel Relance</option>
+              <option value="ECHEANCE">Alerte échéance</option>
+              <option value="EMAIL_ECHEANCE">Courriel d'échéance</option>
+              <option value="EMAIL_MANUEL_RELANCE">Courriel manuel de relance</option>
               <option value="IMPORT">Importation</option>
             </select>
           </div>
@@ -270,7 +270,7 @@ export default function AuditLogsTab({ onCountChange }) {
       {loadingAudit ? (
         <div className="loading-container">
           <RefreshCw size={28} className="spinner-icon" />
-          <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Chargement de l'audit log...</p>
+          <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Chargement du journal d'audit...</p>
         </div>
       ) : filteredAuditLogs.length === 0 ? (
         <div className="empty-msg">Aucune entrée d'audit enregistrée correspondant à ces critères.</div>
@@ -281,13 +281,13 @@ export default function AuditLogsTab({ onCountChange }) {
             <thead>
               <tr className="table-head-row-indigo">
                 <th className="table-head-cell sortable" style={{ width: '145px' }} onClick={() => handleSort('date_action')}>
-                  Date & Heure {renderSortIcon('date_action')}
+                  Date et heure {renderSortIcon('date_action')}
                 </th>
                 <th className="table-head-cell sortable" style={{ width: '130px' }} onClick={() => handleSort('categorie_action')}>
                   Catégorie {renderSortIcon('categorie_action')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('entite_concernee')}>
-                  Entité / Réf {renderSortIcon('entite_concernee')}
+                  Entité / Réf. {renderSortIcon('entite_concernee')}
                 </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('nom_utilisateur')}>
                   Auteur {renderSortIcon('nom_utilisateur')}
@@ -332,7 +332,7 @@ export default function AuditLogsTab({ onCountChange }) {
                         <div>{log.entite_concernee || 'SYSTÈME'}</div>
                         {log.reference_entite && (
                           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                            Réf : {log.reference_entite}
+                            Réf. : {log.reference_entite}
                           </div>
                         )}
                       </td>
@@ -349,7 +349,7 @@ export default function AuditLogsTab({ onCountChange }) {
                             className="pill-btn"
                             style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem' }}
                             onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
-                            title="Voir les données payload"
+                            title="Afficher les détails de l'action"
                           >
                             <Eye size={12} style={{ marginRight: '3px' }} />
                             <span>{isExpanded ? 'Masquer' : 'Voir'}</span>

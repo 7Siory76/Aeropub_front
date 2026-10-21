@@ -119,10 +119,10 @@ export default function TypeSupportModal({
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                {isEditing ? 'Modifier le Type de Support' : 'Nouveau Type de Support'}
+                {isEditing ? 'Modifier le type de support' : 'Nouveau type de support'}
               </h3>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {isEditing ? `ID: #${typeSupport?.id}` : 'Typologie technique d\'affichage'}
+                {isEditing ? `Identifiant : #${typeSupport?.id}` : 'Typologie technique d\'affichage'}
               </span>
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function TypeSupportModal({
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--text-main)' }}>
-              Nom du Type de Support * :
+              Nom du type de support * :
             </label>
             <input
               type="text"
@@ -178,7 +178,7 @@ export default function TypeSupportModal({
                 outline: 'none',
                 boxSizing: 'border-box'
               }}
-              placeholder="Ex : Écran LED, Caisson Lumineux, Totem, Bâche..."
+              placeholder="Ex. : Écran LED, caisson lumineux, totem, bâche..."
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               autoFocus

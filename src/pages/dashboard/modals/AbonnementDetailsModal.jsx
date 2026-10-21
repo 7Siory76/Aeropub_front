@@ -27,7 +27,7 @@ export default function AbonnementDetailsModal({
   const { user } = useAuth();
   const { showSuccess, showError, scrollToTop } = useFeedback();
 
-  // Permissions RBAC (Module 1)
+  // Permissions RBAC
   const canEditDatesMontant = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
   const canValidateRenewalDiscount = hasRole(user, ['Admin', 'Direction', 'Resp_Com']);
   const canDeleteContract = hasRole(user, ['Admin', 'Resp_Com']);
@@ -48,7 +48,7 @@ export default function AbonnementDetailsModal({
   const [remiseMotif, setRemiseMotif] = useState('');
   const [remiseDureeMois, setRemiseDureeMois] = useState(12);
 
-  // État pour basculer en mode sélection rapide du statut
+  // Mode sélection rapide du statut
   const [isChangingStatut, setIsChangingStatut] = useState(false);
   const [selectedNewStatut, setSelectedNewStatut] = useState(abonnement?.statut_abonnement || abonnement?.statut || 'Actif');
   const [typeStatutList, setTypeStatutList] = useState(typeStatut);
@@ -57,7 +57,7 @@ export default function AbonnementDetailsModal({
   const [loadingHistorique, setLoadingHistorique] = useState(false);
   const [showHistory, setShowHistory] = useState(true);
 
-  // Détection du contrat successeur ayant renouvelé le contrat courant
+  // Contrat successeur ayant renouvelé le contrat courant
   const renewedByContract = useMemo(() => {
     if (!abonnement?.reference) return null;
     return (allAbonnements || []).find(a =>
@@ -102,7 +102,6 @@ export default function AbonnementDetailsModal({
 
   if (!abonnement) return null;
 
-  // Action rapide : Changer le statut directement depuis la vue détails
   const handleQuickStatutChange = async (newStatutNom) => {
     setLoading(true);
     setModalError('');
@@ -120,7 +119,6 @@ export default function AbonnementDetailsModal({
     }
   };
 
-  // Action : Déclencher la modale de suppression sécurisée
   const handleDelete = () => {
     setShowDeleteConfirm(true);
   };
@@ -137,7 +135,7 @@ export default function AbonnementDetailsModal({
     return months > 0 ? months : 1;
   };
 
-  // Validation d'un renouvellement avec remise exceptionnelle (Module 1 : Admin, Direction, Resp_Com)
+  // Renouvellement avec remise
   const handleValidateRenewalWithDiscount = async (e) => {
     if (e) e.preventDefault();
     setLoading(true);
@@ -157,7 +155,7 @@ export default function AbonnementDetailsModal({
         commentaire: `Renouvellement validé par ${user?.nom || 'Direction'} avec remise exceptionnelle de ${remisePercent}%. Motif: ${remiseMotif || 'Geste commercial'}.`
       });
 
-      showSuccess(`Renouvellement validé avec ${remisePercent}% de remise (Nouveau tarif: ${newTarif.toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}).`);
+      showSuccess(`Renouvellement validé avec ${remisePercent}% de remise (Nouveau tarif : ${newTarif.toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}).`);
       setShowRenewalModal(false);
       if (onRefresh) onRefresh();
       onClose();
@@ -176,14 +174,14 @@ export default function AbonnementDetailsModal({
         style={{ maxWidth: '840px', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', animation: 'scaleUp 0.25s ease' }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modale de validation de renouvellement avec remise exceptionnelle */}
+        {/* Modale de validation de renouvellement avec remise */}
         {showRenewalModal && (
           <div className="modal-backdrop-portal" style={{ zIndex: 10000 }} onClick={() => setShowRenewalModal(false)}>
             <div className="glass-panel client-modal-box" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
               <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981' }}>
                   <Gift size={20} />
-                  <span>Renouvellement avec Remise Exceptionnelle</span>
+                  <span>Renouvellement avec remise exceptionnelle</span>
                 </h3>
                 <button type="button" className="close-btn" onClick={() => setShowRenewalModal(false)}>
                   <X size={16} />
@@ -196,7 +194,7 @@ export default function AbonnementDetailsModal({
                 </div>
 
                 <div className="modal-form-group">
-                  <label className="modal-label">Pourcentage de Remise Accordée (%) :</label>
+                  <label className="modal-label">Pourcentage de remise accordée (%) :</label>
                   <input
                     type="number"
                     min="1"
@@ -244,7 +242,7 @@ export default function AbonnementDetailsModal({
                   />
                 </div>
 
-                {/* Calcul d'impact tarifaire en direct */}
+                {/* Impact tarifaire */}
                 <div style={{ padding: '0.85rem', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)', fontSize: '0.88rem' }}>
                   <div style={{ color: 'var(--text-muted)' }}>Tarif actuel : {Number(abonnement.tarif || 0).toLocaleString('fr-FR')} {abonnement.devise || 'MGA'}</div>
                   <div style={{ fontWeight: 700, color: '#10b981', marginTop: '0.25rem' }}>
@@ -304,18 +302,18 @@ export default function AbonnementDetailsModal({
           </div>
         )}
 
-        {/* AFFICHAGE DES DÉTAILS */}
+        {/* Détails */}
         <div style={{ marginTop: '1rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
 
             <div className="client-abo-card">
-              <span className="client-abo-label">Client & Raison Sociale :</span>
+              <span className="client-abo-label">Client et raison sociale :</span>
               <div className="client-abo-value" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
                 {abonnement.raison_sociale || abonnement.nom_client || 'N/A'}
               </div>
             </div>
             <div className="client-abo-card">
-              <span className="client-abo-label">Commercial Attitré :</span>
+              <span className="client-abo-label">Commercial attitré :</span>
               <div className="client-abo-value">
                 {abonnement.nom_commercial || 'Direction / Admin'}
                 {abonnement.email_commercial && (
@@ -328,7 +326,7 @@ export default function AbonnementDetailsModal({
 
             {/* Supports liés sous forme de badges */}
             <div className="client-abo-card" style={{ gridColumn: 'span 2' }}>
-              <span className="client-abo-label">Supports Liés / Emplacements :</span>
+              <span className="client-abo-label">Supports liés et emplacements :</span>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.35rem' }}>
                 {supportsList.length === 0 ? (
                   <span style={{ color: 'var(--text-muted)' }}>Aucun support associé</span>
@@ -351,7 +349,7 @@ export default function AbonnementDetailsModal({
             </div>
 
             <div className="client-abo-card">
-              <span className="client-abo-label">Tarif & Périodicité :</span>
+              <span className="client-abo-label">Tarif et périodicité :</span>
               <div className="client-abo-value" style={{ color: '#10b981', fontWeight: 700 }}>
                 {abonnement.tarif ? `${Number(abonnement.tarif).toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}` : 'Non renseigné'}
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: '0.4rem', fontWeight: 400 }}>
@@ -368,7 +366,7 @@ export default function AbonnementDetailsModal({
             </div>
 
             <div className="client-abo-card">
-              <span className="client-abo-label">Période de Validité :</span>
+              <span className="client-abo-label">Période de validité :</span>
               <div className="client-abo-value" style={{ fontSize: '0.9rem' }}>
                 Du {abonnement.date_debut ? new Date(abonnement.date_debut).toLocaleDateString('fr-FR') : '-'} au{' '}
                 {abonnement.date_echeance || abonnement.date_fin ? new Date(abonnement.date_echeance || abonnement.date_fin).toLocaleDateString('fr-FR') : '-'}
@@ -381,7 +379,7 @@ export default function AbonnementDetailsModal({
             </div>
 
             <div className="client-abo-card">
-              <span className="client-abo-label">Préavis & Reconduction :</span>
+              <span className="client-abo-label">Préavis et reconduction :</span>
               <div className="client-abo-value">
                 {abonnement.preavis_jours ? `${abonnement.preavis_jours} jours` : '30 jours'} {abonnement.reconduction_tacite ? '(Tacite)' : '(Non tacite)'}
               </div>
@@ -394,7 +392,7 @@ export default function AbonnementDetailsModal({
               onClick={() => !isChangingStatut && setIsChangingStatut(true)}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span className="client-abo-label">STATUT ACTUEL :</span>
+                <span className="client-abo-label">Statut actuel :</span>
                 {!isChangingStatut && (
                   <span style={{ fontSize: '0.75rem', color: '#60a5fa', textDecoration: 'underline' }}>
                     Changer ▾
@@ -442,7 +440,7 @@ export default function AbonnementDetailsModal({
               </div>
             </div>
 
-            {/* Motif de non-renouvellement (si présent) */}
+            {/* Motif de non-renouvellement */}
             {abonnement.motif_non_renouvellement && (
               <div className="client-abo-card" style={{ gridColumn: 'span 2', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
                 <span className="client-abo-label" style={{ color: '#ef4444' }}>Motif de non-renouvellement :</span>
@@ -452,17 +450,17 @@ export default function AbonnementDetailsModal({
               </div>
             )}
 
-            {/* Contrat précédent (Parent) */}
+            {/* Contrat précédent */}
             {abonnement.id_abonnement_precedent && (
               <div className="client-abo-card" style={{ background: 'rgba(6, 182, 212, 0.08)', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
-                <span className="client-abo-label" style={{ color: '#06b6d4' }}>🔄 Contrat Précédent (Origine) :</span>
+                <span className="client-abo-label" style={{ color: '#06b6d4' }}>🔄 Contrat précédent (origine) :</span>
                 <div className="client-abo-value" style={{ color: '#38bdf8', fontWeight: 700 }}>
                   N° {abonnement.id_abonnement_precedent}
                 </div>
               </div>
             )}
 
-            {/* Contrat suivant (Successeur ayant renouvelé ce contrat) */}
+            {/* Contrat suivant */}
             {renewedByContract && (
               <div className="client-abo-card" style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
                 <span className="client-abo-label" style={{ color: '#10b981' }}>✅ Renouvelé avec succès par :</span>
@@ -474,7 +472,7 @@ export default function AbonnementDetailsModal({
 
           </div>
 
-          {/* Section Historique des Statuts du Contrat */}
+          {/* Historique des statuts */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             borderRadius: '10px',
@@ -553,7 +551,7 @@ export default function AbonnementDetailsModal({
 
           <AbonnementDocuments referenceAbonnement={abonnement.reference} />
 
-          {/* Pied de Modale */}
+          {/* Pied de modale */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
             {canDeleteContract ? (
               <button
@@ -562,7 +560,7 @@ export default function AbonnementDetailsModal({
                 style={{ borderColor: 'rgba(239, 68, 68, 0.4)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                 onClick={handleDelete}
                 disabled={loading}
-                title="Supprimer définitivement ce contrat (Admin / Resp_Com)"
+                title="Supprimer définitivement ce contrat"
               >
                 <Trash2 size={15} />
                 <span>Supprimer</span>
@@ -579,38 +577,38 @@ export default function AbonnementDetailsModal({
                 Fermer
               </button>
 
-              {/* Valider un renouvellement avec remise exceptionnelle */}
+              {/* Valider un renouvellement avec remise */}
               {canValidateRenewalDiscount && (
                 <button
                   type="button"
                   className="pill-btn"
                   style={{ borderColor: '#10b981', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                   onClick={() => setShowRenewalModal(true)}
-                  title="Valider un renouvellement avec remise exceptionnelle (Admin, Direction, Resp_Com)"
+                  title="Valider un renouvellement avec remise exceptionnelle"
                 >
                   <Gift size={15} />
-                  <span>Valider renouvellement (remise)</span>
+                  <span>Valider le renouvellement (remise)</span>
                 </button>
               )}
 
-              {/* Modifier les dates / le montant */}
+              {/* Modifier les dates ou le montant */}
               {canEditDatesMontant && (
                 <button
                   type="button"
                   className="pill-btn active"
                   style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
                   onClick={() => setShowEditModal(true)}
-                  title="Modifier les dates / le montant (Admin, Resp_Com, Commercial)"
+                  title="Modifier les dates et le montant"
                 >
                   <Edit3 size={15} />
-                  <span>Modifier les dates / montant</span>
+                  <span>Modifier les dates et le montant</span>
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Modale d'édition séparée */}
+        {/* Modale d'édition */}
         {showEditModal && (
           <AbonnementEditModal
             abonnement={abonnement}

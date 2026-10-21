@@ -52,21 +52,21 @@ export default function Sidebar({
   const [showRoleGuide, setShowRoleGuide] = useState(false);
   const [showAppGuide, setShowAppGuide] = useState(false);
 
-  // État de la "poche" (accordéon ouvert par défaut)
+  // Accordéon des tables
   const [isCrudPocketOpen, setIsCrudPocketOpen] = useState(true);
-  // État de réduction/compactage de la barre latérale
+  // Barre latérale repliée
   const [isCollapsed, setIsCollapsed] = useState(false);
-  // État d'importation CSV
+  // Importation CSV en cours
   const [uploadingCsv, setUploadingCsv] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Sous-compartiments de la table CRUD (réservé admin pour utilisateurs)
+  // Éléments du menu de données
   const allCrudItems = [
     { key: 'emplacements', label: 'Supports', icon: Tv, count: counts.emplacements },
     { key: 'abonnements', label: 'Abonnements', icon: Calendar, count: counts.abonnements },
     { key: 'clients', label: 'Clients & Contacts', icon: Users, count: counts.clients },
-    { key: 'typesupports', label: 'Types de Support', icon: Layers, count: counts.typeSupports },
+    { key: 'typesupports', label: 'Types de supports', icon: Layers, count: counts.typeSupports },
     { key: 'zones', label: 'Aéroports & Zones', icon: MapPin, count: counts.zones },
     { key: 'formats', label: 'Catégories', icon: FolderKanban, count: counts.categories },
     { key: 'utilisateurs', label: 'Équipe & Rôles', icon: ShieldCheck, count: counts.utilisateurs, adminOnly: true },
@@ -91,7 +91,7 @@ export default function Sidebar({
     setIsCrudPocketOpen(prev => !prev);
   };
 
-  // Déclenchement de l'importation CSV depuis la Sidebar
+  // Importe un fichier CSV depuis la barre latérale
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -113,7 +113,7 @@ export default function Sidebar({
 
   return (
     <aside className={`app-sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
-      {/* En-tête de la Sidebar avec Logo et boutons */}
+      {/* En-tête de navigation */}
       <div className="sidebar-header">
         <div className="sidebar-brand" onClick={() => handleNavigate('planning')}>
           <div className="sidebar-brand-icon">
@@ -127,7 +127,7 @@ export default function Sidebar({
           )}
         </div>
 
-        {/* Bouton de repli pour desktop */}
+        {/* Réduire ou agrandir */}
         <button
           type="button"
           className="sidebar-collapse-btn"
@@ -137,7 +137,7 @@ export default function Sidebar({
           {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
         </button>
 
-        {/* Bouton de fermeture sur mobile (style Facebook / tiroir) */}
+        {/* Fermeture mobile */}
         <button
           type="button"
           className="sidebar-mobile-close-btn"
@@ -149,9 +149,9 @@ export default function Sidebar({
         </button>
       </div>
 
-      {/* Navigation Principale */}
+      {/* Navigation principale */}
       <nav className="sidebar-nav">
-        {/* Section 1 : Planning direct & Guide des Rôles */}
+        {/* Liens principaux */}
         <div className="sidebar-section">
           {!isCollapsed && <span className="sidebar-section-title">Navigation</span>}
 
@@ -162,7 +162,7 @@ export default function Sidebar({
             title="KPI & Statistiques de pilotage"
           >
             <BarChart3 size={18} className="sidebar-item-icon" style={{ color: '#06b6d4' }} />
-            {!isCollapsed && <span className="sidebar-item-label">KPI & Statistiques 📊</span>}
+            {!isCollapsed && <span className="sidebar-item-label">KPI & Statistiques</span>}
           </button>
 
           <button
@@ -179,28 +179,28 @@ export default function Sidebar({
             type="button"
             className="sidebar-nav-item"
             onClick={() => setShowRoleGuide(true)}
-            title="Guide des Rôles & Permissions (Qui peut faire quoi ?)"
+            title="Consulter le guide des rôles et des permissions"
           >
             <ShieldCheck size={18} className="sidebar-item-icon" style={{ color: 'var(--accent-secondary)' }} />
-            {!isCollapsed && <span className="sidebar-item-label">Guide des Rôles 💡</span>}
+            {!isCollapsed && <span className="sidebar-item-label">Guide des rôles</span>}
           </button>
 
           <button
             type="button"
             className="sidebar-nav-item"
             onClick={() => setShowAppGuide(true)}
-            title="Guide d'utilisation de l'Application (Où et comment tout faire ?)"
+            title="Consulter le guide complet de l'application"
           >
             <BookOpen size={18} className="sidebar-item-icon" style={{ color: '#38bdf8' }} />
-            {!isCollapsed && <span className="sidebar-item-label">Guide de l'App 📖</span>}
+            {!isCollapsed && <span className="sidebar-item-label">Guide d'utilisation</span>}
           </button>
         </div>
 
-        {/* Section 2 : POCHE ACCORDÉON "TABLEAU DE BORD / CRUD" */}
+        {/* Section Données */}
         <div className="sidebar-section">
-          {!isCollapsed && <span className="sidebar-section-title">Données & CRUD</span>}
+          {!isCollapsed && <span className="sidebar-section-title">Données</span>}
 
-          {/* En-tête de la poche */}
+          {/* En-tête de l'accordéon */}
           <div
             className={`sidebar-pocket-header ${activePage === 'dashboard' ? 'active-parent' : ''}`}
             onClick={() => {
@@ -212,7 +212,7 @@ export default function Sidebar({
           >
             <div className="sidebar-pocket-title-box">
               <LayoutDashboard size={18} className="sidebar-item-icon" />
-              {!isCollapsed && <span className="sidebar-item-label">Tableau de Bord</span>}
+              {!isCollapsed && <span className="sidebar-item-label">Tableau de bord</span>}
             </div>
 
             {!isCollapsed && (
@@ -220,14 +220,14 @@ export default function Sidebar({
                 type="button"
                 className="sidebar-chevron-btn"
                 onClick={handleTogglePocket}
-                title={isCrudPocketOpen ? 'Fermer la poche' : 'Ouvrir la poche'}
+                title={isCrudPocketOpen ? 'Fermer' : 'Ouvrir'}
               >
                 {isCrudPocketOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </button>
             )}
           </div>
 
-          {/* Contenu déroulant de la poche : Les sous-compartiments pour chaque table CRUD */}
+          {/* Menu déroulant des tables */}
           {(!isCollapsed && isCrudPocketOpen) && (
             <div className="sidebar-pocket-content">
               {crudItems.map((item) => {
@@ -253,7 +253,7 @@ export default function Sidebar({
             </div>
           )}
 
-          {/* Version compacte (quand la sidebar est réduite) : icônes rapides */}
+          {/* Version compacte */}
           {isCollapsed && (
             <div className="sidebar-collapsed-pills">
               {crudItems.map((item) => {
@@ -274,69 +274,67 @@ export default function Sidebar({
             </div>
           )}
 
-          {/* Bouton Importer données dans la Sidebar */}
+          {/* Bouton Importer des données */}
           <div className='sidebar-import-box'>
             <button
               type='button'
               className={`sidebar-nav-item sidebar-import-btn ${activePage === 'import' ? 'active' : ''}`}
               onClick={() => handleNavigate('import')}
-              title="Centre d'importation de données"
+              title="Importer des données"
             >
               <Upload size={18} className='sidebar-item-icon' />
-              {!isCollapsed && <span className="sidebar-item-label">Importer données</span>}
+              {!isCollapsed && <span className="sidebar-item-label">Importer des données</span>}
             </button>
           </div>
         </div>
 
-        {/* Section 3 : Administration & Paramétrage (Module 5 : Strictement réservé à Admin) */}
+        {/* Administration */}
         {hasRole(user, ['Admin']) && (
           <div className="sidebar-section">
             {!isCollapsed && <span className="sidebar-section-title">Administration</span>}
 
-            {/* Menu "Paramètres / Configuration" */}
             <button
               type="button"
               className={`sidebar-nav-item ${activePage === 'settings' ? 'active' : ''}`}
               onClick={() => handleNavigate('settings')}
-              title="Paramètres / Configuration (Réservé Admin)"
+              title="Paramètres et configuration"
             >
               <Settings size={18} className="sidebar-item-icon" />
-              {!isCollapsed && <span className="sidebar-item-label">Paramètres / Config</span>}
+              {!isCollapsed && <span className="sidebar-item-label">Paramètres</span>}
             </button>
 
-            {/* Menu "Journal technique & Audit Log" */}
             <button
               type="button"
               className={`sidebar-nav-item ${activePage === 'audit' ? 'active' : ''}`}
               onClick={() => handleNavigate('audit')}
-              title="Journal technique & Audit Log (Réservé Admin)"
+              title="Journal d'audit"
             >
               <ScrollText size={18} className="sidebar-item-icon" />
-              {!isCollapsed && <span className="sidebar-item-label">Journal & Audit Log</span>}
+              {!isCollapsed && <span className="sidebar-item-label">Journal d'audit</span>}
             </button>
           </div>
         )}
       </nav>
 
-      {/* Pied de page de la Sidebar : État API, Thème et Actualisation */}
+      {/* Pied de page */}
       <div className="sidebar-footer">
         {/* Statut de l'API */}
-        <div className="sidebar-status-pill" title={isBackendOnline ? 'API Connectée' : 'API Déconnectée'}>
+        <div className="sidebar-status-pill" title={isBackendOnline ? 'API connectée' : 'API déconnectée'}>
           <span className={`status-dot ${isBackendOnline ? 'status-online' : 'status-offline'}`}></span>
           {!isCollapsed && (
             <span className="sidebar-status-text">
-              {isBackendOnline ? 'API En Ligne' : 'API Hors Ligne'}
+              {isBackendOnline ? 'API en ligne' : 'API hors ligne'}
             </span>
           )}
         </div>
 
-        {/* Boutons d'action compacts */}
+        {/* Boutons d'action */}
         <div className="sidebar-footer-actions">
           <button
             type="button"
             className="sidebar-tool-btn"
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Passer en Mode Jour' : 'Passer en Mode Nuit'}
+            title={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
           >
             {theme === 'dark' ? <Sun size={16} color="#f59e0b" /> : <Moon size={16} color="#6366f1" />}
             {!isCollapsed && <span>{theme === 'dark' ? 'Jour' : 'Nuit'}</span>}
@@ -355,7 +353,7 @@ export default function Sidebar({
                 setTimeout(() => setRefreshing(false), 500);
               }
             }}
-            title="Rafraîchir les données API"
+            title="Actualiser les données"
           >
             <RefreshCw size={16} className={refreshing ? 'btn-spinner' : ''} />
             {!isCollapsed && <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>}
@@ -363,13 +361,11 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Modale d'aide globale sur les rôles accessible à tout le monde */}
       <RoleGuideModal
         isOpen={showRoleGuide}
         onClose={() => setShowRoleGuide(false)}
       />
 
-      {/* Modale du Guide complet de l'application */}
       <AppGuideModal
         isOpen={showAppGuide}
         onClose={() => setShowAppGuide(false)}

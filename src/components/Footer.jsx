@@ -7,13 +7,13 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="footer-title">
           <Radio size={20} className="footer-icon" />
-          <span>FRONT_OFFICE & BACK_OFFICE Ecosystem</span>
+          <span>Écosystème AeroPub • Affichage et Régie Aéroportuaire</span>
         </div>
         <p className="footer-desc">
-          Développé avec React (Vite), Axios, Node.js, Express & PostgreSQL.
+          Plateforme unifiée de gestion des emplacements et contrats publicitaires.
         </p>
         <p className="footer-desc" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-          Conçu avec <Heart size={14} className="heart-icon" /> pour une expérience vitrine fluide.
+          Conçu avec <Heart size={14} className="heart-icon" /> pour une expérience d'exploitation fluide et intuitive.
         </p>
       </div>
     </footer>

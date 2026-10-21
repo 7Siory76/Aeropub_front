@@ -406,18 +406,18 @@ export default function CalculateurRepartitionCaModal({
   const filterInputs = [
     { label: 'Aéroport', icon: Plane, val: selectedAeroport, set: setSelectedAeroport, allTxt: `Tous les aéroports (${filterOptions.aeroports.length})`, list: filterOptions.aeroports },
     { label: 'Catégorie', icon: Tag, val: selectedCategorie, set: setSelectedCategorie, allTxt: `Toutes les catégories (${filterOptions.categories.length})`, list: filterOptions.categories },
-    { label: 'Type de Support', icon: Tv, val: selectedTypeSupport, set: setSelectedTypeSupport, allTxt: `Tous les types (${filterOptions.types.length})`, list: filterOptions.types },
+    { label: 'Type de support', icon: Tv, val: selectedTypeSupport, set: setSelectedTypeSupport, allTxt: `Tous les types (${filterOptions.types.length})`, list: filterOptions.types },
     { label: 'Client / Annonceur', icon: Users, val: selectedClient, set: setSelectedClient, allTxt: `Tous les clients (${filterOptions.clients.length})`, list: filterOptions.clients },
     { label: 'Année', icon: Calendar, val: selectedAnnee, set: setSelectedAnnee, allTxt: 'Toutes les années', list: availableYears.map(String) },
-    { label: 'Mois', icon: Calendar, val: selectedMois, set: setSelectedMois, allTxt: 'Tous les mois (Annuel complet)', list: MOIS_NOMS.map((_, i) => String(i)), labels: MOIS_NOMS }
+    { label: 'Mois', icon: Calendar, val: selectedMois, set: setSelectedMois, allTxt: 'Tous les mois (annuel complet)', list: MOIS_NOMS.map((_, i) => String(i)), labels: MOIS_NOMS }
   ];
 
   const tabButtons = [
-    { id: 'aeroport', label: 'Par Aéroport', icon: Plane, count: calculationResults.listAeroport.length },
-    { id: 'categorie', label: 'Par Catégorie', icon: Tag, count: calculationResults.listCategorie.length },
-    { id: 'type', label: 'Par Type de Support', icon: Tv, count: calculationResults.listTypeSupport.length },
-    { id: 'client', label: 'Par Client', icon: Users, count: calculationResults.listClient.length },
-    { id: 'contrats', label: 'Détail Contrats', icon: FileSpreadsheet, count: calculationResults.filteredContrats.length }
+    { id: 'aeroport', label: 'Par aéroport', icon: Plane, count: calculationResults.listAeroport.length },
+    { id: 'categorie', label: 'Par catégorie', icon: Tag, count: calculationResults.listCategorie.length },
+    { id: 'type', label: 'Par type de support', icon: Tv, count: calculationResults.listTypeSupport.length },
+    { id: 'client', label: 'Par client', icon: Users, count: calculationResults.listClient.length },
+    { id: 'contrats', label: 'Détail des contrats', icon: FileSpreadsheet, count: calculationResults.filteredContrats.length }
   ];
 
   return createPortal(
@@ -431,10 +431,10 @@ export default function CalculateurRepartitionCaModal({
             </div>
             <div>
               <h2 className="ca-modal-title">
-                <span>Moniteur &amp; Répartition du Chiffre d'Affaires</span>
+                <span>Moniteur et répartition du chiffre d'affaires</span>
                 <span className="ca-badge-actif">
                   <Sparkles size={13} />
-                  Contrats Actifs
+                  Contrats actifs
                 </span>
               </h2>
               <p className="ca-modal-subtitle">
@@ -537,7 +537,7 @@ export default function CalculateurRepartitionCaModal({
           <section className="ca-monitor-grid">
             <div className="ca-monitor-card primary">
               <div className="ca-monitor-card-header">
-                <span className="ca-monitor-card-label">CA Contractuel Total</span>
+                <span className="ca-monitor-card-label">CA contractuel total</span>
                 <div className="ca-monitor-card-icon">
                   <DollarSign size={20} />
                 </div>
@@ -558,7 +558,7 @@ export default function CalculateurRepartitionCaModal({
             <div className="ca-monitor-card secondary">
               <div className="ca-monitor-card-header">
                 <span className="ca-monitor-card-label">
-                  {calculationResults.hasPeriodFilter ? 'CA Imputable Période' : 'CA Période (Plein)'}
+                  {calculationResults.hasPeriodFilter ? 'CA imputable sur la période' : 'CA période (plein)'}
                 </span>
                 <div className="ca-monitor-card-icon">
                   <Calendar size={20} />
@@ -581,7 +581,7 @@ export default function CalculateurRepartitionCaModal({
 
             <div className="ca-monitor-card">
               <div className="ca-monitor-card-header">
-                <span className="ca-monitor-card-label">Contrats Actifs</span>
+                <span className="ca-monitor-card-label">Contrats actifs</span>
                 <div className="ca-monitor-card-icon">
                   <BarChart3 size={20} />
                 </div>
@@ -600,7 +600,7 @@ export default function CalculateurRepartitionCaModal({
 
             <div className="ca-monitor-card">
               <div className="ca-monitor-card-header">
-                <span className="ca-monitor-card-label">Supports Mobilisés</span>
+                <span className="ca-monitor-card-label">Supports mobilisés</span>
                 <div className="ca-monitor-card-icon">
                   <Layers size={20} />
                 </div>

@@ -22,7 +22,7 @@ export default function KpiHeroHeader({
     }}>
       <div className="hero-badge-platform" style={{ alignSelf: 'flex-start', margin: 0 }}>
         <Plane size={14} className="hero-badge-icon" />
-        <span>Plateforme d'Affichage &amp; Publicités Aéroportuaires</span>
+        <span>Plateforme d'affichage publicitaire aéroportuaire</span>
       </div>
 
       <div style={{
@@ -49,12 +49,12 @@ export default function KpiHeroHeader({
           </div>
           <div>
             <h1 className="kpi-hero-h1">
-              Indicateurs KPI &amp; Statistiques de Pilotage
+              Indicateurs de performance et statistiques de pilotage
             </h1>
             <p style={{ margin: '0.3rem 0 0 0', color: 'var(--text-muted, #94a3b8)', fontSize: '0.9rem' }}>
               {isCommercialSimple
-                ? `Espace Commercial • Portefeuille personnel : ${userContractsCount} contrat(s) attribué(s)`
-                : `Vision Consolidée • Direction & Gestion : ${userContractsCount} contrat(s) au total`
+                ? `Espace commercial • Portefeuille personnel : ${userContractsCount} contrat(s) attribué(s)`
+                : `Vue consolidée • Direction et gestion : ${userContractsCount} contrat(s) au total`
               }
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function KpiHeroHeader({
             title="Ouvrir le moniteur de calcul et de répartition du chiffre d'affaires contractuel"
           >
             <Calculator size={16} />
-            <span>Moniteur &amp; Répartition CA</span>
+            <span>Répartition du CA</span>
           </button>
         )}
 
@@ -109,7 +109,7 @@ export default function KpiHeroHeader({
           gap: '0.4rem'
         }}>
           <Sparkles size={14} />
-          Traçabilité -R1 / -R2 active
+          Traçabilité des reconductions active
         </span>
       </div>
       </div>

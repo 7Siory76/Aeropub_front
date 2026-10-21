@@ -53,8 +53,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
     const purgeModules = [
         {
             key: 'abonnements',
-            title: 'Abonnements & Contrats',
-            desc: 'Abonnement, Abonnement_Support, Statut_Abonnement, Actions Commerciales',
+            title: 'Abonnements et contrats',
+            desc: 'Abonnements, contrats, statuts et actions commerciales',
             icon: <CalendarCheck size={18} />,
             count: counts.abonnements,
             execute: async (onProgress) => {
@@ -71,8 +71,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
         },
         {
             key: 'supports',
-            title: 'Supports & Emplacements Publicitaires',
-            desc: 'Support, Etat_Support, Historique des états physiques',
+            title: 'Supports et emplacements publicitaires',
+            desc: 'Supports, états et historique des emplacements',
             icon: <Database size={18} />,
             count: counts.supports,
             execute: async (onProgress) => {
@@ -89,8 +89,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
         },
         {
             key: 'clients',
-            title: 'Clients Partenaires & Annonceurs',
-            desc: 'Client, Contacts multiples (Email, Téléphone)',
+            title: 'Clients, partenaires et annonceurs',
+            desc: 'Clients et contacts associés (courriel, téléphone)',
             icon: <Building2 size={18} />,
             count: counts.clients,
             execute: async (onProgress) => {
@@ -107,8 +107,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
         },
         {
             key: 'zones',
-            title: "Zones & Terminaux d'Aéroport",
-            desc: 'Zone_Terminal (Hall départ, arrivée, parking, etc.)',
+            title: "Zones et terminaux d'aéroport",
+            desc: 'Zones terminales (hall départ, arrivée, parking, etc.)',
             icon: <MapPin size={18} />,
             count: counts.zones,
             execute: async (onProgress) => {
@@ -125,8 +125,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
         },
         {
             key: 'categories',
-            title: 'Catégories de Supports',
-            desc: 'Categorie_Support (Statique, Numérique, Événementiel...)',
+            title: 'Catégories de supports',
+            desc: 'Catégories de supports (statique, numérique, événementiel...)',
             icon: <Layers size={18} />,
             count: counts.categories,
             execute: async (onProgress) => {
@@ -143,8 +143,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
         },
         {
             key: 'types',
-            title: 'Types de Supports Publicitaires',
-            desc: 'Type_Support (Panneau 4x3, Caisson lumineux, Écran LED...)',
+            title: 'Types de supports publicitaires',
+            desc: 'Types de support (panneau 4x3, caisson lumineux, écran LED...)',
             icon: <Tag size={18} />,
             count: counts.types,
             execute: async (onProgress) => {
@@ -156,12 +156,12 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                     await typeSupportsApi.delete(typeSupport.id);
                     deleted++;
                 }
-                return { label: 'Types de Support', count: deleted };
+                return { label: 'Types de support', count: deleted };
             }
         },
         {
             key: 'actions_commerciales',
-            title: 'Actions Commerciales & Alertes',
+            title: 'Actions commerciales et alertes',
             desc: 'Historique des relances, préavis et courriels envoyés',
             icon: <Mail size={18} />,
             count: counts.actionsCommerciales,
@@ -175,13 +175,13 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                     await actionsCommercialesApi.delete(action.id);
                     deleted++;
                 }
-                return { label: 'Actions Commerciales', count: deleted };
+                return { label: 'Actions commerciales', count: deleted };
             }
         },
         {
             key: 'journal_notification',
-            title: 'Journal et Audit',
-            desc: 'Notifications, alertes et journal d’audit des actions',
+            title: "Journal d'audit et notifications",
+            desc: "Notifications, alertes et journal d'audit des actions",
             icon: <Bell size={18} />,
             count: counts.notifications,
             execute: async (onProgress) => {
@@ -194,7 +194,7 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                     await journalNotificationApi.delete(notification.id);
                     deleted++;
                 }
-                return { label: 'Journal & Notifications', count: deleted };
+                return { label: 'Journal et notifications', count: deleted };
             }
         }
     ];
@@ -315,8 +315,8 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                                         categorie_action: 'SUPPRESSION',
                                         entite_concernee: key.toUpperCase(),
                                         reference_entite: key,
-                                        valeur_apres: { count: res.count, label: res.label },
-                                        message_notification: `Suppression de ${res.count} ${res.label.toLowerCase()} (Purge des données).`
+                                        valeur_apres: { count: resultatPurge.count, label: resultatPurge.label },
+                                        message_notification: `Suppression de ${resultatPurge.count} ${resultatPurge.label.toLowerCase()} (purge des données).`
                                     });
                                 } catch {
                                     // Journalisation optionnelle ignorée si indisponible
@@ -324,7 +324,7 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                             }
                         } catch (err) {
                             const errMsg = err.response?.data?.message || err.message || 'Erreur inconnue';
-                            errors.push(`${mod.title} : ${errMsg}`);
+                            errors.push(`${modulePurge.title} : ${errMsg}`);
                         }
                     }
                 }
@@ -367,9 +367,9 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                             <Trash2 size={22} />
                         </div>
                         <div>
-                            <h2 className="purge-modal-title">Purge & Nettoyage Sélectif des Données</h2>
+                            <h2 className="purge-modal-title">Purge et nettoyage sélectif des données</h2>
                             <p className="purge-modal-subtitle">
-                                Supprimez proprement les données de test ou réinitialisez vos tables via les APIs dédiées.
+                                Supprimez proprement les données de test ou réinitialisez vos tables du système.
                             </p>
                         </div>
                     </div>
@@ -391,7 +391,7 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                     <div className="purge-protected-banner">
                         <ShieldCheck size={18} style={{ flexShrink: 0 }} />
                         <span>
-                            <strong>Sécurité garantie :</strong> Les tables <strong>Utilisateur</strong> (comptes, rôles) et <strong>Paramétrage</strong> sont strictement protégées et ne seront jamais supprimées.
+                            <strong>Sécurité garantie :</strong> Les comptes utilisateurs, rôles et paramètres système sont strictement protégés et ne seront jamais supprimés.
                         </span>
                     </div>
 
@@ -399,7 +399,7 @@ export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
                     <div className="purge-warning-banner">
                         <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
                         <div>
-                            Cette action est <strong>irréversible</strong>. Les enregistrements sélectionnés seront définitivement supprimés de la base de données PostgreSQL en respectant les contraintes d'intégrité référentielle.
+                            Cette action est <strong>irréversible</strong>. Les enregistrements sélectionnés seront définitivement supprimés du système en respectant l'intégrité des données.
                         </div>
                     </div>
 

@@ -152,20 +152,20 @@ export default function DeleteConfirmModal({
             <ShieldAlert size={22} style={{ color: '#f59e0b', flexShrink: 0, marginTop: '2px' }} />
             <div>
               <div style={{ fontWeight: 700, color: '#f59e0b', fontSize: '0.92rem', marginBottom: '0.35rem' }}>
-                Suppression impossible (Contrainte d'intégrité)
+                Suppression impossible (contrainte d'intégrité)
               </div>
               <p style={{ margin: 0, fontSize: '0.84rem', color: '#fde68a', lineHeight: 1.45 }}>
-                Le/la {itemType} <strong>« {itemName} »</strong> est actuellement lié(e) à <strong>{associatedCount} {associatedLabel}</strong>.
+                Cet élément ({itemType}) <strong>« {itemName} »</strong> est actuellement lié à <strong>{associatedCount} {associatedLabel}</strong>.
               </p>
               <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Pour garantir l'intégrité des données, veuillez d'abord réassigner ou supprimer ces éléments rattachés avant de supprimer cette entrée.
+                Pour garantir l'intégrité des données, veuillez réassigner ou supprimer ces éléments rattachés avant de procéder à cette suppression.
               </p>
             </div>
           </div>
         ) : (
           <div style={{ marginBottom: '1.25rem' }}>
             <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', margin: '0 0 0.5rem 0', lineHeight: 1.5 }}>
-              Êtes-vous sûr de vouloir supprimer définitivement le/la {itemType} :
+              Souhaitez-vous vraiment supprimer définitivement cet élément ({itemType}) :
             </p>
             <div style={{
               background: 'rgba(255, 255, 255, 0.05)',
@@ -179,7 +179,7 @@ export default function DeleteConfirmModal({
               {itemName}
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '0.75rem 0 0 0' }}>
-              {confirmDescription || "Cette action est irréversible. La suppression sera effective immédiatement dans la base de données."}
+              {confirmDescription || "Cette action est irréversible. Toutes les informations associées seront définitivement effacées."}
             </p>
           </div>
         )}

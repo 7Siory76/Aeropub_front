@@ -19,7 +19,7 @@ export default function ClientsTab({
   const { showSuccess, showError } = useFeedback();
   const { user } = useAuth();
 
-  // Permissions RBAC (Module 2)
+  // Permissions RBAC
   const canCreateOrEditClient = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
   const canDeleteClient = hasRole(user, ['Admin', 'Resp_Com']);
 
@@ -31,7 +31,7 @@ export default function ClientsTab({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // États pour les modales d'ajout et de modification
+  // Modales
   const [showAddModal, setShowAddModal] = useState(false);
   const [clientToEdit, setClientToEdit] = useState(null);
   const [clientToDelete, setClientToDelete] = useState(null);
@@ -153,21 +153,20 @@ export default function ClientsTab({
     return sortedClients.slice(start, start + pageSize);
   }, [sortedClients, currentPage, pageSize]);
 
-  // Déclenchement de la suppression sécurisée
   const handleDeleteClient = (cli) => {
     setClientToDelete(cli);
   };
 
   return (
     <div>
-      {/* Barre de filtres multicritères */}
+      {/* Filtres */}
       <div className="ts-filters-bar">
         <div className="ts-filter-group">
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
             className="ts-filter-input"
-            placeholder="Rechercher (Client, email...)"
+            placeholder="Rechercher (client, courriel...)"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: '190px' }}
@@ -275,8 +274,6 @@ export default function ClientsTab({
                   <span className={`wireframe-badge ${cli.etat_client === 'Actif' ? 'badge-available' : 'badge-occupied'}`}>
                     {cli.etat_client || 'Actif'}
                   </span>
-
-
                 </div>
               </div>
 
@@ -303,11 +300,11 @@ export default function ClientsTab({
                   📄 {countAbos} contrat(s) actif(s)
                 </span>
                 <span style={{ fontSize: '0.8rem', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                  <span>Voir contrats</span>
+                  <span>Voir les contrats</span>
                   <ExternalLink size={12} />
                 </span>
               </div>
-              {/* Actions Modifier / Supprimer selon RBAC (Module 2) */}
+              {/* Actions */}
               {(canCreateOrEditClient || canDeleteClient) && (
                 <>
                   <br />
@@ -329,7 +326,7 @@ export default function ClientsTab({
                       <button
                         type="button"
                         className="client-action-btn btn-delete"
-                        title="Supprimer ce client (Admin / Resp_Com)"
+                        title="Supprimer ce client"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteClient(cli);
@@ -345,7 +342,7 @@ export default function ClientsTab({
           );
         })}
 
-        {/* Dernière carte : contient uniquement "+" pour ajouter de nouveaux clients (Module 2 : Admin, Resp_Com, Commercial) */}
+        {/* Ajout d'un nouveau client */}
         {canCreateOrEditClient && (
           <div
             className="client-card client-card-add"
@@ -372,7 +369,7 @@ export default function ClientsTab({
         />
       )}
 
-      {/* Modale d'ajout d'un nouveau client */}
+      {/* Ajout d'un client */}
       {showAddModal && (
         <AddClientModal
           onClose={() => setShowAddModal(false)}
@@ -380,7 +377,7 @@ export default function ClientsTab({
         />
       )}
 
-      {/* Modale de modification d'un client existant */}
+      {/* Modification d'un client */}
       {clientToEdit && (
         <EditClientModal
           client={clientToEdit}
@@ -389,7 +386,7 @@ export default function ClientsTab({
         />
       )}
 
-      {/* Modale de confirmation de suppression du client */}
+      {/* Suppression du client */}
       {clientToDelete && (
         <DeleteConfirmModal
           isOpen={!!clientToDelete}
