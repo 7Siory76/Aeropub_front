@@ -8,7 +8,7 @@
 .notification-bell-btn {
     position: relative;
     background: var(--bg-card, rgba(30, 41, 59, 0.7));
-    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.1));
+    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12));
     color: var(--text-main, #f8fafc);
     padding: 0.55rem;
     border-radius: 10px;
@@ -21,9 +21,9 @@
 
 .notification-bell-btn:hover,
 .notification-bell-btn.active {
-    background: rgba(37, 99, 235, 0.15);
+    background: rgba(37, 99, 235, 0.18);
     border-color: var(--accent-primary, #2563eb);
-    color: var(--accent-primary, #2563eb);
+    color: var(--accent-primary, #38bdf8);
 }
 
 /* Badge de notifications non lues avec pulsation */
@@ -33,16 +33,16 @@
     right: -4px;
     background: #ef4444;
     color: #ffffff;
-    font-size: 0.68rem;
+    font-size: 0.7rem;
     font-weight: 800;
-    min-width: 17px;
-    height: 17px;
-    padding: 0 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
     border-radius: 9999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
     animation: pulse-notif 2s infinite;
 }
 
@@ -50,53 +50,51 @@
     0% {
         transform: scale(1);
     }
-
     50% {
-        transform: scale(1.1);
+        transform: scale(1.12);
     }
-
     100% {
         transform: scale(1);
     }
 }
 
-/* Panneau Déroulant */
+/* Panneau Déroulant Agrandie (500px) */
 .notification-dropdown {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     right: 0;
-    width: 380px;
-    max-width: 90vw;
+    width: 500px;
+    max-width: min(500px, calc(100vw - 20px));
+    max-height: 85vh;
     background: var(--bg-surface, #0f172a);
-    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12));
-    border-radius: 14px;
-    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.15));
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 1px rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
     z-index: 1000;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: dropdown-fade-in 0.2s ease-out;
+    animation: dropdown-fade-in 0.22s ease-out;
 }
 
 @keyframes dropdown-fade-in {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(-10px) scale(0.98);
     }
-
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
-/* Header du panneau */
+/* En-tête du panneau */
 .notification-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 1rem;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.08));
     background: rgba(255, 255, 255, 0.02);
 }
@@ -104,159 +102,300 @@
 .notification-title {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.92rem;
+    gap: 0.6rem;
+    font-size: 1.05rem;
+    font-weight: 800;
     color: var(--text-main, #f8fafc);
 }
 
 .unread-counter {
-    font-size: 0.72rem;
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-    padding: 0.15rem 0.45rem;
+    font-size: 0.76rem;
+    background: rgba(239, 68, 68, 0.18);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    padding: 0.18rem 0.55rem;
     border-radius: 9999px;
     font-weight: 700;
 }
 
 .btn-mark-all {
-    background: transparent;
-    border: none;
-    color: var(--accent-primary, #2563eb);
-    font-size: 0.75rem;
+    background: rgba(37, 99, 235, 0.1);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    color: #38bdf8;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.2rem 0.4rem;
-    border-radius: 6px;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 8px;
     transition: all 0.2s ease;
 }
 
-.btn-mark-all:hover {
-    background: rgba(37, 99, 235, 0.12);
+.btn-mark-all:hover:not(:disabled) {
+    background: rgba(37, 99, 235, 0.25);
+    border-color: #38bdf8;
+    color: #ffffff;
 }
 
-/* Filtres par Catégorie */
-.notification-categories {
+.btn-mark-all:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Barre de filtre Catégorie (Select) */
+.notification-filter-bar {
     display: flex;
-    gap: 0.35rem;
-    padding: 0.6rem 0.85rem;
-    overflow-x: auto;
-    border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.06));
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.08));
+    background: rgba(255, 255, 255, 0.015);
 }
 
-.cat-pill {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid transparent;
-    color: var(--text-muted, #94a3b8);
-    font-size: 0.75rem;
+.notification-filter-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 0.25rem 0.6rem;
-    border-radius: 9999px;
+    color: var(--text-muted, #94a3b8);
+    white-space: nowrap;
+}
+
+.notification-select-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.notification-category-select {
+    width: 100%;
+    background: var(--bg-card, rgba(30, 41, 59, 0.85));
+    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.15));
+    color: var(--text-main, #f8fafc);
+    padding: 0.48rem 2.2rem 0.48rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    appearance: none;
     cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.notification-category-select:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.notification-category-select option {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 0.5rem;
+}
+
+.notification-select-chevron {
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+    color: var(--text-muted, #94a3b8);
+}
+
+.btn-reset-category {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.12));
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
     white-space: nowrap;
     transition: all 0.15s;
 }
 
-.cat-pill.active {
-    background: rgba(37, 99, 235, 0.18);
-    border-color: rgba(37, 99, 235, 0.45);
+.btn-reset-category:hover {
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
 }
 
-/* Liste des notifications */
+/* Liste des notifications agrandie */
 .notification-list {
-    max-height: 360px;
+    max-height: 480px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
 
-.notif-empty {
-    padding: 2rem 1rem;
-    text-align: center;
-    font-size: 0.82rem;
-    color: var(--text-muted, #94a3b8);
-    font-style: italic;
+.notification-list::-webkit-scrollbar {
+    width: 6px;
 }
 
-/* Item Notification */
+.notification-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.notif-empty {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-muted, #94a3b8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.notif-empty-icon {
+    opacity: 0.35;
+    margin-bottom: 0.6rem;
+    color: var(--accent-primary, #38bdf8);
+}
+
+/* Item Notification Agrandie */
 .notif-item {
     display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.04));
-    transition: background 0.15s;
+    gap: 0.9rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.05));
+    transition: background 0.18s ease;
 }
 
 .notif-item:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.035);
 }
 
 .notif-item.unread {
-    background: rgba(6, 182, 212, 0.05);
-    border-left: 3px solid #06b6d4;
+    background: rgba(6, 182, 212, 0.06);
+    border-left: 4px solid #06b6d4;
 }
 
 .notif-icon-col {
-    padding-top: 0.15rem;
+    padding-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.notif-icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .notif-content {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.25rem;
 }
 
 .notif-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .notif-entity-tag {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: #06b6d4;
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: #38bdf8;
     text-transform: uppercase;
+    letter-spacing: 0.35px;
 }
 
 .notif-time {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     color: var(--text-muted, #94a3b8);
+    white-space: nowrap;
+    font-weight: 500;
 }
 
 .notif-message {
-    margin: 0;
-    font-size: 0.8rem;
+    margin: 0.2rem 0;
+    font-size: 0.92rem;
+    font-weight: 500;
     color: var(--text-main, #f1f5f9);
-    line-height: 1.35;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.notif-footer-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 0.15rem;
+    flex-wrap: wrap;
 }
 
 .notif-author {
-    font-size: 0.7rem;
-    color: var(--text-muted, #64748b);
+    font-size: 0.76rem;
+    color: var(--text-muted, #94a3b8);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
+.notif-cat-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+}
+
+/* Bouton individuel "Marquer comme lu" */
 .btn-mark-one {
     background: transparent;
-    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.15));
+    border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.18));
     color: var(--text-muted, #94a3b8);
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    margin-top: 0.2rem;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    transition: all 0.2s ease;
 }
 
-.btn-mark-one:hover {
+.btn-mark-one:hover:not(:disabled) {
     background: #10b981;
     border-color: #10b981;
     color: #ffffff;
+    transform: scale(1.08);
+}
+
+.btn-mark-one:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-spinner {
+    animation: spin-notif 1s linear infinite;
+}
+
+@keyframes spin-notif {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }

@@ -9,6 +9,8 @@ export const journalNotificationApi = {
         return api.get(`/notifications?${params.toString()}`).then(res => res.data);
     },
 
+    getCategories: () => api.get('/notifications/categories').then(res => res.data.data),
+
     getUnreadCount: () => api.get('/notifications/unread-count').then(res => res.data.unreadCount),
 
     markAsRead: (id) => api.put(`/notifications/${id}/read`).then(res => res.data.data),
