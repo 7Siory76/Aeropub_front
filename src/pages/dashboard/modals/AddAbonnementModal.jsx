@@ -332,6 +332,20 @@ export default function AddAbonnementModal({
             setModalError('Veuillez sélectionner un client.');
             return;
         }
+        if (formData.tarif !== '' && formData.tarif !== null && formData.tarif !== undefined) {
+            const parsedTarif = parseFloat(formData.tarif);
+            if (isNaN(parsedTarif) || parsedTarif < 0) {
+                setModalError('Le montant du tarif ne peut pas être négatif.');
+                return;
+            }
+        }
+        if (formData.preavis_jours !== '' && formData.preavis_jours !== null && formData.preavis_jours !== undefined) {
+            const parsedPreavis = parseInt(formData.preavis_jours, 10);
+            if (isNaN(parsedPreavis) || parsedPreavis < 0) {
+                setModalError('Le délai de préavis ne peut pas être négatif.');
+                return;
+            }
+        }
         if (new Date(formData.date_echeance) < new Date(formData.date_debut)) {
             setModalError("La date d'échéance doit être postérieure à la date de début.");
             return;
@@ -693,10 +707,21 @@ export default function AddAbonnementModal({
                             <input
                                 type="number"
                                 step="any"
+                                min="0"
                                 className="modal-input"
-                                placeholder="Ex: 2500000"
+                                placeholder="Ex. : 2 500 000"
                                 value={formData.tarif}
-                                onChange={(e) => setFormData({ ...formData, tarif: e.target.value })}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || parseFloat(val) >= 0) {
+                                        setFormData({ ...formData, tarif: val });
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === '-' || e.key === 'e') {
+                                        e.preventDefault();
+                                    }
+                                }}
                             />
                         </div>
                         <div className="modal-form-group">
@@ -759,7 +784,17 @@ export default function AddAbonnementModal({
                                 min="0"
                                 className="modal-input"
                                 value={formData.preavis_jours}
-                                onChange={(e) => setFormData({ ...formData, preavis_jours: e.target.value })}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val === '' || parseInt(val, 10) >= 0) {
+                                        setFormData({ ...formData, preavis_jours: val });
+                                    }
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === '-' || e.key === 'e') {
+                                        e.preventDefault();
+                                    }
+                                }}
                             />
                         </div>
                         <div className="modal-form-group" style={{ paddingTop: '1.2rem' }}>

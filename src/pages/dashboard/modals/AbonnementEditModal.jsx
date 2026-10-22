@@ -315,6 +315,20 @@ export default function AbonnementEditModal({
   const handleSaveUpdate = async (e) => {
     e.preventDefault();
     setModalError('');
+    if (formData.tarif !== '' && formData.tarif !== null && formData.tarif !== undefined) {
+      const parsedTarif = parseFloat(formData.tarif);
+      if (isNaN(parsedTarif) || parsedTarif < 0) {
+        setModalError('Le montant du tarif ne peut pas être négatif.');
+        return;
+      }
+    }
+    if (formData.preavis_jours !== '' && formData.preavis_jours !== null && formData.preavis_jours !== undefined) {
+      const parsedPreavis = parseInt(formData.preavis_jours, 10);
+      if (isNaN(parsedPreavis) || parsedPreavis < 0) {
+        setModalError('Le délai de préavis ne peut pas être négatif.');
+        return;
+      }
+    }
     if (formData.date_debut && formData.date_echeance && new Date(formData.date_echeance) < new Date(formData.date_debut)) {
       setModalError("La date d'échéance doit être postérieure ou égale à la date de début.");
       return;
@@ -569,10 +583,21 @@ export default function AbonnementEditModal({
               <input
                 type="number"
                 step="any"
+                min="0"
                 className="modal-input"
                 value={formData.tarif}
-                onChange={(e) => setFormData({ ...formData, tarif: e.target.value })}
-                placeholder="Ex: 2500000"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || parseFloat(val) >= 0) {
+                    setFormData({ ...formData, tarif: val });
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === 'e') {
+                    e.preventDefault();
+                  }
+                }}
+                placeholder="Ex. : 2 500 000"
               />
             </div>
             <div className="modal-form-group">
@@ -690,13 +715,23 @@ export default function AbonnementEditModal({
           {/* Préavis et reconduction tacite */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', alignItems: 'center' }}>
             <div className="modal-form-group">
-              <label className="modal-label">Préavis de résiliation (en jours) :</label>
+              <label className="modal-label">Préavis de reconduction (en jours) :</label>
               <input
                 type="number"
                 min="0"
                 className="modal-input"
                 value={formData.preavis_jours}
-                onChange={(e) => setFormData({ ...formData, preavis_jours: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || parseInt(val, 10) >= 0) {
+                    setFormData({ ...formData, preavis_jours: val });
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === '-' || e.key === 'e') {
+                    e.preventDefault();
+                  }
+                }}
                 placeholder="30"
               />
             </div>
