@@ -120,11 +120,15 @@ export default function AbonnementsTab({
 
   const availableStatuses = useMemo(() => {
     const set = new Set();
-    typeStatut.forEach((a) => {
-      set.add(String(a.nom_statut).trim());
+    (typeStatut || []).forEach((a) => {
+      if (a.nom_statut) set.add(String(a.nom_statut).trim());
+    });
+    abonnements.forEach(a => {
+      const st = a.statut_abonnement || a.statut || a.nom_statut;
+      if (st) set.add(String(st).trim());
     });
     return Array.from(set).sort();
-  }, [abonnements]);
+  }, [typeStatut, abonnements]);
 
   const hasActiveFilters =
     searchTerm.trim() !== '' ||
@@ -155,6 +159,8 @@ export default function AbonnementsTab({
 
   const filteredAbonnements = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
+    const isFilteringExpire = (selectedStatus !== 'all' && (selectedStatus.toLowerCase().includes('expir') || selectedStatus.toLowerCase() === 'échu' || selectedStatus.toLowerCase() === 'echu')) || kpiFilter === 'echus_non_renouveles';
+    const isFilteringArchive = selectedStatus !== 'all' && selectedStatus.toLowerCase().includes('archiv');
 
     return abonnements.filter((abo) => {
       // 1. Recherche textuelle
@@ -178,9 +184,16 @@ export default function AbonnementsTab({
         if (!isMyContrat) return false;
       }
 
-      // 2. Statut
+      // 2. Statut et masquage par défaut des contrats archivés et expirés
+      const statut = (abo.statut_abonnement || abo.statut || abo.nom_statut || 'Actif').toLowerCase();
+      const isExpire = statut.includes('expir') || statut === 'échu' || statut === 'echu';
+      const isArchive = statut.includes('archiv');
+
+      // Ne pas afficher les contrats expirés et archivés sauf si l'utilisateur filtre expressément par ces types
+      if (isExpire && !isFilteringExpire) return false;
+      if (isArchive && !isFilteringArchive) return false;
+
       if (selectedStatus !== 'all') {
-        const statut = (abo.statut_abonnement || abo.statut || 'Actif').toLowerCase();
         if (statut !== selectedStatus.toLowerCase()) return false;
       }
 
@@ -210,7 +223,6 @@ export default function AbonnementsTab({
       if (kpiFilter) {
         const now = new Date();
         const diffJours = Math.ceil((new Date(abo.date_echeance || abo.date_fin) - now) / 86400000);
-        const statut = (abo.statut_abonnement || abo.statut || abo.nom_statut || '').toLowerCase();
         const isActif = statut === 'actif' || statut.includes('actif');
         const aEteRenouvele = renewedParentRefs.has(String(abo.reference).trim());
         const estFilsRenouvellement = Boolean(abo.id_abonnement_precedent) || /-R\d+$/i.test(abo.reference || '');
