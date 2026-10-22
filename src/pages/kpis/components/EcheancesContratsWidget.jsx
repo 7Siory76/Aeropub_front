@@ -15,8 +15,9 @@ export default function EcheancesContratsWidget({
 
   const echeances = useMemo(() => {
     const actifsNonRenouveles = userContracts.filter(c => {
-      const statut = (c.nom_statut || c.statut || '').toLowerCase();
-      if (statut === 'résilié' || statut === 'resilie') return false;
+      const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
+      const isActif = statut === 'actif' || statut.includes('actif');
+      if (!isActif) return false;
       if (renewedParentRefs.has(String(c.reference || '').trim())) return false;
       const diff = getDiffJours(c.date_echeance || c.date_fin);
       return diff >= 0 && diff <= 90;

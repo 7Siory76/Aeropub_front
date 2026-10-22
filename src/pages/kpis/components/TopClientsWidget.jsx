@@ -23,10 +23,10 @@ const getActiveDaysInPeriod = (cDebut, cFin, pStart, pEnd) => {
     return Math.round((end - start) / 86400000) + 1;
 };
 
-// Calcule la durée totale en jours d'un contrat
+// Calcule la durée totale en jours d'un contrat (inclusif)
 const getTotalContractDays = (cDebut, cFin) => {
     if (!cDebut || !cFin) return 1;
-    const diff = Math.round((cFin.getTime() - cDebut.getTime()) / 86400000);
+    const diff = Math.round((cFin.getTime() - cDebut.getTime()) / 86400000) + 1;
     return Math.max(1, diff);
 };
 
@@ -80,7 +80,8 @@ export default function TopClientsWidget({ userContracts = [] }) {
 
         userContracts.forEach((c) => {
             const statut = (c.nom_statut || c.statut || '').toLowerCase();
-            if (statut.includes('archiv') || statut.includes('resili') || statut.includes('annul') || statut.includes('brouillon')) {
+            // Exclure les contrats sans exécution (brouillon, à valider) ou rompus (résilié, annulé)
+            if (statut.includes('resili') || statut.includes('annul') || statut.includes('brouillon') || statut.includes('valid')) {
                 return;
             }
 

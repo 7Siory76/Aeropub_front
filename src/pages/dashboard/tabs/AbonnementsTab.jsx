@@ -30,6 +30,7 @@ export default function AbonnementsTab({
   typeStatut = [],
   clients = [],
   utilisateurs = [],
+  actionsCommerciales = [],
   initialSearchQuery = '',
   onRefresh,
   kpiFilter = null,
@@ -209,21 +210,29 @@ export default function AbonnementsTab({
       if (kpiFilter) {
         const now = new Date();
         const diffJours = Math.ceil((new Date(abo.date_echeance || abo.date_fin) - now) / 86400000);
-        const statut = (abo.statut_abonnement || abo.statut || '').toLowerCase();
+        const statut = (abo.statut_abonnement || abo.statut || abo.nom_statut || '').toLowerCase();
+        const isActif = statut === 'actif' || statut.includes('actif');
         const aEteRenouvele = renewedParentRefs.has(String(abo.reference).trim());
         const estFilsRenouvellement = Boolean(abo.id_abonnement_precedent) || /-R\d+$/i.test(abo.reference || '');
 
-        if (kpiFilter === 'echeance_7' && (diffJours < 0 || diffJours > 7 || aEteRenouvele || statut === 'résilié')) return false;
-        if (kpiFilter === 'echeance_30' && (diffJours <= 7 || diffJours > 30 || aEteRenouvele || statut === 'résilié')) return false;
-        if (kpiFilter === 'echeance_60' && (diffJours <= 30 || diffJours > 60 || aEteRenouvele || statut === 'résilié')) return false;
-        if (kpiFilter === 'echeance_90' && (diffJours <= 60 || diffJours > 90 || aEteRenouvele || statut === 'résilié')) return false;
+        if (kpiFilter === 'echeance_7' && (diffJours < 0 || diffJours > 7 || aEteRenouvele || !isActif)) return false;
+        if (kpiFilter === 'echeance_30' && (diffJours <= 7 || diffJours > 30 || aEteRenouvele || !isActif)) return false;
+        if (kpiFilter === 'echeance_60' && (diffJours <= 30 || diffJours > 60 || aEteRenouvele || !isActif)) return false;
+        if (kpiFilter === 'echeance_90' && (diffJours <= 60 || diffJours > 90 || aEteRenouvele || !isActif)) return false;
 
         if (kpiFilter === 'echus_non_renouveles') {
-          if (diffJours >= 0 || aEteRenouvele || statut === 'résilié') return false;
+          const estResilie = statut === 'résilié' || statut === 'resilie';
+          if (diffJours >= 0 || aEteRenouvele || estResilie) return false;
         }
 
         if (kpiFilter === 'sans_action') {
-          if (diffJours < -15 || diffJours > 90 || aEteRenouvele || statut === 'résilié') return false;
+          if (!isActif) return false;
+          if (aEteRenouvele) return false;
+          if (diffJours < 0 || diffJours > 90) return false;
+          const hasAction = actionsCommerciales.some(a =>
+            String(a.id_abonnement || a.reference || '').trim().toLowerCase() === String(abo.reference || '').trim().toLowerCase()
+          );
+          if (hasAction) return false;
         }
 
         if (kpiFilter === 'montant_actifs') {
@@ -246,7 +255,7 @@ export default function AbonnementsTab({
 
       return true;
     });
-  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs]);
+  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs, actionsCommerciales]);
 
   const sortedAbonnements = useMemo(() => {
     const list = [...filteredAbonnements];
@@ -786,13 +795,15 @@ export default function AbonnementsTab({
             const supportsList = rawSupports ? rawSupports.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
             const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
 
-            // Calcul de l'urgence d'échéance
+            // Calcul de l'urgence d'échéance (uniquement pour les contrats actifs)
             const now = new Date();
             const echeanceDate = new Date(abo.date_echeance || abo.date_fin);
             const diffJours = Math.ceil((echeanceDate - now) / 86400000);
+            const statutClean = statutStr.toLowerCase();
+            const isActifCard = statutClean === 'actif' || statutClean.includes('actif');
             const isExpired = diffJours < 0;
-            const isUrgent = diffJours >= 0 && diffJours <= 30;
-            const isWarning = diffJours > 30 && diffJours <= 60;
+            const isUrgent = isActifCard && diffJours >= 0 && diffJours <= 30;
+            const isWarning = isActifCard && diffJours > 30 && diffJours <= 60;
 
             let borderClass = styles.cardBorderNormal;
             if (isExpired) borderClass = styles.cardBorderExpired;

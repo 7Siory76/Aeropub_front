@@ -51,7 +51,7 @@ export default function OccupationParZoneWidget({
 
         userContracts.forEach((c) => {
             const statut = (c.nom_statut || c.statut || '').toLowerCase();
-            if (statut.includes('archiv') || statut.includes('resili')) return;
+            if (statut.includes('resili') || statut.includes('annul') || statut.includes('brouillon') || statut.includes('valid')) return;
 
             const direct = (c.reference_emplacement || '').trim();
             const associes = (c.supports_associes || '')

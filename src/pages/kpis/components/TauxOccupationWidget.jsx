@@ -49,8 +49,9 @@ export default function TauxOccupationWidget({
         const statut = (c.nom_statut || c.statut || '').toLowerCase();
         if (
           statut.includes('résilié') || statut.includes('resilie') ||
-          statut.includes('archiv') ||
-          statut.includes('annul')
+          statut.includes('annul') ||
+          statut.includes('brouillon') ||
+          statut.includes('valid')
         ) return false;
 
         const cDebut = new Date(c.date_debut);

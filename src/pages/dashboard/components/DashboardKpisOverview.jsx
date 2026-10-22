@@ -40,8 +40,9 @@ export default function DashboardKpisOverview({
     // 2. Échéances à 7, 30, 60 et 90 jours (contrats actifs non renouvelés)
     const echeances = useMemo(() => {
         const actifsNonRenouveles = userContracts.filter(c => {
-            const statut = (c.nom_statut || c.statut || '').toLowerCase();
-            if (statut === 'résilié' || statut === 'resilie') return false;
+            const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
+            const isActif = statut === 'actif' || statut.includes('actif');
+            if (!isActif) return false;
             if (isContratRenouvele(c)) return false;
             const diff = getDiffJours(c.date_echeance || c.date_fin);
             return diff >= 0 && diff <= 90;
@@ -75,26 +76,25 @@ export default function DashboardKpisOverview({
         // Contrats échus non renouvelés et non résiliés
         const echusNonRenouveles = userContracts.filter(c => {
             const diff = getDiffJours(c.date_echeance || c.date_fin);
-            const statut = (c.nom_statut || c.statut || '').toLowerCase();
+            const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
             const estEchu = diff < 0;
             const aEteRenouvele = isContratRenouvele(c);
             const estResilie = statut === 'résilié' || statut === 'resilie';
             return estEchu && !aEteRenouvele && !estResilie;
         });
 
-        // Contrats sans action commerciale planifiée (échéance sous 90 j)
+        // Contrats sans action commerciale planifiée (contrats actifs uniquement, arrivant à terme sous 90 j)
         const sansAction = userContracts.filter(c => {
             const diff = getDiffJours(c.date_echeance || c.date_fin);
-            const statut = (c.nom_statut || c.statut || '').toLowerCase();
-            if (statut === 'résilié' || statut === 'resilie') return false;
+            const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
+            const isActif = statut === 'actif' || statut.includes('actif');
+            if (!isActif) return false;
             if (isContratRenouvele(c)) return false;
 
-            // Concerne les contrats actifs arrivant à terme sous 90j ou déjà échus récents
-            const estSousTension = diff >= -15 && diff <= 90;
-            if (!estSousTension) return false;
+            if (diff < 0 || diff > 90) return false;
 
             const hasAction = actionsCommerciales.some(a =>
-                String(a.id_abonnement || '').trim() === String(c.reference || '').trim()
+                String(a.id_abonnement || a.reference || '').trim().toLowerCase() === String(c.reference || '').trim().toLowerCase()
             );
             return !hasAction;
         });

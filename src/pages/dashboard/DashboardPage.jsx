@@ -172,6 +172,7 @@ export default function DashboardPage({
                 typeStatut={typeStatutAbonnement}
                 clients={clients}
                 utilisateurs={utilisateurs}
+                actionsCommerciales={actionsCommerciales}
                 initialSearchQuery={searchQuery}
                 onRefresh={loadAllData}
                 kpiFilter={kpiFilter}

@@ -81,14 +81,16 @@ export default function CalculateurRepartitionCaModal({
     return map;
   }, [emplacements]);
 
-  // Contrats Actifs uniquement
+  // Contrats pris en compte pour le CA : Actifs et Expirés (ayant généré du chiffre d'affaires)
   const activeContracts = useMemo(() => {
     return userContracts.filter((c) => {
       const st = (c.nom_statut || c.statut || c.statut_abonnement || '').trim().toLowerCase();
-      if (st.includes('archiv') || st.includes('resili') || st.includes('annul') || st.includes('brouillon')) {
+      // Exclure les contrats non exécutés (brouillon, à valider) ou rompus (résilié, annulé)
+      if (st.includes('resili') || st.includes('annul') || st.includes('brouillon') || st.includes('valid')) {
         return false;
       }
-      return st === 'actif' || st.includes('actif') || st.includes('renouv');
+      // Inclure les contrats ayant été effectifs (actif, renouvelé, échu, expiré, archivé)
+      return st.includes('actif') || st.includes('renouv') || st.includes('expir') || st.includes('echu') || st.includes('archiv');
     });
   }, [userContracts]);
 
@@ -299,19 +301,24 @@ export default function CalculateurRepartitionCaModal({
       });
     });
 
+    const hasPeriod = Boolean(pStart && pEnd);
     const toSortedList = (mapObj) => {
-      const total = Object.values(mapObj).reduce((s, item) => s + item.ca, 0);
+      const total = Object.values(mapObj).reduce((s, item) => s + (hasPeriod ? item.caProrata : item.ca), 0);
       return Object.entries(mapObj)
-        .map(([nom, data], idx) => ({
-          nom,
-          ca: data.ca,
-          caProrata: data.caProrata,
-          nbSupports: data.supports.size,
-          nbContrats: data.contrats.size,
-          pct: total > 0 ? (data.ca / total) * 100 : 0,
-          color: PALETTE[idx % PALETTE.length]
-        }))
-        .sort((a, b) => b.ca - a.ca);
+        .map(([nom, data], idx) => {
+          const displayedAmount = hasPeriod ? data.caProrata : data.ca;
+          return {
+            nom,
+            ca: data.ca,
+            caProrata: data.caProrata,
+            displayedAmount,
+            nbSupports: data.supports.size,
+            nbContrats: data.contrats.size,
+            pct: total > 0 ? (displayedAmount / total) * 100 : 0,
+            color: PALETTE[idx % PALETTE.length]
+          };
+        })
+        .sort((a, b) => (hasPeriod ? b.caProrata - a.caProrata : b.ca - a.ca));
     };
 
     const ratioGlobal = globalTotalCa > 0 ? (totalCaContractuel / globalTotalCa) * 100 : 0;
@@ -434,7 +441,7 @@ export default function CalculateurRepartitionCaModal({
                 <span>Moniteur et répartition du chiffre d'affaires</span>
                 <span className="ca-badge-actif">
                   <Sparkles size={13} />
-                  Contrats actifs
+                  Contrats actifs &amp; expirés
                 </span>
               </h2>
               <p className="ca-modal-subtitle">
@@ -581,7 +588,7 @@ export default function CalculateurRepartitionCaModal({
 
             <div className="ca-monitor-card">
               <div className="ca-monitor-card-header">
-                <span className="ca-monitor-card-label">Contrats actifs</span>
+                <span className="ca-monitor-card-label">Contrats pris en compte</span>
                 <div className="ca-monitor-card-icon">
                   <BarChart3 size={20} />
                 </div>
@@ -662,7 +669,7 @@ export default function CalculateurRepartitionCaModal({
           <div className="ca-footer-info">
             <Sparkles size={15} style={{ color: '#06b6d4' }} />
             <span>
-              Calcul dynamique en temps réel • {calculationResults.totalContrats} contrat(s) actif(s) sur {activeContracts.length} au total
+              Calcul dynamique en temps réel • {calculationResults.totalContrats} contrat(s) actif(s) ou expiré(s) sur {activeContracts.length} au total
             </span>
           </div>
 

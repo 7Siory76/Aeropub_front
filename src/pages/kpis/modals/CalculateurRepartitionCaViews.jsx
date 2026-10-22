@@ -36,7 +36,7 @@ export default function CalculateurRepartitionCaViews({
             {activeTab === 'categorie' && "Répartition du chiffre d'affaires par catégorie de support"}
             {activeTab === 'type' && "Répartition du chiffre d'affaires par type de support physique"}
             {activeTab === 'client' && "Classement du chiffre d'affaires par client et annonceur"}
-            {activeTab === 'contrats' && "Inventaire détaillé des contrats actifs filtrés"}
+            {activeTab === 'contrats' && "Inventaire détaillé des contrats filtrés (actifs & expirés)"}
           </span>
         </h4>
 
@@ -81,7 +81,7 @@ export default function CalculateurRepartitionCaViews({
                         </span>
                       </span>
                       <div className="ca-breakdown-values">
-                        <span className="ca-breakdown-amount">{formatMGA(row.ca)}</span>
+                        <span className="ca-breakdown-amount">{formatMGA(row.displayedAmount || row.ca)}</span>
                         <span className="ca-breakdown-pct">{row.pct.toFixed(1)}%</span>
                       </div>
                     </div>
@@ -165,7 +165,7 @@ export default function CalculateurRepartitionCaViews({
                         </span>
                       </span>
                       <div className="ca-breakdown-values">
-                        <span className="ca-breakdown-amount">{formatMGA(row.ca)}</span>
+                        <span className="ca-breakdown-amount">{formatMGA(row.displayedAmount || row.ca)}</span>
                         <span className="ca-breakdown-pct">{row.pct.toFixed(1)}%</span>
                       </div>
                     </div>
@@ -249,7 +249,7 @@ export default function CalculateurRepartitionCaViews({
                         </span>
                       </span>
                       <div className="ca-breakdown-values">
-                        <span className="ca-breakdown-amount">{formatMGA(row.ca)}</span>
+                        <span className="ca-breakdown-amount">{formatMGA(row.displayedAmount || row.ca)}</span>
                         <span className="ca-breakdown-pct">{row.pct.toFixed(1)}%</span>
                       </div>
                     </div>
@@ -333,7 +333,7 @@ export default function CalculateurRepartitionCaViews({
                         </span>
                       </span>
                       <div className="ca-breakdown-values">
-                        <span className="ca-breakdown-amount">{formatMGA(row.ca)}</span>
+                        <span className="ca-breakdown-amount">{formatMGA(row.displayedAmount || row.ca)}</span>
                         <span className="ca-breakdown-pct">{row.pct.toFixed(1)}%</span>
                       </div>
                     </div>
@@ -396,7 +396,7 @@ export default function CalculateurRepartitionCaViews({
         <div className="ca-table-wrapper">
           {calculationResults.filteredContrats.length === 0 ? (
             <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
-              Aucun contrat actif ne correspond aux filtres appliqués.
+              Aucun contrat ne correspond aux filtres appliqués.
             </p>
           ) : (
             <table className="ca-table">

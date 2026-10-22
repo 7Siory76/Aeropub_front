@@ -93,7 +93,7 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
   const alertesCritiques = useMemo(() => {
     const echusNonRenouveles = userContracts.filter(c => {
       const diff = getDiffJours(c.date_echeance || c.date_fin);
-      const statut = (c.nom_statut || c.statut || '').toLowerCase();
+      const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
       const estEchu = diff < 0;
       const aEteRenouvele = renewedParentRefs.has(String(c.reference || '').trim());
       const estResilie = statut === 'résilié' || statut === 'resilie';
@@ -102,13 +102,14 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
 
     const sansAction = userContracts.filter(c => {
       const diff = getDiffJours(c.date_echeance || c.date_fin);
-      const statut = (c.nom_statut || c.statut || '').toLowerCase();
-      if (statut === 'résilié' || statut === 'resilie') return false;
+      const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
+      const isActif = statut === 'actif' || statut.includes('actif');
+      if (!isActif) return false;
       if (renewedParentRefs.has(String(c.reference || '').trim())) return false;
-      if (diff < -15 || diff > 90) return false;
+      if (diff < 0 || diff > 90) return false;
 
       const aUneAction = actionsCommerciales.some(a => {
-        return String(a.id_abonnement || '').trim() === String(c.reference || '').trim();
+        return String(a.id_abonnement || a.reference || '').trim().toLowerCase() === String(c.reference || '').trim().toLowerCase();
       });
       return !aUneAction;
     });
@@ -118,8 +119,9 @@ export default function KpiStatsPage({ onNavigateToAbonnements }) {
 
   const echeances = useMemo(() => {
     const actifs = userContracts.filter(c => {
-      const statut = (c.nom_statut || c.statut || '').toLowerCase();
-      if (statut === 'résilié' || statut === 'resilie') return false;
+      const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').toLowerCase();
+      const isActif = statut === 'actif' || statut.includes('actif');
+      if (!isActif) return false;
       if (renewedParentRefs.has(String(c.reference || '').trim())) return false;
       const diff = getDiffJours(c.date_echeance || c.date_fin);
       return diff >= 0 && diff <= 90;
