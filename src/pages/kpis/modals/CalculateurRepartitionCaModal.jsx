@@ -41,6 +41,30 @@ const formatMGA = (montantNumerique) => {
   return new Intl.NumberFormat('fr-MG').format(Math.round(montantNumerique || 0)) + ' MGA';
 };
 
+// Fonction pour normaliser une date à minuit local (élimine les décalages UTC/fuseau)
+const parseDateOnly = (dateInput) => {
+  if (!dateInput) return null;
+  const dateParse = new Date(dateInput);
+  if (isNaN(dateParse.getTime())) return null;
+  return new Date(dateParse.getFullYear(), dateParse.getMonth(), dateParse.getDate());
+};
+
+// Calcule le nombre de jours calendaires d'activité d'un contrat dans une fenêtre [pStart, pEnd] (inclusif)
+const getActiveDaysInPeriod = (cDebut, cFin, pStart, pEnd) => {
+  if (!cDebut || !cFin || !pStart || !pEnd) return 0;
+  const start = Math.max(cDebut.getTime(), pStart.getTime());
+  const end = Math.min(cFin.getTime(), pEnd.getTime());
+  if (start > end) return 0;
+  return Math.round((end - start) / 86400000) + 1;
+};
+
+// Calcule la durée totale en jours d'un contrat (inclusif)
+const getTotalContractDays = (cDebut, cFin) => {
+  if (!cDebut || !cFin) return 1;
+  const diff = Math.round((cFin.getTime() - cDebut.getTime()) / 86400000) + 1;
+  return Math.max(1, diff);
+};
+
 export default function CalculateurRepartitionCaModal({
   isOpen,
   onClose,
@@ -118,7 +142,7 @@ export default function CalculateurRepartitionCaModal({
     const clients = new Map();
 
     activeContracts.forEach((c) => {
-      const clientName = sanitizeText(c.raison_sociale || c.nom_client || 'Client Inconnu');
+      const clientName = sanitizeText(c.nom_client || c.raison_sociale || `Client #${c.id_client || 'Inconnu'}`);
       if (clientName) clients.set(clientName, (clients.get(clientName) || 0) + 1);
 
       const rawRefs = (c.supports_associes || c.reference_emplacement || '')
@@ -157,16 +181,16 @@ export default function CalculateurRepartitionCaModal({
     if (selectedAnnee !== 'all' && selectedMois !== 'all') {
       const anneeFiltre = parseInt(selectedAnnee, 10);
       const moisFiltre = parseInt(selectedMois, 10);
-      pStart = new Date(anneeFiltre, moisFiltre, 1, 0, 0, 0);
-      pEnd = new Date(anneeFiltre, moisFiltre + 1, 0, 23, 59, 59);
+      pStart = new Date(anneeFiltre, moisFiltre, 1);
+      pEnd = new Date(anneeFiltre, moisFiltre + 1, 0); // Dernier jour du mois à minuit local (inclusif)
     } else if (selectedAnnee !== 'all' && selectedMois === 'all') {
       const anneeFiltre = parseInt(selectedAnnee, 10);
-      pStart = new Date(anneeFiltre, 0, 1, 0, 0, 0);
-      pEnd = new Date(anneeFiltre, 11, 31, 23, 59, 59);
+      pStart = new Date(anneeFiltre, 0, 1);
+      pEnd = new Date(anneeFiltre, 11, 31);
     } else if (selectedAnnee === 'all' && selectedMois !== 'all') {
       const moisFiltre = parseInt(selectedMois, 10);
-      pStart = new Date(currentYear, moisFiltre, 1, 0, 0, 0);
-      pEnd = new Date(currentYear, moisFiltre + 1, 0, 23, 59, 59);
+      pStart = new Date(currentYear, moisFiltre, 1);
+      pEnd = new Date(currentYear, moisFiltre + 1, 0);
     }
 
     const filteredContrats = [];
@@ -190,12 +214,12 @@ export default function CalculateurRepartitionCaModal({
 
     activeContracts.forEach((c) => {
       const tarif = parseFloat(c.tarif) || 0;
-      const clientName = sanitizeText(c.raison_sociale || c.nom_client || 'Client Inconnu');
-      const cDebut = c.date_debut ? new Date(c.date_debut) : null;
-      const cFin = (c.date_echeance || c.date_fin) ? new Date(c.date_echeance || c.date_fin) : null;
+      const clientName = sanitizeText(c.nom_client || c.raison_sociale || `Client #${c.id_client || 'Inconnu'}`);
+      const cDebut = parseDateOnly(c.date_debut);
+      const cFin = parseDateOnly(c.date_echeance || c.date_fin);
 
       if (pStart && pEnd) {
-        if (!cDebut || !cFin || isNaN(cDebut.getTime()) || isNaN(cFin.getTime())) return;
+        if (!cDebut || !cFin) return;
         if (cDebut > pEnd || cFin < pStart) return;
       }
 
@@ -249,16 +273,14 @@ export default function CalculateurRepartitionCaModal({
 
       if (!matchAero || !matchCat || !matchType) return;
 
+      const totalDays = getTotalContractDays(cDebut, cFin);
+      const dailyRate = tarif / totalDays;
+      let activeDaysInPeriod = totalDays;
       let prorataCa = tarif;
-      let activeDaysInPeriod = 0;
-      let totalDays = 1;
 
       if (pStart && pEnd && cDebut && cFin) {
-        const s = Math.max(cDebut.getTime(), pStart.getTime());
-        const e = Math.min(cFin.getTime(), pEnd.getTime());
-        activeDaysInPeriod = Math.max(0, Math.round((e - s) / 86400000) + 1);
-        totalDays = Math.max(1, Math.round((cFin.getTime() - cDebut.getTime()) / 86400000) + 1);
-        prorataCa = (tarif * activeDaysInPeriod) / totalDays;
+        activeDaysInPeriod = getActiveDaysInPeriod(cDebut, cFin, pStart, pEnd);
+        prorataCa = dailyRate * activeDaysInPeriod;
       }
 
       const eligibleSupports = contractSupports.filter((s) => {

@@ -6,6 +6,11 @@ const MOIS_NOMS = [
     'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
 ];
 
+const sanitizeText = (txt) => {
+    if (!txt) return '';
+    return String(txt).replace(/‚/g, 'é').replace(/Ext‚rieur/g, 'Extérieur').trim();
+};
+
 // Fonction pour normaliser une date à minuit local
 const parseDateOnly = (dateInput) => {
     if (!dateInput) return null;
@@ -72,16 +77,20 @@ export default function TopClientsWidget({ userContracts = [] }) {
 
         if (modePeriode === 'mois') {
             pStart = new Date(selectedYear, selectedMonth, 1);
-            pEnd = new Date(selectedYear, selectedMonth + 1, 0); // Dernier jour du mois
+            pEnd = new Date(selectedYear, selectedMonth + 1, 0); // Dernier jour du mois (inclusif)
         } else if (modePeriode === 'annee') {
             pStart = new Date(selectedYear, 0, 1);
             pEnd = new Date(selectedYear, 11, 31);
         }
 
         userContracts.forEach((c) => {
-            const statut = (c.nom_statut || c.statut || '').toLowerCase();
+            const statut = (c.nom_statut || c.statut || c.statut_abonnement || '').trim().toLowerCase();
             // Exclure les contrats sans exécution (brouillon, à valider) ou rompus (résilié, annulé)
             if (statut.includes('resili') || statut.includes('annul') || statut.includes('brouillon') || statut.includes('valid')) {
+                return;
+            }
+            // Inclure les contrats ayant été effectifs (actif, renouvelé, échu, expiré, archivé)
+            if (!statut.includes('actif') && !statut.includes('renouv') && !statut.includes('expir') && !statut.includes('echu') && !statut.includes('archiv')) {
                 return;
             }
 
@@ -109,7 +118,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
             }
 
             if (valeurMarchandeContrat > 0) {
-                const clientNom = (c.nom_client || c.raison_sociale || `Client #${c.id_client || 'Inconnu'}`).trim();
+                const clientNom = sanitizeText(c.nom_client || c.raison_sociale || `Client #${c.id_client || 'Inconnu'}`);
                 if (!map[clientNom]) {
                     map[clientNom] = {
                         nom: clientNom,
