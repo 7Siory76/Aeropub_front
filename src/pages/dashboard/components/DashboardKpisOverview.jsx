@@ -322,7 +322,7 @@ export default function DashboardKpisOverview({
                     </div>
                     {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
-                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
                             {montants.nbActifs}
                         </span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#10b981', textTransform: 'uppercase' }}>
@@ -332,7 +332,7 @@ export default function DashboardKpisOverview({
                     {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
-                        <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.actifs)}</strong>
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.actifs)}</strong>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.4rem' }}>
                         Dernier statut : <strong style={{ color: '#10b981' }}>Actif</strong>
@@ -362,7 +362,7 @@ export default function DashboardKpisOverview({
                     </div>
                     {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
-                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
                             {montants.nbRenouveles}
                         </span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#c084fc', textTransform: 'uppercase' }}>
@@ -372,7 +372,7 @@ export default function DashboardKpisOverview({
                     {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(168, 85, 247, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
-                        <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.renouveles)}</strong>
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.renouveles)}</strong>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.4rem' }}>
                         Reconduits (-R1, -R2...)
@@ -402,7 +402,7 @@ export default function DashboardKpisOverview({
                     </div>
                     {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
-                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
                             {montants.nbAValider}
                         </span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#eab308', textTransform: 'uppercase' }}>
@@ -412,7 +412,7 @@ export default function DashboardKpisOverview({
                     {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(234, 179, 8, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
-                        <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.aValider)}</strong>
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.aValider)}</strong>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.4rem' }}>
                         Dernier statut : <strong style={{ color: '#eab308' }}>À valider</strong>
@@ -442,7 +442,7 @@ export default function DashboardKpisOverview({
                     </div>
                     {/* Nombre */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
-                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
                             {montants.nbBrouillons}
                         </span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#06b6d4', textTransform: 'uppercase' }}>
@@ -452,7 +452,7 @@ export default function DashboardKpisOverview({
                     {/* Montant */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(6, 182, 212, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
-                        <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.brouillons)}</strong>
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.brouillons)}</strong>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.4rem' }}>
                         Dernier statut : <strong style={{ color: '#06b6d4' }}>Brouillon</strong>
@@ -482,7 +482,7 @@ export default function DashboardKpisOverview({
                     </div>
                     {/* 1ER PLAN : NOMBRE */}
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem', marginTop: '0.3rem' }}>
-                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+                        <span style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
                             {montants.nbARenouveler}
                         </span>
                         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f59e0b', textTransform: 'uppercase' }}>
@@ -492,7 +492,7 @@ export default function DashboardKpisOverview({
                     {/* 2E PLAN : MONTANT */}
                     <div style={{ marginTop: '0.4rem', padding: '0.3rem 0.5rem', background: 'rgba(245, 158, 11, 0.08)', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Total :</span>
-                        <strong style={{ fontSize: '0.88rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.aRenouveler)}</strong>
+                        <strong style={{ fontSize: '0.88rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.aRenouveler)}</strong>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', marginTop: '0.4rem' }}>
                         En attente d'action commerciale
@@ -511,7 +511,7 @@ export default function DashboardKpisOverview({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Calendar size={18} style={{ color: '#06b6d4' }} />
-                            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+                            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
                                 Échéances des contrats (non renouvelés)
                             </h3>
                         </div>
@@ -526,7 +526,7 @@ export default function DashboardKpisOverview({
                             className="kpi-mini-card"
                             onClick={() => triggerFilter('echeance_7')}
                             style={{
-                                background: echeances.j7.length > 0 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                                background: echeances.j7.length > 0 ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
                                 border: echeances.j7.length > 0 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid var(--border-glass)',
                                 borderRadius: '10px',
                                 padding: '0.75rem 0.5rem',
@@ -538,7 +538,7 @@ export default function DashboardKpisOverview({
                             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#ef4444', display: 'block' }}>
                                 ≤ 7 jours
                             </span>
-                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j7.length > 0 ? '#ef4444' : '#fff', marginTop: '0.2rem' }}>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j7.length > 0 ? '#ef4444' : 'var(--text-main, #fff)', marginTop: '0.2rem' }}>
                                 {echeances.j7.length}
                             </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
@@ -551,7 +551,7 @@ export default function DashboardKpisOverview({
                             className="kpi-mini-card"
                             onClick={() => triggerFilter('echeance_30')}
                             style={{
-                                background: echeances.j30.length > 0 ? 'rgba(249, 115, 22, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                                background: echeances.j30.length > 0 ? 'rgba(249, 115, 22, 0.12)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
                                 border: echeances.j30.length > 0 ? '1px solid rgba(249, 115, 22, 0.4)' : '1px solid var(--border-glass)',
                                 borderRadius: '10px',
                                 padding: '0.75rem 0.5rem',
@@ -563,7 +563,7 @@ export default function DashboardKpisOverview({
                             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#f97316', display: 'block' }}>
                                 ≤ 30 jours
                             </span>
-                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j30.length > 0 ? '#f97316' : '#fff', marginTop: '0.2rem' }}>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j30.length > 0 ? '#f97316' : 'var(--text-main, #fff)', marginTop: '0.2rem' }}>
                                 {echeances.j30.length}
                             </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
@@ -576,7 +576,7 @@ export default function DashboardKpisOverview({
                             className="kpi-mini-card"
                             onClick={() => triggerFilter('echeance_60')}
                             style={{
-                                background: echeances.j60.length > 0 ? 'rgba(234, 179, 8, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                                background: echeances.j60.length > 0 ? 'rgba(234, 179, 8, 0.12)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
                                 border: echeances.j60.length > 0 ? '1px solid rgba(234, 179, 8, 0.4)' : '1px solid var(--border-glass)',
                                 borderRadius: '10px',
                                 padding: '0.75rem 0.5rem',
@@ -588,7 +588,7 @@ export default function DashboardKpisOverview({
                             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#eab308', display: 'block' }}>
                                 ≤ 60 jours
                             </span>
-                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j60.length > 0 ? '#eab308' : '#fff', marginTop: '0.2rem' }}>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j60.length > 0 ? '#eab308' : 'var(--text-main, #fff)', marginTop: '0.2rem' }}>
                                 {echeances.j60.length}
                             </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
@@ -601,7 +601,7 @@ export default function DashboardKpisOverview({
                             className="kpi-mini-card"
                             onClick={() => triggerFilter('echeance_90')}
                             style={{
-                                background: echeances.j90.length > 0 ? 'rgba(59, 130, 246, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                                background: echeances.j90.length > 0 ? 'rgba(59, 130, 246, 0.12)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
                                 border: echeances.j90.length > 0 ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid var(--border-glass)',
                                 borderRadius: '10px',
                                 padding: '0.75rem 0.5rem',
@@ -613,7 +613,7 @@ export default function DashboardKpisOverview({
                             <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#3b82f6', display: 'block' }}>
                                 ≤ 90 jours
                             </span>
-                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j90.length > 0 ? '#3b82f6' : '#fff', marginTop: '0.2rem' }}>
+                            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: echeances.j90.length > 0 ? '#3b82f6' : 'var(--text-main, #fff)', marginTop: '0.2rem' }}>
                                 {echeances.j90.length}
                             </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
@@ -628,7 +628,7 @@ export default function DashboardKpisOverview({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <ShieldAlert size={18} style={{ color: '#f43f5e' }} />
-                            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+                            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
                                 Alertes commerciales critiques
                             </h3>
                         </div>
@@ -643,7 +643,7 @@ export default function DashboardKpisOverview({
                             className="kpi-mini-card"
                             onClick={() => triggerFilter('echus_non_renouveles')}
                             style={{
-                                background: alertesCritiques.echusNonRenouveles.length > 0 ? 'rgba(244, 63, 94, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                                background: alertesCritiques.echusNonRenouveles.length > 0 ? 'rgba(244, 63, 94, 0.1)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
                                 border: alertesCritiques.echusNonRenouveles.length > 0 ? '1px solid rgba(244, 63, 94, 0.4)' : '1px solid var(--border-glass)',
                                 borderRadius: '10px',
                                 padding: '0.85rem',
@@ -655,7 +655,7 @@ export default function DashboardKpisOverview({
                                 <AlertTriangle size={15} />
                                 <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>Échus non renouvelés</span>
                             </div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: alertesCritiques.echusNonRenouveles.length > 0 ? '#f43f5e' : '#fff' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: alertesCritiques.echusNonRenouveles.length > 0 ? '#f43f5e' : 'var(--text-main, #fff)' }}>
                                 {alertesCritiques.echusNonRenouveles.length}
                             </div>
                             <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -668,7 +668,7 @@ export default function DashboardKpisOverview({
                             className="kpi-mini-card"
                             onClick={() => triggerFilter('sans_action')}
                             style={{
-                                background: alertesCritiques.sansAction.length > 0 ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                                background: alertesCritiques.sansAction.length > 0 ? 'rgba(245, 158, 11, 0.1)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
                                 border: alertesCritiques.sansAction.length > 0 ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid var(--border-glass)',
                                 borderRadius: '10px',
                                 padding: '0.85rem',
@@ -680,7 +680,7 @@ export default function DashboardKpisOverview({
                                 <Clock size={15} />
                                 <span style={{ fontSize: '0.78rem', fontWeight: 700 }}>Sans action planifiée</span>
                             </div>
-                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: alertesCritiques.sansAction.length > 0 ? '#f59e0b' : '#fff' }}>
+                            <div style={{ fontSize: '1.5rem', fontWeight: 800, color: alertesCritiques.sansAction.length > 0 ? '#f59e0b' : 'var(--text-main, #fff)' }}>
                                 {alertesCritiques.sansAction.length}
                             </div>
                             <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -695,13 +695,13 @@ export default function DashboardKpisOverview({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Percent size={18} style={{ color: '#10b981' }} />
-                            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+                            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
                                 Taux d'occupation des supports
                             </h3>
                         </div>
 
                         {/* Sélecteur de période */}
-                        <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '8px', padding: '2px' }}>
+                        <div style={{ display: 'flex', background: 'var(--border-glass, rgba(148, 163, 184, 0.15))', borderRadius: '8px', padding: '2px' }}>
                             {['mois', 'trimestre', 'annee'].map((p) => (
                                 <button
                                     key={p}
@@ -740,7 +740,7 @@ export default function DashboardKpisOverview({
                             <div style={{
                                 width: '100%',
                                 height: '10px',
-                                background: 'rgba(255, 255, 255, 0.08)',
+                                background: 'var(--border-glass, rgba(148, 163, 184, 0.2))',
                                 borderRadius: '9999px',
                                 overflow: 'hidden',
                                 marginBottom: '0.4rem'
@@ -759,9 +759,9 @@ export default function DashboardKpisOverview({
                             </div>
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                <span>Occupés : <strong style={{ color: '#fff' }}>{statsOccupation.occupesCount}</strong></span>
+                                <span>Occupés : <strong style={{ color: 'var(--text-main, #fff)' }}>{statsOccupation.occupesCount}</strong></span>
                                 <span>Disponibles : <strong style={{ color: '#10b981' }}>{statsOccupation.disponiblesCount}</strong></span>
-                                <span>Total : <strong>{statsOccupation.totalSupports}</strong></span>
+                                <span>Total : <strong style={{ color: 'var(--text-main, #fff)' }}>{statsOccupation.totalSupports}</strong></span>
                             </div>
                         </div>
                     </div>

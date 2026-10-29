@@ -213,7 +213,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
                       <div className="app-guide-subtab-box-header">
                         <div>
                           <div className="app-guide-subtab-box-title">
-                            <SubBoxIcon size={20} style={{ color: '#38bdf8' }} />
+                            <SubBoxIcon size={20} className="app-guide-subtab-icon-svg" />
                             <span>Onglet : {currentSub.name}</span>
                           </div>
                           <div className="app-guide-subtab-box-desc">{currentSub.desc}</div>
@@ -230,7 +230,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
                       </div>
 
                       <div>
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8' }}>
+                        <span className="app-guide-subtab-checklist-title">
                           Ce que vous pouvez faire dans cet onglet :
                         </span>
                         <ul className="app-guide-checklist" style={{ marginTop: '0.65rem' }}>
@@ -273,7 +273,7 @@ export default function AppGuideModal({ isOpen, onClose }) {
         {/* Pied de page */}
         <div className="app-guide-footer">
           <div className="app-guide-footer-hint">
-            <Sparkles size={14} style={{ color: '#38bdf8' }} />
+            <Sparkles size={14} className="app-guide-sparkle-icon" />
             <span>Sélectionnez une page à gauche pour voir toutes ses fonctionnalités et vous y rendre directement.</span>
           </div>
 

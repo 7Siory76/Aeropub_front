@@ -128,7 +128,7 @@ export default function MontantsFinanciersWidget({
           className="kpi-card-hover"
           onClick={() => onFilterClick && onFilterClick('montant_actifs')}
           style={{
-            background: 'linear-gradient(135deg, rgba(160, 185, 129, 0.12), rgba(16, 185, 129, 0.02))',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.02))',
             border: '1px solid rgba(16, 185, 129, 0.35)',
             borderRadius: '14px',
             padding: '1.25rem',
@@ -148,7 +148,7 @@ export default function MontantsFinanciersWidget({
 
           {/* 1er plan : nombre */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.45rem', marginTop: '0.35rem' }}>
-            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
               {montants.nbActifs}
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#10b981', textTransform: 'uppercase' }}>
@@ -159,7 +159,7 @@ export default function MontantsFinanciersWidget({
           {/* 2e plan : montant */}
           <div style={{ marginTop: '0.45rem', padding: '0.35rem 0.6rem', background: 'rgba(16, 185, 129, 0.08)', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Total :</span>
-            <strong style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.actifs)}</strong>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.actifs)}</strong>
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>
@@ -197,7 +197,7 @@ export default function MontantsFinanciersWidget({
 
           {/* 1er plan : nombre */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.45rem', marginTop: '0.35rem' }}>
-            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
               {montants.nbRenouveles}
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#c084fc', textTransform: 'uppercase' }}>
@@ -208,7 +208,7 @@ export default function MontantsFinanciersWidget({
           {/* 2e plan : montant */}
           <div style={{ marginTop: '0.45rem', padding: '0.35rem 0.6rem', background: 'rgba(168, 85, 247, 0.08)', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Total :</span>
-            <strong style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.renouveles)}</strong>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.renouveles)}</strong>
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>
@@ -246,7 +246,7 @@ export default function MontantsFinanciersWidget({
 
           {/* 1er plan : nombre */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.45rem', marginTop: '0.35rem' }}>
-            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
               {montants.nbAValider}
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#eab308', textTransform: 'uppercase' }}>
@@ -257,7 +257,7 @@ export default function MontantsFinanciersWidget({
           {/* 2e plan : montant */}
           <div style={{ marginTop: '0.45rem', padding: '0.35rem 0.6rem', background: 'rgba(234, 179, 8, 0.08)', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Total :</span>
-            <strong style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.aValider)}</strong>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.aValider)}</strong>
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>
@@ -295,7 +295,7 @@ export default function MontantsFinanciersWidget({
 
           {/* 1er plan : nombre */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.45rem', marginTop: '0.35rem' }}>
-            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
               {montants.nbBrouillons}
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#06b6d4', textTransform: 'uppercase' }}>
@@ -306,7 +306,7 @@ export default function MontantsFinanciersWidget({
           {/* 2e plan : montant */}
           <div style={{ marginTop: '0.45rem', padding: '0.35rem 0.6rem', background: 'rgba(6, 182, 212, 0.08)', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Total :</span>
-            <strong style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.brouillons)}</strong>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.brouillons)}</strong>
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>
@@ -344,7 +344,7 @@ export default function MontantsFinanciersWidget({
 
           {/* 1er plan : nombre */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.45rem', marginTop: '0.35rem' }}>
-            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
+            <span style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-main, #fff)', lineHeight: 1.1 }}>
               {montants.nbARenouveler}
             </span>
             <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f97316', textTransform: 'uppercase' }}>
@@ -355,7 +355,7 @@ export default function MontantsFinanciersWidget({
           {/* 2e plan : montant */}
           <div style={{ marginTop: '0.45rem', padding: '0.35rem 0.6rem', background: 'rgba(249, 115, 22, 0.08)', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>Total :</span>
-            <strong style={{ fontSize: '0.9rem', color: '#fff', fontWeight: 800 }}>{formatMontant(montants.aRenouveler)}</strong>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-main, #fff)', fontWeight: 800 }}>{formatMontant(montants.aRenouveler)}</strong>
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.45rem' }}>

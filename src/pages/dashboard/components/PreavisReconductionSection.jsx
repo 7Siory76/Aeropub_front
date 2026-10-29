@@ -131,12 +131,12 @@ export default function PreavisReconductionSection({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#38bdf8'
+              color: 'var(--accent-cyan)'
             }}>
               <RotateCcw size={20} />
             </div>
             <div>
-              <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '1.05rem', fontWeight: 700 }}>
+              <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.05rem', fontWeight: 700 }}>
                 Préavis de reconduction tacite ({alertPreavisAbos.length} contrat{alertPreavisAbos.length > 1 ? 's' : ''} actif{alertPreavisAbos.length > 1 ? 's' : ''} sous préavis)
               </h4>
               <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -169,8 +169,9 @@ export default function PreavisReconductionSection({
               <div key={abo.reference} style={{
                 padding: '0.85rem 1rem',
                 borderRadius: '10px',
-                background: 'rgba(15, 23, 42, 0.75)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
+                background: 'var(--bg-card, #1e293b)',
+                border: '1px solid var(--border-glass, rgba(56, 189, 248, 0.3))',
+                boxShadow: 'var(--shadow-sm)',
                 fontSize: '0.85rem',
                 display: 'flex',
                 flexDirection: 'column',
@@ -180,14 +181,14 @@ export default function PreavisReconductionSection({
                 maxWidth: '100%'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ color: '#38bdf8', fontSize: '0.95rem' }}>{abo.reference}</strong>
+                  <strong style={{ color: 'var(--accent-cyan)', fontSize: '0.95rem' }}>{abo.reference}</strong>
                   <span style={{
                     fontSize: '0.72rem',
-                    fontWeight: 600,
+                    fontWeight: 700,
                     padding: '0.15rem 0.5rem',
                     borderRadius: '4px',
-                    background: abo.diffDaysPreavis > 0 ? 'rgba(56, 189, 248, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                    color: abo.diffDaysPreavis > 0 ? '#38bdf8' : '#f87171',
+                    background: abo.diffDaysPreavis > 0 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                    color: abo.diffDaysPreavis > 0 ? 'var(--accent-cyan)' : '#dc2626',
                     border: abo.diffDaysPreavis > 0 ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid rgba(239, 68, 68, 0.4)'
                   }}>
                     {abo.diffDaysPreavis > 0 
@@ -202,12 +203,12 @@ export default function PreavisReconductionSection({
 
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
                   <div>
-                    📅 Échéance : <strong>{new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')}</strong>
+                    📅 Échéance : <strong style={{ color: 'var(--text-main)' }}>{new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')}</strong>
                   </div>
                   <div>
-                    ⏱️ Préavis : <strong>{abo.preavisJours} jours</strong>
+                    ⏱️ Préavis : <strong style={{ color: 'var(--text-main)' }}>{abo.preavisJours} jours</strong>
                   </div>
-                  <div style={{ color: abo.diffDaysPreavis > 0 ? '#38bdf8' : '#fca5a5', fontWeight: 600 }}>
+                  <div style={{ color: abo.diffDaysPreavis > 0 ? 'var(--accent-cyan)' : '#dc2626', fontWeight: 600 }}>
                     ⚠️ Date limite de résiliation : {abo.dateLimitePreavis.toLocaleDateString('fr-FR')}
                   </div>
                 </div>
@@ -224,8 +225,9 @@ export default function PreavisReconductionSection({
                       alignItems: 'center',
                       gap: '0.35rem',
                       marginTop: '0.35rem',
-                      background: '#0284c7',
-                      borderColor: '#38bdf8'
+                      background: 'var(--gradient-primary)',
+                      color: '#ffffff',
+                      border: '1px solid rgba(255, 255, 255, 0.2)'
                     }}
                     onClick={() => onSendPreavisEmail(abo)}
                     disabled={sendingRef === abo.reference}
@@ -285,7 +287,7 @@ export default function PreavisReconductionSection({
 
         {filteredActions.length === 0 ? (
           <div className="empty-state" style={{ padding: '2.5rem 1rem', textAlign: 'center', border: '1px dashed var(--border-glass)', borderRadius: '12px' }}>
-            <Mail size={32} style={{ opacity: 0.35, marginBottom: '0.5rem', color: '#38bdf8' }} />
+            <Mail size={32} style={{ opacity: 0.35, marginBottom: '0.5rem', color: 'var(--accent-primary, #0284c7)' }} />
             <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>
               Aucun préavis de reconduction ne correspond à ces critères.
             </p>
@@ -331,7 +333,7 @@ export default function PreavisReconductionSection({
                           borderRadius: '6px',
                           background: 'rgba(56, 189, 248, 0.15)',
                           border: '1px solid rgba(56, 189, 248, 0.35)',
-                          color: '#38bdf8',
+                          color: 'var(--accent-cyan)',
                           fontWeight: 600,
                           fontSize: '0.78rem'
                         }}>
@@ -341,7 +343,7 @@ export default function PreavisReconductionSection({
                       <td className="cell-bold-white">
                         <div>{act.nom_client || (act.id_client ? `Client #${act.id_client}` : 'Général')}</div>
                         {aboRef && (
-                          <div style={{ fontSize: '0.78rem', color: '#38bdf8' }}>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--accent-cyan)' }}>
                             Réf. : {aboRef}
                           </div>
                         )}
@@ -369,8 +371,9 @@ export default function PreavisReconductionSection({
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.3rem',
-                              background: '#0284c7',
-                              borderColor: '#38bdf8',
+                              background: 'var(--gradient-primary)',
+                              color: '#ffffff',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
                               opacity: !aboRef ? 0.45 : 1
                             }}
                             onClick={() => onSendPreavisEmail && onSendPreavisEmail(act)}

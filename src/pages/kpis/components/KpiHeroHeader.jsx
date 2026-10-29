@@ -10,16 +10,7 @@ export default function KpiHeroHeader({
   isCommercialSimple = false
 }) {
   return (
-    <section className="glass-panel" style={{
-      padding: '1.75rem 2rem',
-      borderRadius: '16px',
-      marginBottom: '1.75rem',
-      background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(30, 41, 59, 0.5))',
-      border: '1px solid rgba(6, 182, 212, 0.3)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '1rem'
-    }}>
+    <section className="glass-panel kpi-hero-panel">
       <div className="hero-badge-platform" style={{ alignSelf: 'flex-start', margin: 0 }}>
         <Plane size={14} className="hero-badge-icon" />
         <span>Plateforme d'affichage publicitaire aéroportuaire</span>

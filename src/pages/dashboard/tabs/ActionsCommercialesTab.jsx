@@ -400,26 +400,31 @@ export default function ActionsCommercialesTab({
       <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <button
           type="button"
-          className={`pill-btn ${alertSectionTab === 'preavis' ? 'active' : ''}`}
+          onClick={() => setAlertSectionTab('preavis')}
           style={{
             fontSize: '0.85rem',
             padding: '0.45rem 1rem',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.45rem',
-            borderColor: alertSectionTab === 'preavis' ? '#38bdf8' : 'rgba(56, 189, 248, 0.3)',
-            background: alertSectionTab === 'preavis' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(15, 23, 42, 0.5)'
+            borderRadius: '9999px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: alertSectionTab === 'preavis' ? '1px solid #0284c7' : '1px solid var(--border-glass)',
+            background: alertSectionTab === 'preavis' ? 'linear-gradient(135deg, #0284c7, #2563eb)' : 'var(--bg-card, rgba(255, 255, 255, 0.05))',
+            color: alertSectionTab === 'preavis' ? '#ffffff' : 'var(--text-main)',
+            boxShadow: alertSectionTab === 'preavis' ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
           }}
-          onClick={() => setAlertSectionTab('preavis')}
         >
-          <RotateCcw size={15} style={{ color: '#38bdf8' }} />
-          <span style={{ fontWeight: 600 }}>Préavis de reconduction tacite</span>
+          <RotateCcw size={15} style={{ color: alertSectionTab === 'preavis' ? '#ffffff' : '#0284c7' }} />
+          <span style={{ fontWeight: 700 }}>Préavis de reconduction tacite</span>
           <span style={{
             fontSize: '0.72rem',
             padding: '0.1rem 0.45rem',
             borderRadius: '999px',
-            background: alertPreavisAbos.length > 0 ? '#0284c7' : 'rgba(255,255,255,0.1)',
-            color: '#fff',
+            background: alertSectionTab === 'preavis' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(2, 132, 199, 0.15)',
+            color: alertSectionTab === 'preavis' ? '#ffffff' : '#0284c7',
+            fontWeight: 800,
             marginLeft: '0.2rem'
           }}>
             {alertPreavisAbos.length}
@@ -428,26 +433,31 @@ export default function ActionsCommercialesTab({
 
         <button
           type="button"
-          className={`pill-btn ${alertSectionTab === 'j30' ? 'active' : ''}`}
+          onClick={() => setAlertSectionTab('j30')}
           style={{
             fontSize: '0.85rem',
             padding: '0.45rem 1rem',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.45rem',
-            borderColor: alertSectionTab === 'j30' ? '#facc15' : 'rgba(250, 204, 21, 0.3)',
-            background: alertSectionTab === 'j30' ? 'rgba(250, 204, 21, 0.15)' : 'rgba(15, 23, 42, 0.5)'
+            borderRadius: '9999px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            border: alertSectionTab === 'j30' ? '1px solid #d97706' : '1px solid var(--border-glass)',
+            background: alertSectionTab === 'j30' ? 'linear-gradient(135deg, #d97706, #b45309)' : 'var(--bg-card, rgba(255, 255, 255, 0.05))',
+            color: alertSectionTab === 'j30' ? '#ffffff' : 'var(--text-main)',
+            boxShadow: alertSectionTab === 'j30' ? '0 4px 14px rgba(217, 119, 6, 0.35)' : 'none'
           }}
-          onClick={() => setAlertSectionTab('j30')}
         >
-          <Bell size={15} style={{ color: '#facc15' }} />
-          <span style={{ fontWeight: 600 }}>Échéances standards (J-30)</span>
+          <Bell size={15} style={{ color: alertSectionTab === 'j30' ? '#ffffff' : '#d97706' }} />
+          <span style={{ fontWeight: 700 }}>Échéances standards (J-30)</span>
           <span style={{
             fontSize: '0.72rem',
             padding: '0.1rem 0.45rem',
             borderRadius: '999px',
-            background: alertJ30Abos.length > 0 ? '#ca8a04' : 'rgba(255,255,255,0.1)',
-            color: '#fff',
+            background: alertSectionTab === 'j30' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(217, 119, 6, 0.15)',
+            color: alertSectionTab === 'j30' ? '#ffffff' : '#d97706',
+            fontWeight: 800,
             marginLeft: '0.2rem'
           }}>
             {alertJ30Abos.length}
@@ -485,7 +495,7 @@ export default function ActionsCommercialesTab({
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <Bell size={18} style={{ color: 'var(--accent-secondary)' }} />
                 <div>
-                  <h4 style={{ margin: 0, color: 'var(--accent-secondary)', fontSize: '1rem', fontWeight: 700 }}>
+                  <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1rem', fontWeight: 700 }}>
                     Alertes Relance J-30 ({alertJ30Abos.length} contrat(s) en échéance proche)
                   </h4>
                   <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -532,8 +542,9 @@ export default function ActionsCommercialesTab({
                   <div key={abo.reference} style={{
                     padding: '0.6rem 0.85rem',
                     borderRadius: '8px',
-                    background: 'rgba(15, 23, 42, 0.6)',
-                    border: '1px solid rgba(250, 204, 21, 0.3)',
+                    background: 'var(--bg-card, #1e293b)',
+                    border: '1px solid var(--border-glass, rgba(250, 204, 21, 0.3))',
+                    boxShadow: 'var(--shadow-sm)',
                     fontSize: '0.85rem',
                     display: 'flex',
                     flexDirection: 'column',
@@ -542,16 +553,27 @@ export default function ActionsCommercialesTab({
                     flex: '1 1 calc(33.333% - 0.75rem)'
                   }}>
                     <div>
-                      <strong style={{ color: 'var(--text-main)' }}>{abo.reference}</strong> - <span>{abo.nom_client || abo.raison_sociale}</span>
+                      <strong style={{ color: 'var(--text-main)' }}>{abo.reference}</strong> - <span style={{ color: 'var(--text-main)' }}>{abo.nom_client || abo.raison_sociale}</span>
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--accent-secondary)' }}>
-                      Échéance : {new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')}
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      📅 Échéance : <strong style={{ color: 'var(--text-main)' }}>{new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR')}</strong>
                     </div>
                     {canSendManualEmail && (
                       <button
                         type="button"
                         className="pill-btn active"
-                        style={{ fontSize: '0.74rem', padding: '0.2rem 0.55rem', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}
+                        style={{
+                          fontSize: '0.74rem',
+                          padding: '0.2rem 0.55rem',
+                          alignSelf: 'flex-start',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          marginTop: '0.25rem',
+                          background: 'var(--gradient-primary)',
+                          color: '#ffffff',
+                          border: '1px solid rgba(255, 255, 255, 0.2)'
+                        }}
                         onClick={() => handleSendManualEmail(abo)}
                         disabled={sendingRef === abo.reference}
                         title="Envoyer le courriel de relance manuel au client"
@@ -779,9 +801,9 @@ export default function ActionsCommercialesTab({
             width: '100%',
             padding: '1.75rem',
             borderRadius: '16px',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-            background: 'var(--bg-secondary, #1e293b)'
+            border: '1px solid var(--border-glass)',
+            boxShadow: 'var(--shadow-glow, 0 20px 50px rgba(0,0,0,0.5))',
+            background: 'var(--bg-card, #1e293b)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -833,8 +855,8 @@ export default function ActionsCommercialesTab({
                     width: '100%',
                     padding: '0.6rem 0.8rem',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    background: 'rgba(15, 23, 42, 0.6)',
+                    border: '1px solid var(--border-glass, rgba(255,255,255,0.2))',
+                    background: 'var(--bg-main, #ffffff)',
                     color: 'var(--text-main)',
                     fontSize: '0.9rem'
                   }}
@@ -854,8 +876,8 @@ export default function ActionsCommercialesTab({
                     width: '100%',
                     padding: '0.6rem 0.8rem',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    background: 'rgba(15, 23, 42, 0.6)',
+                    border: '1px solid var(--border-glass, rgba(255,255,255,0.2))',
+                    background: 'var(--bg-main, #ffffff)',
                     color: 'var(--text-main)',
                     fontSize: '0.88rem',
                     resize: 'vertical',
@@ -868,11 +890,11 @@ export default function ActionsCommercialesTab({
               <div style={{
                 padding: '0.65rem 0.85rem',
                 borderRadius: '8px',
-                background: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.25)',
+                background: 'var(--bg-glass, rgba(59, 130, 246, 0.1))',
+                border: '1px solid var(--border-glass, rgba(59, 130, 246, 0.25))',
                 fontSize: '0.78rem'
               }}>
-                <div style={{ fontWeight: 600, color: 'var(--accent-secondary, #38bdf8)', marginBottom: '0.35rem' }}>
+                <div style={{ fontWeight: 600, color: 'var(--accent-cyan)', marginBottom: '0.35rem' }}>
                   💡 Variables dynamiques pour {selectedTemplateCode === 'PREAVIS_RECONDUCTION' ? 'le préavis de reconduction' : 'la relance d\'échéance'} :
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
@@ -898,11 +920,11 @@ export default function ActionsCommercialesTab({
                     <code
                       key={tag}
                       style={{
-                        background: 'rgba(15, 23, 42, 0.7)',
+                        background: 'var(--bg-card, rgba(15, 23, 42, 0.7))',
                         padding: '0.15rem 0.4rem',
                         borderRadius: '4px',
-                        color: '#93c5fd',
-                        border: '1px solid rgba(147, 197, 253, 0.3)',
+                        color: 'var(--accent-cyan)',
+                        border: '1px solid var(--border-glass, rgba(147, 197, 253, 0.3))',
                         cursor: 'pointer'
                       }}
                       title={`${desc} - Cliquer pour insérer`}

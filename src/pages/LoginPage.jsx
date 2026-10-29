@@ -39,7 +39,8 @@ export default function LoginPage() {
             });
 
             const userData = response.user;
-            login(userData);
+            const token = response.token;
+            login(userData, token);
         } catch (err) {
             const friendlyMsg = sanitizeUserError(err, 'Identifiants invalides ou serveur indisponible.');
             setErrorMessage(friendlyMsg);

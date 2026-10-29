@@ -287,14 +287,14 @@ export default function OccupationParZoneWidget({
                     justifyContent: 'center',
                     marginTop: '0.9rem',
                     paddingTop: '0.75rem',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+                    borderTop: '1px solid var(--border-glass, rgba(148, 163, 184, 0.15))'
                 }}>
                     <button
                         type="button"
                         onClick={() => setAfficherTout(!afficherTout)}
                         style={{
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            background: 'var(--bg-glass, rgba(148, 163, 184, 0.12))',
+                            border: '1px solid var(--border-glass, rgba(148, 163, 184, 0.2))',
                             color: 'var(--text-main, #ffffff)',
                             padding: '0.4rem 0.95rem',
                             borderRadius: '20px',

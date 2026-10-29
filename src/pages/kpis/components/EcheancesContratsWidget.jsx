@@ -52,7 +52,7 @@ export default function EcheancesContratsWidget({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <Calendar size={20} style={{ color: '#06b6d4' }} />
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
               Contrats arrivant à échéance
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -78,7 +78,7 @@ export default function EcheancesContratsWidget({
           className="kpi-mini-card"
           onClick={() => onFilterClick && onFilterClick('echeance_7')}
           style={{
-            background: echeances.j7.length > 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+            background: echeances.j7.length > 0 ? 'rgba(239, 68, 68, 0.15)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
             border: echeances.j7.length > 0 ? '1px solid rgba(239, 68, 68, 0.45)' : '1px solid var(--border-glass)',
             borderRadius: '12px',
             padding: '0.85rem 0.5rem',
@@ -89,7 +89,7 @@ export default function EcheancesContratsWidget({
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#ef4444', display: 'block' }}>
             ≤ 7 jours
           </span>
-          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j7.length > 0 ? '#ef4444' : '#fff', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j7.length > 0 ? '#ef4444' : 'var(--text-main, #fff)', marginTop: '0.25rem' }}>
             {echeances.j7.length}
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
@@ -102,7 +102,7 @@ export default function EcheancesContratsWidget({
           className="kpi-mini-card"
           onClick={() => onFilterClick && onFilterClick('echeance_30')}
           style={{
-            background: echeances.j30.length > 0 ? 'rgba(249, 115, 22, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+            background: echeances.j30.length > 0 ? 'rgba(249, 115, 22, 0.15)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
             border: echeances.j30.length > 0 ? '1px solid rgba(249, 115, 22, 0.45)' : '1px solid var(--border-glass)',
             borderRadius: '12px',
             padding: '0.85rem 0.5rem',
@@ -113,7 +113,7 @@ export default function EcheancesContratsWidget({
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f97316', display: 'block' }}>
             ≤ 30 jours
           </span>
-          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j30.length > 0 ? '#f97316' : '#fff', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j30.length > 0 ? '#f97316' : 'var(--text-main, #fff)', marginTop: '0.25rem' }}>
             {echeances.j30.length}
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
@@ -126,7 +126,7 @@ export default function EcheancesContratsWidget({
           className="kpi-mini-card"
           onClick={() => onFilterClick && onFilterClick('echeance_60')}
           style={{
-            background: echeances.j60.length > 0 ? 'rgba(234, 179, 8, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+            background: echeances.j60.length > 0 ? 'rgba(234, 179, 8, 0.15)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
             border: echeances.j60.length > 0 ? '1px solid rgba(234, 179, 8, 0.45)' : '1px solid var(--border-glass)',
             borderRadius: '12px',
             padding: '0.85rem 0.5rem',
@@ -137,7 +137,7 @@ export default function EcheancesContratsWidget({
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#eab308', display: 'block' }}>
             ≤ 60 jours
           </span>
-          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j60.length > 0 ? '#eab308' : '#fff', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j60.length > 0 ? '#eab308' : 'var(--text-main, #fff)', marginTop: '0.25rem' }}>
             {echeances.j60.length}
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
@@ -150,7 +150,7 @@ export default function EcheancesContratsWidget({
           className="kpi-mini-card"
           onClick={() => onFilterClick && onFilterClick('echeance_90')}
           style={{
-            background: echeances.j90.length > 0 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+            background: echeances.j90.length > 0 ? 'rgba(59, 130, 246, 0.15)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
             border: echeances.j90.length > 0 ? '1px solid rgba(59, 130, 246, 0.45)' : '1px solid var(--border-glass)',
             borderRadius: '12px',
             padding: '0.85rem 0.5rem',
@@ -161,7 +161,7 @@ export default function EcheancesContratsWidget({
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#3b82f6', display: 'block' }}>
             ≤ 90 jours
           </span>
-          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j90.length > 0 ? '#3b82f6' : '#fff', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.6rem', fontWeight: 900, color: echeances.j90.length > 0 ? '#3b82f6' : 'var(--text-main, #fff)', marginTop: '0.25rem' }}>
             {echeances.j90.length}
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>

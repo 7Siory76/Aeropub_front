@@ -51,7 +51,7 @@ export default function AlertesCritiquesWidget({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <ShieldAlert size={20} style={{ color: '#f43f5e' }} />
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
               Alertes critiques
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -77,7 +77,7 @@ export default function AlertesCritiquesWidget({
           className="kpi-mini-card"
           onClick={() => onFilterClick && onFilterClick('echus_non_renouveles')}
           style={{
-            background: alertesCritiques.echusNonRenouveles.length > 0 ? 'rgba(244, 63, 94, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+            background: alertesCritiques.echusNonRenouveles.length > 0 ? 'rgba(244, 63, 94, 0.12)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
             border: alertesCritiques.echusNonRenouveles.length > 0 ? '1px solid rgba(244, 63, 94, 0.45)' : '1px solid var(--border-glass)',
             borderRadius: '12px',
             padding: '1rem',
@@ -88,7 +88,7 @@ export default function AlertesCritiquesWidget({
             <AlertTriangle size={17} />
             <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>Échus non renouvelés</span>
           </div>
-          <div style={{ fontSize: '1.7rem', fontWeight: 900, color: alertesCritiques.echusNonRenouveles.length > 0 ? '#f43f5e' : '#fff' }}>
+          <div style={{ fontSize: '1.7rem', fontWeight: 900, color: alertesCritiques.echusNonRenouveles.length > 0 ? '#f43f5e' : 'var(--text-main, #fff)' }}>
             {alertesCritiques.echusNonRenouveles.length}
           </div>
           <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -101,7 +101,7 @@ export default function AlertesCritiquesWidget({
           className="kpi-mini-card"
           onClick={() => onFilterClick && onFilterClick('sans_action')}
           style={{
-            background: alertesCritiques.sansAction.length > 0 ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+            background: alertesCritiques.sansAction.length > 0 ? 'rgba(245, 158, 11, 0.12)' : 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
             border: alertesCritiques.sansAction.length > 0 ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid var(--border-glass)',
             borderRadius: '12px',
             padding: '1rem',
@@ -112,7 +112,7 @@ export default function AlertesCritiquesWidget({
             <Clock size={17} />
             <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>Sans action planifiée</span>
           </div>
-          <div style={{ fontSize: '1.7rem', fontWeight: 900, color: alertesCritiques.sansAction.length > 0 ? '#f59e0b' : '#fff' }}>
+          <div style={{ fontSize: '1.7rem', fontWeight: 900, color: alertesCritiques.sansAction.length > 0 ? '#f59e0b' : 'var(--text-main, #fff)' }}>
             {alertesCritiques.sansAction.length}
           </div>
           <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>

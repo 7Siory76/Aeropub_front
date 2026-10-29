@@ -20,6 +20,19 @@ export function AuthProvider({ children }) {
         return saved ? JSON.parse(saved) : null;
     });
 
+    // Écouter les événements 401 (Token expiré ou invalide) provenant de l'intercepteur Axios
+    useEffect(() => {
+        const handleUnauthorized = () => {
+            setUser(null);
+            localStorage.removeItem('aeropub_user');
+            localStorage.removeItem('aeropub_token');
+            localStorage.setItem('aeropub_session_expired', 'true');
+        };
+
+        window.addEventListener('aeropub:unauthorized', handleUnauthorized);
+        return () => window.removeEventListener('aeropub:unauthorized', handleUnauthorized);
+    }, []);
+
     // Mettre à jour l'horodatage d'activité lors des clics ou touches du clavier
     useEffect(() => {
         if (!user) return;
@@ -38,9 +51,12 @@ export function AuthProvider({ children }) {
         };
     }, [user]);
 
-    const login = (userData) => {
+    const login = (userData, token) => {
         setUser(userData);
         localStorage.setItem('aeropub_user', JSON.stringify(userData));
+        if (token) {
+            localStorage.setItem('aeropub_token', token);
+        }
         localStorage.setItem('aeropub_last_activity', Date.now().toString());
         localStorage.removeItem('aeropub_session_expired');
     };
@@ -48,6 +64,7 @@ export function AuthProvider({ children }) {
     const logout = () => {
         setUser(null);
         localStorage.removeItem('aeropub_user');
+        localStorage.removeItem('aeropub_token');
         localStorage.removeItem('aeropub_last_activity');
         localStorage.removeItem('aeropub_session_expired');
     };

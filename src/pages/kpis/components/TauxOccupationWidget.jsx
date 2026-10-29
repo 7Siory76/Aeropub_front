@@ -120,7 +120,7 @@ export default function TauxOccupationWidget({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <Percent size={20} style={{ color: '#10b981' }} />
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
               Taux d'occupation des supports
             </h3>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -130,7 +130,7 @@ export default function TauxOccupationWidget({
         </div>
 
         {/* Sélecteur de période */}
-        <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '10px', padding: '3px' }}>
+        <div style={{ display: 'flex', background: 'var(--border-glass, rgba(148, 163, 184, 0.15))', borderRadius: '10px', padding: '3px' }}>
           {['mois', 'trimestre', 'annee'].map((p) => (
             <button
               key={p}
@@ -168,7 +168,7 @@ export default function TauxOccupationWidget({
           <div style={{
             width: '100%',
             height: '12px',
-            background: 'rgba(255, 255, 255, 0.08)',
+            background: 'var(--border-glass, rgba(148, 163, 184, 0.2))',
             borderRadius: '9999px',
             overflow: 'hidden',
             marginBottom: '0.6rem'
@@ -187,9 +187,9 @@ export default function TauxOccupationWidget({
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            <span>Occupés : <strong style={{ color: '#fff' }}>{statsOccupation.occupesCount}</strong></span>
+            <span>Occupés : <strong style={{ color: 'var(--text-main, #fff)' }}>{statsOccupation.occupesCount}</strong></span>
             <span>Disponibles : <strong style={{ color: '#10b981' }}>{statsOccupation.disponiblesCount}</strong></span>
-            <span>Capacité totale : <strong>{statsOccupation.totalSupports}</strong></span>
+            <span>Capacité totale : <strong style={{ color: 'var(--text-main, #fff)' }}>{statsOccupation.totalSupports}</strong></span>
           </div>
         </div>
       </div>

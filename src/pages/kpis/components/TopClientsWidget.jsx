@@ -153,7 +153,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                     <Trophy size={20} style={{ color: '#f59e0b' }} />
                     <div>
-                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: '#fff' }}>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0, color: 'var(--text-main, #fff)' }}>
                             Top 10 des clients (valeur marchande)
                         </h3>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -169,7 +169,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                 {/* Sélecteur de période et filtres temporels */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     {/* Commutateur de mode */}
-                    <div style={{ display: 'flex', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '10px', padding: '3px' }}>
+                    <div style={{ display: 'flex', background: 'var(--border-glass, rgba(148, 163, 184, 0.15))', borderRadius: '10px', padding: '3px' }}>
                         <button
                             type="button"
                             onClick={() => setModePeriode('mois')}
@@ -226,8 +226,8 @@ export default function TopClientsWidget({ userContracts = [] }) {
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(Number(e.target.value))}
                             style={{
-                                background: 'rgba(255, 255, 255, 0.08)',
-                                color: '#fff',
+                                background: 'var(--bg-card, rgba(255, 255, 255, 0.08))',
+                                color: 'var(--text-main, #fff)',
                                 border: '1px solid var(--border-glass)',
                                 borderRadius: '8px',
                                 padding: '0.3rem 0.6rem',
@@ -237,7 +237,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                             }}
                         >
                             {MOIS_NOMS.map((m, idx) => (
-                                <option key={idx} value={idx} style={{ background: '#1e293b', color: '#fff' }}>
+                                <option key={idx} value={idx} style={{ background: 'var(--bg-card, #1e293b)', color: 'var(--text-main, #fff)' }}>
                                     {m}
                                 </option>
                             ))}
@@ -250,8 +250,8 @@ export default function TopClientsWidget({ userContracts = [] }) {
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(Number(e.target.value))}
                             style={{
-                                background: 'rgba(255, 255, 255, 0.08)',
-                                color: '#fff',
+                                background: 'var(--bg-card, rgba(255, 255, 255, 0.08))',
+                                color: 'var(--text-main, #fff)',
                                 border: '1px solid var(--border-glass)',
                                 borderRadius: '8px',
                                 padding: '0.3rem 0.6rem',
@@ -261,7 +261,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                             }}
                         >
                             {availableYears.map((anneeOption) => (
-                                <option key={anneeOption} value={anneeOption} style={{ background: '#1e293b', color: '#fff' }}>
+                                <option key={anneeOption} value={anneeOption} style={{ background: 'var(--bg-card, #1e293b)', color: 'var(--text-main, #fff)' }}>
                                     {anneeOption}
                                 </option>
                             ))}
@@ -289,7 +289,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                                             width: '24px',
                                             height: '24px',
                                             borderRadius: '6px',
-                                            background: isPodium ? podiumColor : 'rgba(255, 255, 255, 0.08)',
+                                            background: isPodium ? podiumColor : 'var(--border-glass, rgba(255, 255, 255, 0.08))',
                                             color: isPodium ? '#000' : 'var(--text-muted)',
                                             display: 'flex',
                                             alignItems: 'center',
@@ -299,7 +299,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                                         }}>
                                             {client.rang}
                                         </span>
-                                        <strong style={{ color: '#fff' }}>{client.nom}</strong>
+                                        <strong style={{ color: 'var(--text-main, #fff)' }}>{client.nom}</strong>
                                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                                             ({client.nbContrats} contrat{client.nbContrats > 1 ? 's' : ''}{modePeriode !== 'general' ? ` · ${client.totalJoursActifs} j` : ''})
                                         </span>
@@ -318,7 +318,7 @@ export default function TopClientsWidget({ userContracts = [] }) {
                                 </div>
 
                                 {/* Barre de progression */}
-                                <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.06)', borderRadius: '999px', overflow: 'hidden' }}>
+                                <div style={{ width: '100%', height: '8px', background: 'var(--border-glass, rgba(148, 163, 184, 0.15))', borderRadius: '999px', overflow: 'hidden' }}>
                                     <div style={{
                                         width: `${client.pourcentageRelatif}%`,
                                         height: '100%',
