@@ -1,0 +1,23 @@
+import api from './client';
+
+export const journalNotificationApi = {
+    // Récupérer les notifications avec filtre optionnel
+    getAll: (categorie = null, nonLu = false) => {
+        const params = new URLSearchParams();
+        if (categorie && categorie !== 'TOUTES') params.append('categorie', categorie);
+        if (nonLu) params.append('nonLu', 'true');
+        return api.get(`/notifications?${params.toString()}`).then(res => res.data);
+    },
+
+    getCategories: () => api.get('/notifications/categories').then(res => res.data.data),
+
+    getUnreadCount: () => api.get('/notifications/unread-count').then(res => res.data.unreadCount),
+
+    markAsRead: (id) => api.put(`/notifications/${id}/read`).then(res => res.data.data),
+
+    markAllAsRead: () => api.put('/notifications/mark-all-read').then(res => res.data),
+
+    delete: (id) => api.delete(`/notifications/${id}`).then(res => res.data),
+
+    create: (data) => api.post('/notifications', data).then(res => res.data)
+};

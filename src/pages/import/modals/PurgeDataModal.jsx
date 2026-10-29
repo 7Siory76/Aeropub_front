@@ -1,0 +1,546 @@
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import {
+    X,
+    Trash2,
+    AlertTriangle,
+    ShieldCheck,
+    Loader2,
+    Layers,
+    CalendarCheck,
+    Building2,
+    Database,
+    MapPin,
+    Tag,
+    Bell,
+    Mail
+} from 'lucide-react';
+import {
+    abonnementsApi,
+    clientsApi,
+    supportsApi,
+    zonesApi,
+    categoriesApi,
+    typeSupportsApi,
+    journalNotificationApi,
+    actionsCommercialesApi
+} from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+
+import './PurgeDataModal.css';
+
+export default function PurgeDataModal({ isOpen, onClose, onPurgeSuccess }) {
+    const { showSuccess, showError, showInfo } = useFeedback();
+
+    const [loadingCounts, setLoadingCounts] = useState(true);
+    const [counts, setCounts] = useState({
+        abonnements: 0,
+        supports: 0,
+        clients: 0,
+        zones: 0,
+        categories: 0,
+        types: 0,
+        notifications: 0,
+        actionsCommerciales: 0
+    });
+
+    const [selectedKeys, setSelectedKeys] = useState(new Set());
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [progressStatus, setProgressStatus] = useState('');
+    const [confirmationChecked, setConfirmationChecked] = useState(false);
+
+    // Définition des modules de données purgeables
+    const purgeModules = [
+        {
+            key: 'abonnements',
+            title: 'Abonnements et contrats',
+            desc: 'Abonnements, contrats, statuts et actions commerciales',
+            icon: <CalendarCheck size={18} />,
+            count: counts.abonnements,
+            execute: async (onProgress) => {
+                const abonnements = await abonnementsApi.getAll();
+                let deleted = 0;
+                for (let i = 0; i < abonnements.length; i++) {
+                    const abonnement = abonnements[i];
+                    onProgress(`Suppression des abonnements (${i + 1}/${abonnements.length})...`);
+                    await abonnementsApi.delete(abonnement.reference || abonnement.id);
+                    deleted++;
+                }
+                return { label: 'Abonnements', count: deleted };
+            }
+        },
+        {
+            key: 'supports',
+            title: 'Supports et emplacements publicitaires',
+            desc: 'Supports, états et historique des emplacements',
+            icon: <Database size={18} />,
+            count: counts.supports,
+            execute: async (onProgress) => {
+                const supports = await supportsApi.getAll();
+                let deleted = 0;
+                for (let i = 0; i < supports.length; i++) {
+                    const support = supports[i];
+                    onProgress(`Suppression des supports (${i + 1}/${supports.length})...`);
+                    await supportsApi.delete(support.reference);
+                    deleted++;
+                }
+                return { label: 'Supports', count: deleted };
+            }
+        },
+        {
+            key: 'clients',
+            title: 'Clients, partenaires et annonceurs',
+            desc: 'Clients et contacts associés (courriel, téléphone)',
+            icon: <Building2 size={18} />,
+            count: counts.clients,
+            execute: async (onProgress) => {
+                const clients = await clientsApi.getAll();
+                let deleted = 0;
+                for (let i = 0; i < clients.length; i++) {
+                    const client = clients[i];
+                    onProgress(`Suppression des clients (${i + 1}/${clients.length})...`);
+                    await clientsApi.delete(client.id);
+                    deleted++;
+                }
+                return { label: 'Clients', count: deleted };
+            }
+        },
+        {
+            key: 'zones',
+            title: "Zones et terminaux d'aéroport",
+            desc: 'Zones terminales (hall départ, arrivée, parking, etc.)',
+            icon: <MapPin size={18} />,
+            count: counts.zones,
+            execute: async (onProgress) => {
+                const zones = await zonesApi.getAll();
+                let deleted = 0;
+                for (let i = 0; i < zones.length; i++) {
+                    const zone = zones[i];
+                    onProgress(`Suppression des zones (${i + 1}/${zones.length})...`);
+                    await zonesApi.delete(zone.id);
+                    deleted++;
+                }
+                return { label: 'Zones', count: deleted };
+            }
+        },
+        {
+            key: 'categories',
+            title: 'Catégories de supports',
+            desc: 'Catégories de supports (statique, numérique, événementiel...)',
+            icon: <Layers size={18} />,
+            count: counts.categories,
+            execute: async (onProgress) => {
+                const categories = await categoriesApi.getAll();
+                let deleted = 0;
+                for (let i = 0; i < categories.length; i++) {
+                    const categorie = categories[i];
+                    onProgress(`Suppression des catégories (${i + 1}/${categories.length})...`);
+                    await categoriesApi.delete(categorie.id);
+                    deleted++;
+                }
+                return { label: 'Catégories', count: deleted };
+            }
+        },
+        {
+            key: 'types',
+            title: 'Types de supports publicitaires',
+            desc: 'Types de support (panneau 4x3, caisson lumineux, écran LED...)',
+            icon: <Tag size={18} />,
+            count: counts.types,
+            execute: async (onProgress) => {
+                const types = await typeSupportsApi.getAll();
+                let deleted = 0;
+                for (let i = 0; i < types.length; i++) {
+                    const typeSupport = types[i];
+                    onProgress(`Suppression des types (${i + 1}/${types.length})...`);
+                    await typeSupportsApi.delete(typeSupport.id);
+                    deleted++;
+                }
+                return { label: 'Types de support', count: deleted };
+            }
+        },
+        {
+            key: 'actions_commerciales',
+            title: 'Actions commerciales et alertes',
+            desc: 'Historique des relances, préavis et courriels envoyés',
+            icon: <Mail size={18} />,
+            count: counts.actionsCommerciales,
+            execute: async (onProgress) => {
+                const reponseActions = await actionsCommercialesApi.getAll();
+                const actions = Array.isArray(reponseActions) ? reponseActions : (reponseActions?.data || []);
+                let deleted = 0;
+                for (let i = 0; i < actions.length; i++) {
+                    const action = actions[i];
+                    onProgress(`Suppression des actions commerciales (${i + 1}/${actions.length})...`);
+                    await actionsCommercialesApi.delete(action.id);
+                    deleted++;
+                }
+                return { label: 'Actions commerciales', count: deleted };
+            }
+        },
+        {
+            key: 'journal_notification',
+            title: "Journal d'audit et notifications",
+            desc: "Notifications, alertes et journal d'audit des actions",
+            icon: <Bell size={18} />,
+            count: counts.notifications,
+            execute: async (onProgress) => {
+                const reponseNotifications = await journalNotificationApi.getAll();
+                const notifications = Array.isArray(reponseNotifications) ? reponseNotifications : (reponseNotifications?.data || []);
+                let deleted = 0;
+                for (let i = 0; i < notifications.length; i++) {
+                    const notification = notifications[i];
+                    onProgress(`Suppression des notifications (${i + 1}/${notifications.length})...`);
+                    await journalNotificationApi.delete(notification.id);
+                    deleted++;
+                }
+                return { label: 'Journal et notifications', count: deleted };
+            }
+        }
+    ];
+
+    // Charger les compteurs réels en base de données
+    const loadCounts = async () => {
+        setLoadingCounts(true);
+        try {
+            const [abos, supps, clis, zns, cats, typs, notifs, acts] = await Promise.allSettled([
+                abonnementsApi.getAll(),
+                supportsApi.getAll(),
+                clientsApi.getAll(),
+                zonesApi.getAll(),
+                categoriesApi.getAll(),
+                typeSupportsApi.getAll(),
+                journalNotificationApi.getAll(),
+                actionsCommercialesApi.getAll()
+            ]);
+
+            const notifItems = notifs.status === 'fulfilled'
+                ? (Array.isArray(notifs.value) ? notifs.value : notifs.value?.data || [])
+                : [];
+            const actItems = acts.status === 'fulfilled'
+                ? (Array.isArray(acts.value) ? acts.value : acts.value?.data || [])
+                : [];
+
+            setCounts({
+                abonnements: abos.status === 'fulfilled' && Array.isArray(abos.value) ? abos.value.length : 0,
+                supports: supps.status === 'fulfilled' && Array.isArray(supps.value) ? supps.value.length : 0,
+                clients: clis.status === 'fulfilled' && Array.isArray(clis.value) ? clis.value.length : 0,
+                zones: zns.status === 'fulfilled' && Array.isArray(zns.value) ? zns.value.length : 0,
+                categories: cats.status === 'fulfilled' && Array.isArray(cats.value) ? cats.value.length : 0,
+                types: typs.status === 'fulfilled' && Array.isArray(typs.value) ? typs.value.length : 0,
+                notifications: notifItems.length,
+                actionsCommerciales: actItems.length
+            });
+        } catch {
+            // Échec silencieux du chargement préalable des compteurs
+        } finally {
+            setLoadingCounts(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            loadCounts();
+            setSelectedKeys(new Set());
+            setConfirmationChecked(false);
+            setProgressStatus('');
+        }
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+
+    // Gestion de la sélection
+    const toggleKey = (key) => {
+        if (isDeleting) return;
+        setSelectedKeys(prev => {
+            const next = new Set(prev);
+            if (next.has(key)) next.delete(key);
+            else next.add(key);
+            return next;
+        });
+    };
+
+    const handleSelectAll = () => {
+        if (isDeleting) return;
+        const allKeys = purgeModules.filter(m => m.count > 0).map(m => m.key);
+        setSelectedKeys(new Set(allKeys));
+    };
+
+    const handleDeselectAll = () => {
+        if (isDeleting) return;
+        setSelectedKeys(new Set());
+    };
+
+    // Exécution de la suppression dans l'ordre strict des dépendances
+    const handleExecutePurge = async () => {
+        if (selectedKeys.size === 0) {
+            showInfo('Veuillez sélectionner au moins une table à vider.');
+            return;
+        }
+
+        if (!confirmationChecked) {
+            showInfo('Veuillez cocher la case de confirmation pour continuer.');
+            return;
+        }
+
+        setIsDeleting(true);
+        const results = [];
+        const errors = [];
+
+        try {
+            // Ordre obligatoire d'exécution pour respecter les clés étrangères
+            const executionOrder = [
+                'actions_commerciales',
+                'journal_notification',
+                'abonnements',
+                'supports',
+                'clients',
+                'zones',
+                'categories',
+                'types'
+            ];
+
+            for (const key of executionOrder) {
+                if (selectedKeys.has(key)) {
+                    const modulePurge = purgeModules.find(m => m.key === key);
+                    if (modulePurge) {
+                        try {
+                            const resultatPurge = await modulePurge.execute(setProgressStatus);
+                            results.push(resultatPurge);
+
+                            // Enregistrer la notification récapitulative dans le journal d'audit
+                            if (resultatPurge && resultatPurge.count > 0 && key !== 'journal_notification') {
+                                try {
+                                    await journalNotificationApi.create({
+                                        categorie_action: 'SUPPRESSION',
+                                        entite_concernee: key.toUpperCase(),
+                                        reference_entite: key,
+                                        valeur_apres: { count: resultatPurge.count, label: resultatPurge.label },
+                                        message_notification: `Suppression de ${resultatPurge.count} ${resultatPurge.label.toLowerCase()} (purge des données).`
+                                    });
+                                } catch {
+                                    // Journalisation optionnelle ignorée si indisponible
+                                }
+                            }
+                        } catch (err) {
+                            const errMsg = err.response?.data?.message || err.message || 'Erreur inconnue';
+                            errors.push(`${modulePurge.title} : ${errMsg}`);
+                        }
+                    }
+                }
+            }
+
+            const totalDeleted = results.reduce((acc, r) => acc + r.count, 0);
+
+            if (errors.length > 0) {
+                showError(`Suppression partielle (${totalDeleted} supprimés). Erreurs : ${errors.join(' | ')}`);
+            } else {
+                showSuccess(`Nettoyage réussi : ${totalDeleted} enregistrement(s) supprimé(s) au total.`);
+            }
+
+            if (onPurgeSuccess) {
+                onPurgeSuccess();
+            }
+
+            onClose();
+
+        } catch (globalErr) {
+            showError("Une erreur inattendue est survenue pendant l'opération.");
+        } finally {
+            setIsDeleting(false);
+            setProgressStatus('');
+        }
+    };
+
+    const totalSelectedRecords = purgeModules
+        .filter(m => selectedKeys.has(m.key))
+        .reduce((acc, m) => acc + m.count, 0);
+
+    return createPortal(
+        <div className="purge-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget && !isDeleting) onClose(); }}>
+            <div className="purge-modal-card">
+
+                {/* En-tête de la modale */}
+                <div className="purge-modal-header">
+                    <div className="purge-modal-title-group">
+                        <div className="purge-modal-icon-badge">
+                            <Trash2 size={22} />
+                        </div>
+                        <div>
+                            <h2 className="purge-modal-title">Purge et nettoyage sélectif des données</h2>
+                            <p className="purge-modal-subtitle">
+                                Supprimez proprement les données de test ou réinitialisez vos tables du système.
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        className="purge-modal-close-btn"
+                        onClick={onClose}
+                        disabled={isDeleting}
+                        title="Fermer"
+                    >
+                        <X size={20} />
+                    </button>
+                </div>
+
+                {/* Corps de la modale */}
+                <div className="purge-modal-body">
+
+                    {/* Badge tables protégées */}
+                    <div className="purge-protected-banner">
+                        <ShieldCheck size={18} style={{ flexShrink: 0 }} />
+                        <span>
+                            <strong>Sécurité garantie :</strong> Les comptes utilisateurs, rôles et paramètres système sont strictement protégés et ne seront jamais supprimés.
+                        </span>
+                    </div>
+
+                    {/* Avertissement */}
+                    <div className="purge-warning-banner">
+                        <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+                        <div>
+                            Cette action est <strong>irréversible</strong>. Les enregistrements sélectionnés seront définitivement supprimés du système en respectant l'intégrité des données.
+                        </div>
+                    </div>
+
+                    {/* Barre d'outils de sélection */}
+                    <div className="purge-selection-toolbar">
+                        <span>
+                            {loadingCounts ? (
+                                <span>Calcul des enregistrements en cours...</span>
+                            ) : (
+                                <span>{selectedKeys.size} module(s) sélectionné(s) ({totalSelectedRecords} lignes)</span>
+                            )}
+                        </span>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                type="button"
+                                className="purge-select-btn"
+                                onClick={handleSelectAll}
+                                disabled={isDeleting || loadingCounts}
+                            >
+                                Tout sélectionner
+                            </button>
+                            <span style={{ color: 'var(--border-color, rgba(255,255,255,0.1))' }}>|</span>
+                            <button
+                                type="button"
+                                className="purge-select-btn"
+                                onClick={handleDeselectAll}
+                                disabled={isDeleting || selectedKeys.size === 0}
+                            >
+                                Tout désélectionner
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Liste des tables sélectionnables */}
+                    <div className="purge-tables-list">
+                        {purgeModules.map((mod) => {
+                            const isSelected = selectedKeys.has(mod.key);
+                            return (
+                                <div
+                                    key={mod.key}
+                                    className={`purge-table-item ${isSelected ? 'selected' : ''}`}
+                                    onClick={() => toggleKey(mod.key)}
+                                >
+                                    <div className="purge-item-left">
+                                        <input
+                                            type="checkbox"
+                                            className="purge-checkbox"
+                                            checked={isSelected}
+                                            onChange={() => { }} // Géré par le div parent
+                                            disabled={isDeleting}
+                                        />
+                                        <div className="purge-item-icon">
+                                            {mod.icon}
+                                        </div>
+                                        <div>
+                                            <div className="purge-item-title">{mod.title}</div>
+                                            <div className="purge-item-desc">{mod.desc}</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="purge-item-badge">
+                                        {loadingCounts ? (
+                                            <Loader2 size={12} className="btn-spinner" />
+                                        ) : (
+                                            `${mod.count} en base`
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Indicateur de progression en cours */}
+                    {isDeleting && (
+                        <div className="purge-progress-box">
+                            <div className="purge-progress-label">
+                                <Loader2 size={16} className="btn-spinner" />
+                                <span>{progressStatus || 'Suppression en cours...'}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Case de confirmation explicite */}
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.65rem',
+                        fontSize: '0.86rem',
+                        cursor: isDeleting ? 'not-allowed' : 'pointer',
+                        padding: '0.6rem 0.75rem',
+                        borderRadius: '8px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid rgba(255, 255, 255, 0.06)'
+                    }}>
+                        <input
+                            type="checkbox"
+                            checked={confirmationChecked}
+                            onChange={(e) => setConfirmationChecked(e.target.checked)}
+                            disabled={isDeleting}
+                            style={{ width: '16px', height: '16px', accentColor: '#ef4444' }}
+                        />
+                        <span>Je confirme vouloir supprimer définitivement les données sélectionnées.</span>
+                    </label>
+
+                </div>
+
+                {/* Pied de page */}
+                <div className="purge-modal-footer">
+                    <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={onClose}
+                        disabled={isDeleting}
+                        style={{ padding: '0.65rem 1.25rem', borderRadius: '10px' }}
+                    >
+                        Annuler
+                    </button>
+                    <button
+                        type="button"
+                        className="btn-purge-danger"
+                        onClick={handleExecutePurge}
+                        disabled={isDeleting || selectedKeys.size === 0 || !confirmationChecked}
+                    >
+                        {isDeleting ? (
+                            <>
+                                <Loader2 size={16} className="btn-spinner" />
+                                <span>Suppression en cours...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Trash2 size={16} />
+                                <span>
+                                    Purger les données ({totalSelectedRecords})
+                                </span>
+                            </>
+                        )}
+                    </button>
+                </div>
+
+            </div>
+        </div>,
+        document.body
+    );
+}

@@ -1,0 +1,339 @@
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { X, AlertCircle, Loader2 } from 'lucide-react';
+import { abonnementsApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
+import SearchableSelect from '../../../components/SearchableSelect';
+
+export default function AssociateAbonnementModal({
+    targetEmp,
+    clients = [],
+    abonnements = [],
+    selectedDate,
+    onClose,
+    onSuccess
+}) {
+    const { navigateWithFeedback, scrollToTop } = useFeedback();
+
+    // 1. États internes propres au formulaire
+    const [referenceAbo, setReferenceAbo] = useState('');
+    const [clientId, setClientId] = useState(clients[0]?.id || '');
+    const [startDate, setStartDate] = useState(selectedDate || new Date().toISOString().split('T')[0]);
+    const [modalError, setModalError] = useState('');
+
+    useEffect(() => {
+        if (modalError) {
+            scrollToTop();
+        }
+    }, [modalError, scrollToTop]);
+
+    // Date de fin par défaut (+1 an)
+    const defaultEnd = () => {
+        const dateReference = new Date(selectedDate || new Date());
+        dateReference.setFullYear(dateReference.getFullYear() + 1);
+        return dateReference.toISOString().split('T')[0];
+    }
+    const [endDate, setEndDate] = useState(defaultEnd());
+    const [duree, setDuree] = useState('1 an');
+    const [dureeValeur, setDureeValeur] = useState(1);
+    const [dureeUnite, setDureeUnite] = useState('an');
+    const [periodicite, setPeriodicite] = useState('Annuel');
+    const [facture, setFacture] = useState('');
+    const [loading, setLoanding] = useState(false);
+
+    const deducePeriodicite = (dureeChiffre, unite) => {
+        const nombre = parseInt(dureeChiffre, 10) || 1;
+        if (unite === 'an') return 'Annuel';
+        if (nombre <= 1) return 'Mensuel';
+        if (nombre >= 2 && nombre <= 4) return 'Trimestriel';
+        if (nombre >= 5 && nombre <= 8) return 'Semestriel';
+        return 'Annuel';
+    };
+
+    const getDureeContratText = (dureeChiffre, unite) => {
+        const nombre = parseInt(dureeChiffre, 10) || 1;
+        if (unite === 'an') {
+            return `${nombre} ${nombre > 1 ? 'ans' : 'an'}`;
+        }
+        return `${nombre} mois`;
+    };
+
+    useEffect(() => {
+        if (!startDate) return;
+
+        // Décomposition pour éviter tout problème de décalage de fuseau horaire
+        const [year, month, day] = startDate.split('-').map(Number);
+        const dateCalculFin = new Date(year, month - 1, day);
+        const nombreDuree = parseInt(dureeValeur, 10) || 1;
+        if (dureeUnite === 'an') {
+            dateCalculFin.setFullYear(dateCalculFin.getFullYear() + nombreDuree);
+        } else if (dureeUnite === 'mois') {
+            dateCalculFin.setMonth(dateCalculFin.getMonth() + nombreDuree);
+        }
+        const anneeFin = dateCalculFin.getFullYear();
+        const moisFin = String(dateCalculFin.getMonth() + 1).padStart(2, '0');
+        const jourFin = String(dateCalculFin.getDate()).padStart(2, '0');
+        setEndDate(`${anneeFin}-${moisFin}-${jourFin}`);
+
+        // Déduire la périodicité adaptée à la durée
+        setPeriodicite(deducePeriodicite(nombreDuree, dureeUnite));
+    }, [startDate, dureeValeur, dureeUnite]);
+
+    //2. Soumission du formulaire
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setModalError('');
+        const cleanRef = referenceAbo.trim();
+
+        if (!cleanRef || !clientId || !startDate || !endDate) {
+            setModalError("Veuillez renseigner la référence du contrat et tous les champs obligatoires.");
+            return;
+        }
+
+        // Vérifier si la référence du contrat existe déjà
+        const isRefTaken = abonnements.some(
+            (a) => String(a.reference || '').trim().toLowerCase() === cleanRef.toLowerCase()
+        );
+        if (isRefTaken) {
+            setModalError(`La référence « ${cleanRef} » existe déjà. Veuillez en choisir une autre.`);
+            return;
+        }
+
+        setLoanding(true);
+        try {
+            if (new Date(startDate) > new Date(endDate)) {
+                setModalError('La date de fin doit être postérieure à la date de début.');
+                setLoanding(false);
+                return;
+            }
+
+            const targetRef = String(targetEmp.reference).trim().toUpperCase();
+            const newStart = new Date(startDate).getTime();
+            const newEnd = new Date(endDate).getTime();
+
+            const conflictAbo = abonnements.find(abo => {
+                const supportsList = (abo.supports_associes || '')
+                    .split(',')
+                    .map(s => s.trim().toUpperCase());
+                const isMatch =
+                    supportsList.includes(targetRef) ||
+                    String(abo.reference_emplacement || '').trim().toUpperCase() === targetRef ||
+                    String(abo.reference_support || '').trim().toUpperCase() === targetRef;
+                if (!isMatch) return false;
+                const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+                const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                if (cleanSt.includes('resili') || cleanSt.includes('annul') || cleanSt.includes('archiv') || cleanSt.includes('expir')) {
+                    return false;
+                }
+
+                const existStart = new Date(abo.date_debut).getTime();
+                const existEnd = new Date(abo.date_fin || abo.date_echeance).getTime();
+
+                if (isNaN(existStart) || isNaN(existEnd)) return false;
+
+                // Vérifier le chevauchement
+                return newStart <= existEnd && newEnd >= existStart;
+            });
+
+            if (conflictAbo) {
+                const dDebut = new Date(conflictAbo.date_debut).toLocaleDateString('fr-FR');
+                const dFin = new Date(conflictAbo.date_fin || conflictAbo.date_echeance).toLocaleDateString('fr-FR');
+                const clientNom = conflictAbo.nom_client || conflictAbo.raison_sociale || 'un client';
+                setModalError(
+                    `Conflit de période : cet emplacement est déjà réservé du ${dDebut} au ${dFin} par ${clientNom}.`
+                );
+                setLoanding(false);
+                return;
+            }
+
+            const dureeFinale = getDureeContratText(dureeValeur, dureeUnite);
+
+            await abonnementsApi.create({
+                reference: cleanRef,
+                reference_emplacement: targetEmp.reference,
+                reference_support: targetEmp.reference,
+                id_client: parseInt(clientId, 10),
+                date_debut: startDate,
+                date_fin: endDate,
+                date_echeance: endDate,
+                periodicite: periodicite || deducePeriodicite(dureeValeur, dureeUnite),
+                duree_contrat: dureeFinale,
+                ref_facture: facture,
+                id_type_statut: 2,
+                statut: 'à valider'
+            });
+
+            onClose();
+            if (onSuccess) onSuccess();
+            navigateWithFeedback('dashboard', 'abonnements', `Contrat « ${cleanRef} » associé au support ${targetEmp.reference} avec succès !`);
+        } catch (err) {
+            const userMsg = sanitizeUserError(err, "Erreur lors de la création de l'abonnement.");
+            setModalError(userMsg);
+        } finally {
+            setLoanding(false);
+        }
+    };
+    // Téléportation dans le <body> avec createPortal
+    return createPortal(
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" style={{ maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close-btn" onClick={onClose} type="button">
+                    <X size={20} />
+                </button>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                    📝 Associer un contrat d'affichage
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                    Emplacement sélectionné : <strong style={{ color: '#6366f1' }}>{targetEmp.reference}</strong> ({targetEmp.nom_type_support || 'Support standard'} - {targetEmp.ref_format || targetEmp.caracteristiques || 'Format non renseigné'})
+                </p>
+
+                {modalError && (
+                    <div className="modal-error-box" style={{ marginBottom: '1.25rem' }}>
+                        <AlertCircle size={16} />
+                        <span>{modalError}</span>
+                    </div>
+                )}
+                <form onSubmit={handleSubmit}>
+                    {/* Référence du contrat */}
+                    <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+                            Référence du contrat : <span style={{ color: '#ef4444' }}>*</span>
+                        </label>
+                        <input
+                            type="text"
+                            className="search-input"
+                            style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                            placeholder="Ex. : ABO-2026-005"
+                            value={referenceAbo}
+                            onChange={(e) => setReferenceAbo(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    {/* Sélection Client */}
+                    <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+                            Client souscripteur : <span style={{ color: '#ef4444' }}>*</span>
+                        </label>
+                        <SearchableSelect
+                            options={clients}
+                            value={clientId}
+                            onChange={(selectedClientId) => setClientId(selectedClientId)}
+                            placeholder="-- Sélectionner un client --"
+                            searchPlaceholder="Rechercher un client (nom, secteur)..."
+                            getOptionValue={(c) => c.id}
+                            getOptionLabel={(c) => c.raison_sociale || c.nom_client}
+                            getOptionSublabel={(c) => c.secteur_activite ? `Secteur : ${c.secteur_activite}` : (c.contact || null)}
+                            getOptionBadge={(c) => c.etat_client || null}
+                        />
+                    </div>
+                    {/* Durée et périodicité */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+                        <div>
+                            <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                                Durée du contrat :
+                            </label>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="120"
+                                    className="search-input"
+                                    style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '80px', textAlign: 'center' }}
+                                    value={dureeValeur}
+                                    onChange={(e) => setDureeValeur(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                                />
+                                <select
+                                    className="search-input"
+                                    style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', flex: 1 }}
+                                    value={dureeUnite}
+                                    onChange={(e) => setDureeUnite(e.target.value)}
+                                >
+                                    <option value="an">Année(s)</option>
+                                    <option value="mois">Mois</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                                Périodicité :
+                            </label>
+                            <select
+                                className="search-input"
+                                style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                                value={periodicite}
+                                onChange={(e) => setPeriodicite(e.target.value)}
+                            >
+                                <option value="Mensuel">Mensuel</option>
+                                <option value="Trimestriel">Trimestriel</option>
+                                <option value="Semestriel">Semestriel</option>
+                                <option value="Annuel">Annuel</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Dates Début / Fin */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+                        <div>
+                            <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                                Date de début :
+                            </label>
+                            <input
+                                type="date"
+                                className="search-input"
+                                style={{ borderRadius: '10px', padding: '0.65rem 0.85rem' }}
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                                Date de fin :
+                            </label>
+                            <input
+                                type="date"
+                                className="search-input"
+                                style={{ borderRadius: '10px', padding: '0.65rem 0.85rem' }}
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    {/* Référence Facture / Commande */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                            Référence de facture ou bon de commande (facultatif) :
+                        </label>
+                        <input
+                            type="text"
+                            className="search-input"
+                            style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                            placeholder="Ex. : FA 240"
+                            value={facture}
+                            onChange={(e) => setFacture(e.target.value)}
+                        />
+                    </div>
+                    {/* Boutons d'action */}
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                        <button type="button" onClick={onClose} className="btn-secondary" disabled={loading}>
+                            Annuler
+                        </button>
+                        <button type="submit" className="btn-primary" disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            {loading ? (
+                                <>
+                                    <Loader2 size={16} className="btn-spinner" />
+                                    <span>Validation en cours...</span>
+                                </>
+                            ) : (
+                                "Valider le contrat"
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>,
+        document.body
+    );
+}

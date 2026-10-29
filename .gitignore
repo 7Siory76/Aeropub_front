@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+dist-ssr/
+
+# Environment files & secrets (Protection anti-bot / fuite de données)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!.env.example
+
+# Private keys, certificates and secrets
+*.pem
+*.key
+*.cert
+*.pfx
+*.p12
+*credentials*.json
+
+# Editor & OS files
+*.local
+.vscode/
+.idea/
+.DS_Store
+*.log

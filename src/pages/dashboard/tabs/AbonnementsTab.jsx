@@ -1,0 +1,991 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  User,
+  Search,
+  RotateCcw,
+  Plus,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  SlidersHorizontal,
+  X,
+  Tv,
+  Clock,
+  AlertTriangle,
+  ArrowRight,
+  Check
+} from 'lucide-react';
+import Pagination from '../../../components/Pagination';
+import ExportExcelCsv from '../../../components/ExportExcelCsv';
+import AbonnementDetailsModal from '../modals/AbonnementDetailsModal';
+import AddAbonnementModal from '../modals/AddAbonnementModal';
+import { useAuth } from '../../../context/AuthContext';
+import { hasRole } from '../../../utils/rbac';
+import { useFeedback } from '../../../context/FeedbackContext';
+import styles from './AbonnementsTab.module.css';
+
+export default function AbonnementsTab({
+  abonnements = [],
+  emplacements = [],
+  typeStatut = [],
+  clients = [],
+  utilisateurs = [],
+  actionsCommerciales = [],
+  initialSearchQuery = '',
+  onRefresh,
+  kpiFilter = null,
+  onClearKpiFilter
+}) {
+  const { user } = useAuth();
+  const { showSuccess, showInfo } = useFeedback();
+
+  // Permissions RBAC
+  const canCreateOrDuplicate = hasRole(user, ['Admin', 'Resp_Com', 'Commercial']);
+  const canViewGlobalFilter = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Lecture_Seule']);
+  const isRestrictedCommercial = !canViewGlobalFilter && hasRole(user, ['Commercial']);
+  const canExport = hasRole(user, ['Admin', 'Direction', 'Resp_Com', 'Commercial', 'Lecture_Seule']);
+
+  // Contrats parents renouvelés avec continuité
+  const renewedParentRefs = useMemo(() => {
+    const set = new Set();
+    abonnements.forEach(c => {
+      if (c.id_abonnement_precedent) {
+        set.add(String(c.id_abonnement_precedent).trim());
+      }
+    });
+    return set;
+  }, [abonnements]);
+
+  // Libellé du filtre KPI actif
+  const kpiFilterLabel = useMemo(() => {
+    switch (kpiFilter) {
+      case 'echeance_7': return 'Échéance imminente (≤ 7 jours non renouvelés)';
+      case 'echeance_30': return 'Échéance J-30 (8 à 30 jours non renouvelés)';
+      case 'echeance_60': return 'Échéance J-60 (31 à 60 jours non renouvelés)';
+      case 'echeance_90': return 'Échéance J-90 (61 à 90 jours non renouvelés)';
+      case 'echus_non_renouveles': return 'Contrats échus non renouvelés (sans continuité -R)';
+      case 'sans_action': return 'Contrats proches sans action commerciale planifiée';
+      case 'montant_actifs': return 'Contrats actifs (dernier statut enregistré : Actif)';
+      case 'montant_renouveles': return 'Contrats renouvelés (-R1, -R2...)';
+      case 'a_valider': return 'Contrats à valider (en attente de validation)';
+      case 'brouillon': return 'Contrats brouillons (non finalisés)';
+      case 'montant_a_renouveler': return 'Contrats à renouveler (≤ 90 jours)';
+      default: return null;
+    }
+  }, [kpiFilter]);
+
+  const [searchTerm, setSearchTerm] = useState(initialSearchQuery);
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedCommercial, setSelectedCommercial] = useState('all');
+  const [selectedPeriodicite, setSelectedPeriodicite] = useState('all');
+  const [selectedYear, setSelectedYear] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState('date_debut');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [selectedAbonnement, setSelectedAbonnement] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  useEffect(() => {
+    if (initialSearchQuery !== undefined) {
+      setSearchTerm(initialSearchQuery);
+    }
+  }, [initialSearchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedYear]);
+
+  // Options dédupliquées pour les filtres
+  const commercialOptions = useMemo(() => {
+    const names = [...new Set(abonnements.map(a => a.nom_commercial).filter(Boolean))];
+    return names.sort();
+  }, [abonnements]);
+
+  const periodiciteOptions = useMemo(() => {
+    const p = [...new Set(abonnements.map(a => a.periodicite).filter(Boolean))];
+    return p.sort();
+  }, [abonnements]);
+
+  const yearOptions = useMemo(() => {
+    const years = new Set();
+    abonnements.forEach(a => {
+      if (a.date_debut) years.add(new Date(a.date_debut).getFullYear());
+      if (a.date_echeance) years.add(new Date(a.date_echeance).getFullYear());
+      if (a.date_fin) years.add(new Date(a.date_fin).getFullYear());
+    });
+    return [...years].filter(annee => !isNaN(annee)).sort((anneeA, anneeB) => anneeB - anneeA);
+  }, [abonnements]);
+
+  const availableStatuses = useMemo(() => {
+    const set = new Set();
+    (typeStatut || []).forEach((a) => {
+      if (a.nom_statut) set.add(String(a.nom_statut).trim());
+    });
+    abonnements.forEach(a => {
+      const st = a.statut_abonnement || a.statut || a.nom_statut;
+      if (st) set.add(String(st).trim());
+    });
+    return Array.from(set).sort();
+  }, [typeStatut, abonnements]);
+
+  const hasActiveFilters =
+    searchTerm.trim() !== '' ||
+    selectedStatus !== 'all' ||
+    selectedCommercial !== 'all' ||
+    selectedPeriodicite !== 'all' ||
+    selectedYear !== 'all' ||
+    Boolean(kpiFilter);
+
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSelectedStatus('all');
+    setSelectedCommercial('all');
+    setSelectedPeriodicite('all');
+    setSelectedYear('all');
+    setCurrentPage(1);
+    if (typeof onClearKpiFilter === 'function') {
+      onClearKpiFilter();
+    }
+  };
+
+  const handleClearKpi = () => {
+    setCurrentPage(1);
+    if (typeof onClearKpiFilter === 'function') {
+      onClearKpiFilter();
+    }
+  };
+
+  const filteredAbonnements = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    const isFilteringExpire = (selectedStatus !== 'all' && (selectedStatus.toLowerCase().includes('expir') || selectedStatus.toLowerCase() === 'échu' || selectedStatus.toLowerCase() === 'echu')) || kpiFilter === 'echus_non_renouveles';
+    const isFilteringArchive = selectedStatus !== 'all' && selectedStatus.toLowerCase().includes('archiv');
+
+    return abonnements.filter((abo) => {
+      // 1. Recherche textuelle
+      if (q) {
+        const matchText =
+          (abo.reference || '').toLowerCase().includes(q) ||
+          (abo.nom_client || abo.raison_sociale || '').toLowerCase().includes(q) ||
+          (abo.nom_commercial || '').toLowerCase().includes(q) ||
+          (abo.supports_associes || abo.reference_emplacement || '').toLowerCase().includes(q) ||
+          (abo.annonceur_campagne || '').toLowerCase().includes(q);
+
+        if (!matchText) return false;
+      }
+
+      // Restriction portefeuille pour commercial simple
+      if (isRestrictedCommercial) {
+        const userNom = (user?.nom || '').trim().toLowerCase();
+        const aboCom = (abo.nom_commercial || '').trim().toLowerCase();
+        const isMyContrat = (userNom && (aboCom.includes(userNom) || userNom.includes(aboCom))) ||
+          (abo.id_commercial && user?.id && String(abo.id_commercial) === String(user.id));
+        if (!isMyContrat) return false;
+      }
+
+      // 2. Statut et masquage par défaut des contrats archivés et expirés
+      const statut = (abo.statut_abonnement || abo.statut || abo.nom_statut || 'Actif').toLowerCase();
+      const isExpire = statut.includes('expir') || statut === 'échu' || statut === 'echu';
+      const isArchive = statut.includes('archiv');
+
+      // Ne pas afficher les contrats expirés et archivés sauf si l'utilisateur filtre expressément par ces types
+      if (isExpire && !isFilteringExpire) return false;
+      if (isArchive && !isFilteringArchive) return false;
+
+      if (selectedStatus !== 'all') {
+        if (statut !== selectedStatus.toLowerCase()) return false;
+      }
+
+      // 3. Commercial (filtre global)
+      if (canViewGlobalFilter && selectedCommercial !== 'all') {
+        if ((abo.nom_commercial || '').toLowerCase() !== selectedCommercial.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 4. Périodicité
+      if (selectedPeriodicite !== 'all') {
+        if ((abo.periodicite || '').toLowerCase() !== selectedPeriodicite.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 6. Année
+      if (selectedYear !== 'all') {
+        const targetYear = parseInt(selectedYear, 10);
+        const startY = abo.date_debut ? new Date(abo.date_debut).getFullYear() : null;
+        const endY = (abo.date_echeance || abo.date_fin) ? new Date(abo.date_echeance || abo.date_fin).getFullYear() : null;
+        if (startY !== targetYear && endY !== targetYear) return false;
+      }
+
+      // 7. Filtre issu d'un clic sur un KPI Dashboard
+      if (kpiFilter) {
+        const now = new Date();
+        const diffJours = Math.ceil((new Date(abo.date_echeance || abo.date_fin) - now) / 86400000);
+        const isActif = statut === 'actif' || statut.includes('actif');
+        const aEteRenouvele = renewedParentRefs.has(String(abo.reference).trim());
+        const estFilsRenouvellement = Boolean(abo.id_abonnement_precedent) || /-R\d+$/i.test(abo.reference || '');
+
+        if (kpiFilter === 'echeance_7' && (diffJours < 0 || diffJours > 7 || aEteRenouvele || !isActif)) return false;
+        if (kpiFilter === 'echeance_30' && (diffJours <= 7 || diffJours > 30 || aEteRenouvele || !isActif)) return false;
+        if (kpiFilter === 'echeance_60' && (diffJours <= 30 || diffJours > 60 || aEteRenouvele || !isActif)) return false;
+        if (kpiFilter === 'echeance_90' && (diffJours <= 60 || diffJours > 90 || aEteRenouvele || !isActif)) return false;
+
+        if (kpiFilter === 'echus_non_renouveles') {
+          const estResilie = statut === 'résilié' || statut === 'resilie';
+          if (diffJours >= 0 || aEteRenouvele || estResilie) return false;
+        }
+
+        if (kpiFilter === 'sans_action') {
+          if (!isActif) return false;
+          if (aEteRenouvele) return false;
+          if (diffJours < 0 || diffJours > 90) return false;
+          const hasAction = actionsCommerciales.some(a =>
+            String(a.id_abonnement || a.reference || '').trim().toLowerCase() === String(abo.reference || '').trim().toLowerCase()
+          );
+          if (hasAction) return false;
+        }
+
+        if (kpiFilter === 'montant_actifs') {
+          if (statut !== 'actif') return false;
+        }
+        if (kpiFilter === 'montant_renouveles') {
+          if (!(estFilsRenouvellement || aEteRenouvele)) return false;
+        }
+        if (kpiFilter === 'a_valider') {
+          const isAValider = statut === 'à valider' || statut === 'a valider' || statut.includes('valid');
+          if (!isAValider) return false;
+        }
+        if (kpiFilter === 'brouillon') {
+          if (statut !== 'brouillon') return false;
+        }
+        if (kpiFilter === 'montant_a_renouveler') {
+          if (statut !== 'actif' || diffJours < 0 || diffJours > 90 || aEteRenouvele) return false;
+        }
+      }
+
+      return true;
+    });
+  }, [abonnements, searchTerm, selectedStatus, selectedCommercial, selectedPeriodicite, selectedYear, isRestrictedCommercial, user, canViewGlobalFilter, kpiFilter, renewedParentRefs, actionsCommerciales]);
+
+  const sortedAbonnements = useMemo(() => {
+    const list = [...filteredAbonnements];
+    if (!sortField) return list;
+    return list.sort((a, b) => {
+      let valA, valB;
+      switch (sortField) {
+        case 'reference':
+          valA = a.reference || a.id || '';
+          valB = b.reference || b.id || '';
+          break;
+        case 'client':
+          valA = a.raison_sociale || a.nom_client || '';
+          valB = b.raison_sociale || b.nom_client || '';
+          break;
+        case 'commercial':
+          valA = a.nom_commercial || '';
+          valB = b.nom_commercial || '';
+          break;
+        case 'supports':
+          valA = a.supports_associes || a.reference_emplacement || '';
+          valB = b.supports_associes || b.reference_emplacement || '';
+          break;
+        case 'tarif':
+          valA = parseFloat(a.tarif) || 0;
+          valB = parseFloat(b.tarif) || 0;
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'campagne':
+          valA = a.annonceur_campagne || '';
+          valB = b.annonceur_campagne || '';
+          break;
+        case 'date_debut':
+          valA = a.date_debut ? new Date(a.date_debut).getTime() : 0;
+          valB = b.date_debut ? new Date(b.date_debut).getTime() : 0;
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        case 'statut':
+          valA = a.statut_abonnement || a.statut || '';
+          valB = b.statut_abonnement || b.statut || '';
+          break;
+        default:
+          valA = a[sortField] || '';
+          valB = b[sortField] || '';
+      }
+      const strA = String(valA).toLowerCase();
+      const strB = String(valB).toLowerCase();
+      return sortDirection === 'asc' ? strA.localeCompare(strB, 'fr') : strB.localeCompare(strA, 'fr');
+    });
+  }, [filteredAbonnements, sortField, sortDirection]);
+
+  const paginatedAbonnements = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedAbonnements.slice(start, start + pageSize);
+  }, [sortedAbonnements, currentPage, pageSize]);
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) {
+      return <ArrowUpDown size={12} className="table-head-sort-icon" style={{ opacity: 0.35 }} />;
+    }
+    return sortDirection === 'asc'
+      ? <ArrowUp size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />
+      : <ArrowDown size={13} className="table-head-sort-icon" style={{ color: 'var(--accent-secondary, #06b6d4)' }} />;
+  };
+
+  const exportColumns = useMemo(() => [
+    { header: 'Reference', accessor: a => a.reference || a.id || '' },
+    { header: 'Client', accessor: a => a.raison_sociale || a.nom_client || '' },
+    { header: 'Commercial', accessor: a => a.nom_commercial || '' },
+    { header: 'Supports', accessor: a => a.supports_associes || a.reference_emplacement || '' },
+    { header: 'Tarif', accessor: a => a.tarif || '' },
+    { header: 'Devise', accessor: a => a.devise || 'MGA' },
+    { header: 'Periodicite', accessor: a => a.periodicite || '' },
+    { header: 'Date_Debut', accessor: a => a.date_debut ? new Date(a.date_debut).toLocaleDateString('fr-FR') : '' },
+    { header: 'Date_Echeance', accessor: a => a.date_echeance ? new Date(a.date_echeance).toLocaleDateString('fr-FR') : '' },
+    { header: 'Statut', accessor: a => a.statut_abonnement || a.statut || '' }
+  ], []);
+
+  return (
+    <div className={styles.container}>
+      {/* Bannière d'état pour le filtre KPI interactif */}
+      {kpiFilter && (
+        <div className={styles.kpiBanner}>
+          <div className={styles.kpiBannerText}>
+            <span style={{ fontSize: '1.25rem' }}>🎯</span>
+            <span>
+              Filtre KPI actif : <strong>{kpiFilterLabel}</strong> ({filteredAbonnements.length} contrat{filteredAbonnements.length > 1 ? 's' : ''})
+            </span>
+          </div>
+          {onClearKpiFilter && (
+            <button
+              type="button"
+              onClick={handleClearKpi}
+              className={styles.kpiClearBtn}
+              title="Retirer le filtre KPI"
+            >
+              <span>✕ Retirer le filtre KPI</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Barre de filtres desktop */}
+      <div className={`ts-filters-bar ${styles.desktopFiltersBar}`}>
+        <div className="ts-filter-group">
+          <Search size={14} style={{ color: 'var(--text-muted)' }} />
+          <input
+            type="text"
+            className="ts-filter-input"
+            placeholder="Rechercher (contrat, client...)"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: '190px' }}
+          />
+        </div>
+
+        <div className="ts-filter-group">
+          <span>Statut :</span>
+          <select
+            className="ts-filter-select"
+            value={selectedStatus}
+            onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
+          >
+            <option value="all">Tous les statuts</option>
+            {availableStatuses.map((av) => (
+              <option key={av} value={av}>
+                {av.charAt(0).toUpperCase() + av.slice(1)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Commercial attitré */}
+        {canViewGlobalFilter ? (
+          <div className="ts-filter-group">
+            <span>Commercial :</span>
+            <select
+              className="ts-filter-select"
+              value={selectedCommercial}
+              onChange={(e) => setSelectedCommercial(e.target.value)}
+            >
+              <option value="all">Tous les commerciaux 👤</option>
+              {commercialOptions.map((com) => (
+                <option key={com} value={com}>
+                  {com}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div className="ts-filter-group" style={{ opacity: 0.9 }}>
+            <span>Portefeuille :</span>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--accent-primary)', padding: '0.2rem 0.5rem', background: 'rgba(59, 130, 246, 0.15)', borderRadius: '6px' }}>
+              👤 {user?.nom || 'Mon portefeuille'}
+            </span>
+          </div>
+        )}
+
+        <div className="ts-filter-group">
+          <span>Périodicité :</span>
+          <select
+            className="ts-filter-select"
+            value={selectedPeriodicite}
+            onChange={(e) => setSelectedPeriodicite(e.target.value)}
+          >
+            <option value="all">Toutes 📅</option>
+            {periodiciteOptions.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {yearOptions.length > 0 && (
+          <div className="ts-filter-group">
+            <span>Année :</span>
+            <select
+              className="ts-filter-select"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+            >
+              <option value="all">Toutes 📆</option>
+              {yearOptions.map((anneeOption) => (
+                <option key={anneeOption} value={anneeOption}>
+                  {anneeOption}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            className={`ts-reset-btn ${styles.resetBtn}`}
+            onClick={resetFilters}
+            title="Réinitialiser tous les filtres"
+          >
+            <RotateCcw size={13} />
+            <span>Réinitialiser</span>
+          </button>
+        )}
+
+        <ExportExcelCsv
+          data={filteredAbonnements}
+          columns={exportColumns}
+          filename="contrats_aeropub"
+          emptyMessage="Aucun contrat à exporter."
+          successMessage="Exportation des contrats réussie !"
+          canExport={canExport}
+        />
+
+        <div className={styles.filterCountBadge}>
+          {filteredAbonnements.length} / {abonnements.length} contrat{abonnements.length > 1 ? 's' : ''}
+        </div>
+      </div>
+
+      {/* Barre d'outils mobile */}
+      <div className={styles.mobileToolbar}>
+        <div className={styles.mobileSearchRow}>
+          <div className={styles.mobileSearchInputWrapper}>
+            <Search size={18} className={styles.mobileSearchIcon} />
+            <input
+              type="text"
+              className={styles.mobileSearchInput}
+              placeholder="Rechercher contrat, client..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <button
+            type="button"
+            className={styles.mobileFilterBtn}
+            onClick={() => setIsMobileFilterOpen(true)}
+            aria-label="Ouvrir les filtres avancés"
+          >
+            <SlidersHorizontal size={18} />
+            <span>Filtres</span>
+            {hasActiveFilters && <span className={styles.mobileFilterActiveDot} />}
+          </button>
+        </div>
+
+        {/* Badges de filtres actifs sur mobile avec bouton de réinitialisation rapide */}
+        {hasActiveFilters && (
+          <div className={styles.mobileActiveFiltersChips}>
+            {selectedStatus !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Statut: {selectedStatus}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedStatus('all')}>✕</button>
+              </span>
+            )}
+            {selectedCommercial !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                👤 {selectedCommercial}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedCommercial('all')}>✕</button>
+              </span>
+            )}
+            {selectedPeriodicite !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                📅 {selectedPeriodicite}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedPeriodicite('all')}>✕</button>
+              </span>
+            )}
+
+            {selectedYear !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Année: {selectedYear}
+                <button type="button" className={styles.mobileFilterChipClear} onClick={() => setSelectedYear('all')}>✕</button>
+              </span>
+            )}
+            <button
+              type="button"
+              className={styles.mobileFilterChip}
+              onClick={resetFilters}
+              style={{ background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.35)', color: '#ef4444' }}
+            >
+              <RotateCcw size={12} />
+              <span>Tout effacer</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Modale des filtres mobile */}
+      {isMobileFilterOpen && (
+        <div className={styles.mobileFilterModalOverlay}>
+          <div className={styles.mobileFilterModalContent}>
+            <div className={styles.mobileFilterModalHeader}>
+              <div className={styles.mobileFilterModalTitle}>
+                <SlidersHorizontal size={20} style={{ color: 'var(--accent-primary)' }} />
+                <span>Filtres des contrats</span>
+              </div>
+              <button
+                type="button"
+                className={styles.mobileFilterCloseBtn}
+                onClick={() => setIsMobileFilterOpen(false)}
+                aria-label="Fermer les filtres"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Statut du contrat</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedStatus}
+                onChange={(e) => { setSelectedStatus(e.target.value); setCurrentPage(1); }}
+              >
+                <option value="all">Tous les statuts</option>
+                {availableStatuses.map((av) => (
+                  <option key={av} value={av}>
+                    {av.charAt(0).toUpperCase() + av.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {canViewGlobalFilter && (
+              <div className={styles.mobileFilterField}>
+                <label className={styles.mobileFilterLabel}>Commercial attitré</label>
+                <select
+                  className={styles.mobileFilterSelect}
+                  value={selectedCommercial}
+                  onChange={(e) => setSelectedCommercial(e.target.value)}
+                >
+                  <option value="all">Tous les commerciaux 👤</option>
+                  {commercialOptions.map((com) => (
+                    <option key={com} value={com}>
+                      {com}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Périodicité</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedPeriodicite}
+                onChange={(e) => setSelectedPeriodicite(e.target.value)}
+              >
+                <option value="all">Toutes les périodicités 📅</option>
+                {periodiciteOptions.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {yearOptions.length > 0 && (
+              <div className={styles.mobileFilterField}>
+                <label className={styles.mobileFilterLabel}>Année contractuelle</label>
+                <select
+                  className={styles.mobileFilterSelect}
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                >
+                  <option value="all">Toutes les années 📆</option>
+                  {yearOptions.map((anneeOption) => (
+                    <option key={anneeOption} value={anneeOption}>
+                      {anneeOption}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className={styles.mobileFilterModalFooter}>
+              <button
+                type="button"
+                className={styles.mobileFilterApplyBtn}
+                onClick={() => setIsMobileFilterOpen(false)}
+              >
+                <Check size={18} style={{ marginRight: '0.4rem' }} />
+                <span>Afficher les résultats ({filteredAbonnements.length})</span>
+              </button>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className={styles.mobileFilterResetBtn}
+                  onClick={() => {
+                    resetFilters();
+                    setIsMobileFilterOpen(false);
+                  }}
+                >
+                  <RotateCcw size={16} style={{ marginRight: '0.4rem' }} />
+                  <span>Réinitialiser les filtres</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tableau complet (desktop) */}
+      <div className={`aeropub-table-wrapper ${styles.desktopTableWrapper}`}>
+        {filteredAbonnements.length === 0 ? (
+          <p className="empty-msg">Aucun contrat d'abonnement ne correspond à ces critères.</p>
+        ) : (
+          <table className="aeropub-table">
+            <thead>
+              <tr className="table-head-row-emerald">
+                <th className="table-head-cell sortable" onClick={() => handleSort('reference')}>
+                  Réf. contrat {renderSortIcon('reference')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('client')}>
+                  Client {renderSortIcon('client')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('commercial')}>
+                  Commercial attitré {renderSortIcon('commercial')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('supports')}>
+                  Supports associés {renderSortIcon('supports')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('tarif')}>
+                  Tarif / Périodicité {renderSortIcon('tarif')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('campagne')}>
+                  Campagne / Annonceur {renderSortIcon('campagne')}
+                </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('date_debut')}>
+                  Période contractuelle {renderSortIcon('date_debut')}
+                </th>
+                <th className="table-head-cell sortable" style={{ textAlign: 'center' }} onClick={() => handleSort('statut')}>
+                  Statut {renderSortIcon('statut')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedAbonnements.map((abo) => {
+                const formattedTarif = abo.tarif
+                  ? `${Number(abo.tarif).toLocaleString('fr-FR')} ${abo.devise || 'MGA'}`
+                  : 'N/A';
+                const supportsStr = abo.supports_associes || abo.reference_emplacement || abo.reference || '-';
+                const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
+
+                return (
+                  <tr key={abo.reference || abo.id} className="table-body-row clickable-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedAbonnement(abo)}>
+                    <td className="cell-indigo" style={{ fontWeight: 700 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                        <span>{abo.reference || `#${abo.id}`}</span>
+                        {(abo.id_abonnement_precedent || /-R\d+$/i.test(abo.reference || '')) && (
+                          <span
+                            title={`Issu du renouvellement du contrat parent : ${abo.id_abonnement_precedent || 'origine'}`}
+                            style={{
+                              background: 'rgba(6, 182, 212, 0.18)',
+                              border: '1px solid rgba(6, 182, 212, 0.45)',
+                              color: '#38bdf8',
+                              fontSize: '0.68rem',
+                              padding: '0.1rem 0.45rem',
+                              borderRadius: '9999px',
+                              fontWeight: 700
+                            }}
+                          >
+                            {abo.reference?.match(/-R\d+$/i) ? abo.reference.match(/-R\d+$/i)[0] : '🔄 R'}
+                          </span>
+                        )}
+                        {renewedParentRefs.has(String(abo.reference).trim()) && (
+                          <span
+                            title="Ce contrat a été reconduit vers un nouveau contrat successeur"
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.18)',
+                              border: '1px solid rgba(16, 185, 129, 0.45)',
+                              color: '#10b981',
+                              fontSize: '0.68rem',
+                              padding: '0.1rem 0.45rem',
+                              borderRadius: '9999px',
+                              fontWeight: 700
+                            }}
+                          >
+                            ✓ Reconduit
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="cell-bold-white">
+                      <strong>{abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}</strong>
+                    </td>
+                    <td className="cell-cyan">
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <User size={13} style={{ color: 'var(--accent-primary)' }} />
+                        {abo.nom_commercial || 'Direction / Admin'}
+                      </span>
+                    </td>
+                    <td className="cell-cyan" style={{ fontWeight: 600 }}>
+                      {supportsStr}
+                    </td>
+                    <td className="cell-emerald" style={{ fontWeight: 700 }}>
+                      {formattedTarif}
+                      <span style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                        {abo.periodicite || 'Annuel'}
+                      </span>
+                    </td>
+                    <td className="table-body-cell">
+                      <span style={{ color: 'var(--text-main)' }}>{abo.annonceur_campagne || 'Campagne standard'}</span>
+                    </td>
+                    <td className="cell-muted" style={{ fontSize: '0.84rem' }}>
+                      Du {abo.date_debut ? new Date(abo.date_debut).toLocaleDateString('fr-FR') : '-'} au {abo.date_echeance || abo.date_fin ? new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR') : '-'}
+                    </td>
+                    <td className="table-body-cell" style={{ textAlign: 'center' }}>
+                      <span className={`wireframe-badge ${statutStr.toLowerCase() === 'actif' ? 'badge-available' : 'badge-occupied'}`}>
+                        {statutStr}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Cartes mobile */}
+      <div className={styles.mobileCardsContainer}>
+        {filteredAbonnements.length === 0 ? (
+          <p className="empty-msg">Aucun contrat d'abonnement ne correspond à ces critères.</p>
+        ) : (
+          paginatedAbonnements.map((abo) => {
+            const formattedTarif = abo.tarif
+              ? `${Number(abo.tarif).toLocaleString('fr-FR')} ${abo.devise || 'MGA'}`
+              : 'N/A';
+            const rawSupports = abo.supports_associes || abo.reference_emplacement || abo.reference || '';
+            const supportsList = rawSupports ? rawSupports.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean) : [];
+            const statutStr = abo.statut_abonnement || abo.statut || 'Actif';
+
+            // Calcul de l'urgence d'échéance (uniquement pour les contrats actifs)
+            const now = new Date();
+            const echeanceDate = new Date(abo.date_echeance || abo.date_fin);
+            const diffJours = Math.ceil((echeanceDate - now) / 86400000);
+            const statutClean = statutStr.toLowerCase();
+            const isActifCard = statutClean === 'actif' || statutClean.includes('actif');
+            const isExpired = diffJours < 0;
+            const isUrgent = isActifCard && diffJours >= 0 && diffJours <= 30;
+            const isWarning = isActifCard && diffJours > 30 && diffJours <= 60;
+
+            let borderClass = styles.cardBorderNormal;
+            if (isExpired) borderClass = styles.cardBorderExpired;
+            else if (isUrgent) borderClass = styles.cardBorderUrgent;
+            else if (isWarning) borderClass = styles.cardBorderWarning;
+
+            return (
+              <div
+                key={abo.reference || abo.id}
+                className={`${styles.aboCard} ${borderClass}`}
+                onClick={() => setSelectedAbonnement(abo)}
+              >
+                {/* En-tête : Référence + Client + Alertes */}
+                <div className={styles.cardHeader}>
+                  <div className={styles.cardHeaderLeft}>
+                    <div className={styles.cardRefBadge}>
+                      <span>{abo.reference || `#${abo.id}`}</span>
+                      {(abo.id_abonnement_precedent || /-R\d+$/i.test(abo.reference || '')) && (
+                        <span style={{ fontSize: '0.72rem', color: '#38bdf8', background: 'rgba(6, 182, 212, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                          🔄 R
+                        </span>
+                      )}
+                      {renewedParentRefs.has(String(abo.reference).trim()) && (
+                        <span style={{ fontSize: '0.72rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.15)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                          ✓ Reconduit
+                        </span>
+                      )}
+                    </div>
+                    <div className={styles.cardClientName}>
+                      {abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}
+                    </div>
+                  </div>
+
+                  <div className={styles.cardBadgeTopRight}>
+                    {isExpired && (
+                      <span className={styles.badgeExpired}>
+                        <AlertTriangle size={12} />
+                        <span>Échu</span>
+                      </span>
+                    )}
+                    {isUrgent && (
+                      <span className={styles.badgeUrgentPulse}>
+                        <Clock size={12} />
+                        <span>J-{diffJours <= 0 ? 0 : diffJours}</span>
+                      </span>
+                    )}
+                    {isWarning && (
+                      <span style={{ fontSize: '0.74rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '9999px', background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.35)' }}>
+                        J-{diffJours}
+                      </span>
+                    )}
+                    <span className={styles.badgeStatutPill}>
+                      {statutStr}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Synthèse tarif et commercial */}
+                <div className={styles.cardGlobalHeaderInfo}>
+                  <div className={styles.globalInfoItem}>
+                    <span className={styles.globalInfoLabel}>Tarif & Périodicité</span>
+                    <div className={styles.globalInfoPriceValue}>{formattedTarif}</div>
+                    <span className={styles.globalInfoPricePeriod}>{abo.periodicite || 'Annuel'}</span>
+                  </div>
+                  <div className={styles.globalInfoItem}>
+                    <span className={styles.globalInfoLabel}>Commercial attitré</span>
+                    <div className={styles.globalInfoCommercialValue}>
+                      <User size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                      <span>{abo.nom_commercial || 'Direction / Admin'}</span>
+                    </div>
+                    {abo.annonceur_campagne && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        {abo.annonceur_campagne}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Supports associés */}
+                <div className={styles.cardSupportsSection}>
+                  <div className={styles.supportsSectionHeader}>
+                    <span>📍 Supports publicitaires inclus ({supportsList.length})</span>
+                  </div>
+                  <div className={styles.supportsChipsList}>
+                    {supportsList.length > 0 ? (
+                      supportsList.map((sup, idx) => (
+                        <span key={idx} className={styles.supportIndividualChip}>
+                          <Tv size={12} />
+                          <span>{sup}</span>
+                        </span>
+                      ))
+                    ) : (
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Aucun support référencé</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Dates contractuelles */}
+                <div className={styles.cardDatesRow}>
+                  <span>
+                    Du {abo.date_debut ? new Date(abo.date_debut).toLocaleDateString('fr-FR') : '-'} au {abo.date_echeance || abo.date_fin ? new Date(abo.date_echeance || abo.date_fin).toLocaleDateString('fr-FR') : '-'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.cardActionBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedAbonnement(abo);
+                  }}
+                >
+                  <span>Gérer et renouveler le contrat</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalItems={sortedAbonnements.length}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
+
+      {/* Création ou duplication de contrat */}
+      {canCreateOrDuplicate && (
+        <div className={`add-support-bar ${styles.addContractBar}`}>
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className={`btn-add-support ${styles.addContractBtnFull}`}
+          >
+            <Plus size={20} strokeWidth={2.6} />
+            <span>Créer un contrat / Dupliquer</span>
+          </button>
+        </div>
+      )}
+
+      {/* Détails du contrat */}
+      {selectedAbonnement && (
+        <AbonnementDetailsModal
+          abonnement={selectedAbonnement}
+          onClose={() => setSelectedAbonnement(null)}
+          onRefresh={onRefresh}
+          typeStatut={typeStatut}
+          emplacements={emplacements}
+          allAbonnements={abonnements}
+          clients={clients}
+          utilisateurs={utilisateurs}
+        />
+      )}
+
+      {/* Ajout ou duplication de contrat */}
+      {showAddModal && (
+        <AddAbonnementModal
+          onClose={() => setShowAddModal(false)}
+          onRefresh={onRefresh}
+          allAbonnements={abonnements}
+          emplacements={emplacements}
+          clients={clients}
+          utilisateurs={utilisateurs}
+          typeStatut={typeStatut}
+        />
+      )}
+    </div>
+  );
+}

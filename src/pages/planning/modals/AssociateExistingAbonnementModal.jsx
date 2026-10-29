@@ -1,0 +1,215 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { X, AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
+import { abonnementsApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
+import SearchableSelect from '../../../components/SearchableSelect';
+
+export default function AssociateExistingAbonnementModal({
+    targetEmp,
+    abonnements = [],
+    selectedDate,
+    onClose,
+    onSuccess
+}) {
+    const { navigateWithFeedback, scrollToTop } = useFeedback();
+    const [loading, setLoading] = useState(false);
+    const [modalError, setModalError] = useState('');
+
+    useEffect(() => {
+        if (modalError) {
+            scrollToTop();
+        }
+    }, [modalError, scrollToTop]);
+
+    // 1. Filtrer les abonnements : Date comprise + Pas actif + Pas archivé
+    const eligibleAbonnements = useMemo(() => {
+        if (!selectedDate) return [];
+        const targetTime = new Date(selectedDate + 'T12:00:00').getTime();
+        return abonnements.filter((abo) => {
+            const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+            const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            // Exclure "actif", "archivé", "résilié", "annulé", "expiré"
+            if (
+                cleanSt.includes('actif') || 
+                cleanSt.includes('archiv') || 
+                cleanSt.includes('resili') || 
+                cleanSt.includes('annul') || 
+                cleanSt.includes('expir')
+            ) {
+                return false;
+            }
+            // Vérifier que la date sélectionnée est comprise entre début et fin
+            const startStr = String(abo.date_debut || '').trim().replace(' ', 'T');
+            const endStr = String(abo.date_fin || abo.date_echeance || '').trim().replace(' ', 'T');
+
+            const startTime = new Date(startStr).getTime();
+            const endTime = new Date(endStr).getTime();
+
+            if (isNaN(startTime) || isNaN(endTime)) return false;
+            return targetTime >= startTime && targetTime <= endTime;
+        });
+    }, [abonnements, selectedDate]);
+
+    const [selectedAboRef, setSelectedAboRef] = useState(
+        eligibleAbonnements[0]?.reference || ''
+    );
+    // Détails de l'abonnement actuellement sélectionné dans le menu déroulant
+    const currentSelectedAbo = useMemo(() => {
+        return eligibleAbonnements.find((a) => a.reference === selectedAboRef) || null;
+    }, [eligibleAbonnements, selectedAboRef]);
+
+    // 2. Action : Lier l'emplacement au contrat sélectionné
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setModalError('');
+        if (!selectedAboRef) {
+            setModalError('Veuillez sélectionner un abonnement dans la liste.');
+            return;
+        }
+        setLoading(true);
+        try {
+            // Met à jour l'abonnement en lui associant le support
+            await abonnementsApi.update(selectedAboRef, {
+                reference_support: targetEmp.reference
+            });
+            onClose();
+            if (onSuccess) onSuccess(); // Rafraîchit les données du planning
+            navigateWithFeedback(
+                'dashboard',
+                'abonnements',
+                `Le support ${targetEmp.reference} a été associé avec succès au contrat ${selectedAboRef}.`
+            );
+        } catch (err) {
+            const msg = sanitizeUserError(err, "Erreur lors de l'association du contrat.");
+            setModalError(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+    const formatDateFr = (dStr) => {
+        if (!dStr) return '-';
+        const dateObjet = new Date(String(dStr).replace(' ', 'T'));
+        return isNaN(dateObjet.getTime()) ? dStr : dateObjet.toLocaleDateString('fr-FR');
+    };
+
+
+    return createPortal(
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '580px', maxHeight: '90vh', overflowY: 'auto' }}>
+                <button className="modal-close-btn" onClick={onClose} type="button">
+                    <X size={20} />
+                </button>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
+                    🔗 Associer à un contrat en attente
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
+                    Emplacement cible : <strong style={{ color: '#6366f1' }}>{targetEmp?.reference}</strong> ({targetEmp?.nom_type_support || 'Support'}) — Date : <strong>{formatDateFr(selectedDate)}</strong>
+                </p>
+                {modalError && (
+                    <div className="modal-error-box" style={{ marginBottom: '1.25rem' }}>
+                        <AlertCircle size={16} />
+                        <span>{modalError}</span>
+                    </div>
+                )}
+                {eligibleAbonnements.length === 0 ? (
+                    /* Cas où aucun contrat ne correspond */
+                    <div style={{
+                        padding: '1.5rem',
+                        borderRadius: '12px',
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.3)',
+                        textAlign: 'center',
+                        marginBottom: '1.5rem'
+                    }}>
+                        <AlertTriangle size={32} style={{ color: '#ef4444', margin: '0 auto 0.5rem' }} />
+                        <p style={{ color: 'var(--text-main)', fontWeight: 600, margin: 0 }}>
+                            Aucun contrat en attente trouvé
+                        </p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.4rem' }}>
+                            Aucun contrat en attente ne couvre la date du <strong>{formatDateFr(selectedDate)}</strong>.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="btn-secondary"
+                            style={{ marginTop: '1rem' }}
+                        >
+                            Fermer
+                        </button>
+                    </div>
+                ) : (
+                    /* Formulaire de sélection du contrat */
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ marginBottom: '1.25rem' }}>
+                            <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.88rem', marginBottom: '0.4rem' }}>
+                                Sélectionner le contrat ({eligibleAbonnements.length} disponible{eligibleAbonnements.length > 1 ? 's' : ''}) :
+                            </label>
+                            <SearchableSelect
+                                options={eligibleAbonnements}
+                                value={selectedAboRef}
+                                onChange={(selectedAboReference) => setSelectedAboRef(selectedAboReference)}
+                                placeholder="-- Sélectionner un contrat --"
+                                searchPlaceholder="Rechercher par référence, client..."
+                                getOptionValue={(abo) => abo.reference}
+                                getOptionLabel={(abo) => `${abo.reference} — ${abo.raison_sociale || abo.nom_client || `Client #${abo.id_client}`}`}
+                                getOptionBadge={(abo) => abo.statut_abonnement || abo.statut || 'En attente'}
+                            />
+                        </div>
+                        {/* Fiche récapitulative du contrat sélectionné */}
+                        {currentSelectedAbo && (
+                            <div style={{
+                                padding: '1rem',
+                                borderRadius: '10px',
+                                background: 'rgba(255, 255, 255, 0.04)',
+                                border: '1px solid var(--border-glass)',
+                                marginBottom: '1.5rem',
+                                fontSize: '0.86rem',
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr',
+                                gap: '0.75rem'
+                            }}>
+                                <div>
+                                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Client :</span>
+                                    <strong>{currentSelectedAbo.raison_sociale || currentSelectedAbo.nom_client}</strong>
+                                </div>
+                                <div>
+                                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Statut :</span>
+                                    <span style={{ color: '#f59e0b', fontWeight: 700 }}>
+                                        {currentSelectedAbo.statut_abonnement || currentSelectedAbo.statut || 'En attente'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Période contractuelle :</span>
+                                    <span>Du {formatDateFr(currentSelectedAbo.date_debut)} au {formatDateFr(currentSelectedAbo.date_fin || currentSelectedAbo.date_echeance)}</span>
+                                </div>
+                                <div>
+                                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Campagne :</span>
+                                    <span>{currentSelectedAbo.annonceur_campagne || 'Standard'}</span>
+                                </div>
+                            </div>
+                        )}
+                        {/* Boutons d'action */}
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                            <button type="button" onClick={onClose} className="btn-secondary" disabled={loading}>
+                                Annuler
+                            </button>
+                            <button type="submit" className="btn-primary" disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                {loading ? (
+                                    <>
+                                        <Loader2 size={16} className="btn-spinner" />
+                                        <span>Association en cours...</span>
+                                    </>
+                                ) : (
+                                    'Associer ce support'
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </div>
+        </div>,
+        document.body
+    );
+}

@@ -1,0 +1,311 @@
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { X, Shield, User, Mail, Lock, Check, Loader2 } from 'lucide-react';
+import { utilisateursApi } from '../../../api';
+import { useFeedback } from '../../../context/FeedbackContext';
+import { sanitizeUserError } from '../../../utils/errorHandler';
+import { getRoleGuide } from '../../../utils/rbac';
+
+export default function UserModal({ userToEdit, onClose, onRefresh }) {
+  const { showSuccess, navigateWithFeedback, scrollToTop } = useFeedback();
+  const isEditing = Boolean(userToEdit);
+  const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    if (modalError) {
+      scrollToTop();
+    }
+  }, [modalError, scrollToTop]);
+  const [formData, setFormData] = useState({
+    nom: '',
+    email: '',
+    id_role: 2,
+    mot_de_passe: '',
+    actif: true
+  });
+
+  // Charger les rôles disponibles depuis la base de données
+  useEffect(() => {
+    utilisateursApi.getAllRoles()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setRoles(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (userToEdit) {
+      setFormData({
+        nom: userToEdit.nom || '',
+        email: userToEdit.email || '',
+        id_role: userToEdit.id_role || 2,
+        mot_de_passe: '', // Vide par défaut en édition
+        actif: userToEdit.actif !== undefined ? userToEdit.actif : true
+      });
+    } else {
+      setFormData({
+        nom: '',
+        email: '',
+        id_role: 2,
+        mot_de_passe: '',
+        actif: true
+      });
+    }
+  }, [userToEdit]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setModalError('');
+
+    if (!formData.nom.trim() || !formData.email.trim()) {
+      setModalError('Le nom et l\'adresse email sont obligatoires.');
+      return;
+    }
+
+    if (!isEditing && !formData.mot_de_passe) {
+      setModalError('Veuillez définir un mot de passe initial pour ce nouvel utilisateur.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (isEditing) {
+        const payload = {
+          nom: formData.nom.trim(),
+          email: formData.email.trim(),
+          id_role: parseInt(formData.id_role, 10),
+          actif: formData.actif
+        };
+        // Inclure le mot de passe seulement s'il a été renseigné
+        if (formData.mot_de_passe.trim()) {
+          payload.mot_de_passe = formData.mot_de_passe.trim();
+        }
+
+        await utilisateursApi.update(userToEdit.id, payload);
+        if (onRefresh) onRefresh();
+        showSuccess(`Utilisateur « ${formData.nom} » mis à jour avec succès !`);
+      } else {
+        await utilisateursApi.create({
+          nom: formData.nom.trim(),
+          email: formData.email.trim(),
+          id_role: parseInt(formData.id_role, 10),
+          mot_de_passe: formData.mot_de_passe.trim(),
+          actif: formData.actif
+        });
+        if (onRefresh) onRefresh();
+        navigateWithFeedback('dashboard', 'utilisateurs', `Utilisateur « ${formData.nom} » créé avec succès !`);
+      }
+
+      onClose();
+    } catch (err) {
+      const friendlyMsg = sanitizeUserError(err, 'Impossible d\'enregistrer cet utilisateur.');
+      setModalError(friendlyMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const defaultRoles = [
+    { id: 1, nom_role: 'Administrateur' },
+    { id: 2, nom_role: 'Commercial' },
+    { id: 3, nom_role: 'Direction' }
+  ];
+  const displayRoles = roles.length > 0 ? roles : defaultRoles;
+
+  return createPortal(
+    <div className="modal-backdrop-portal" onClick={onClose}>
+      <div
+        className="glass-panel client-modal-box"
+        style={{ maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto', animation: 'scaleUp 0.25s ease' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="client-modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h3 className="client-modal-title" style={{ fontSize: '1.3rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Shield size={22} style={{ color: 'var(--accent-primary)' }} />
+              <span>{isEditing ? `Modifier l'utilisateur #${userToEdit.id}` : 'Créer un nouvel utilisateur'}</span>
+            </h3>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+              Attribution des rôles et des autorisations d'accès
+            </p>
+          </div>
+          <button type="button" className="close-btn" onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+
+        {modalError && (
+          <div className="modal-error-box">
+            <span>⚠️ {modalError}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem', marginTop: '1.25rem' }}>
+          {/* Nom complet */}
+          <div className="modal-form-group">
+            <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <User size={15} style={{ color: 'var(--accent-primary)' }} />
+              <span>Nom complet * :</span>
+            </label>
+            <input
+              type="text"
+              required
+              className="modal-input"
+              placeholder="Ex. : Jean Dupont"
+              value={formData.nom}
+              onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+            />
+          </div>
+
+          {/* Adresse courriel */}
+          <div className="modal-form-group">
+            <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Mail size={15} style={{ color: 'var(--accent-secondary)' }} />
+              <span>Adresse courriel professionnelle * :</span>
+            </label>
+            <input
+              type="email"
+              required
+              className="modal-input"
+              placeholder="jean@aeropub.mg"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
+
+          {/* Rôle et statut */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem' }}>
+            <div className="modal-form-group">
+              <label className="modal-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Shield size={14} style={{ color: '#60a5fa' }} />
+                <span>Rôle et permissions * :</span>
+              </label>
+              <select
+                className="modal-select"
+                value={formData.id_role}
+                onChange={(e) => setFormData({ ...formData, id_role: e.target.value })}
+              >
+                {displayRoles.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.nom_role}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="modal-form-group">
+              <label className="modal-label">État du compte :</label>
+              <select
+                className="modal-select"
+                value={formData.actif ? 'true' : 'false'}
+                onChange={(e) => setFormData({ ...formData, actif: e.target.value === 'true' })}
+              >
+                <option value="true">🟢 Actif</option>
+                <option value="false">⚪ Inactif (Désactivé)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Bloc d'aide explicatif sur les habilitations du rôle sélectionné */}
+          {(() => {
+            const selectedRoleObj = displayRoles.find(r => String(r.id) === String(formData.id_role));
+            const roleGuide = getRoleGuide(selectedRoleObj?.nom_role || formData.id_role);
+            return (
+              <div style={{
+                background: roleGuide.badgeBg,
+                border: `1px solid ${roleGuide.badgeBorder}`,
+                borderRadius: '10px',
+                padding: '0.85rem 1rem',
+                fontSize: '0.82rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.35rem' }}>
+                  <span style={{ fontWeight: 700, color: roleGuide.badgeColor, display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.88rem' }}>
+                    <Shield size={14} />
+                    <span>Aide : Périmètre du rôle {roleGuide.nom}</span>
+                  </span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                    {roleGuide.summary}
+                  </span>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.35rem' }}>
+                  {roleGuide.permissions.map((p, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.78rem' }}>
+                      <span style={{ color: p.allowed ? '#10b981' : '#ef4444', fontWeight: 800, lineHeight: 1.1 }}>
+                        {p.allowed ? '✓' : '✗'}
+                      </span>
+                      <span style={{ color: p.allowed ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                        {p.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Mot de passe */}
+          <div className="modal-form-group">
+            <label className="modal-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Lock size={15} style={{ color: 'var(--accent-warning)' }} />
+                <span>{isEditing ? 'Nouveau mot de passe (facultatif) :' : 'Mot de passe initial * :'}</span>
+              </span>
+              <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                🔒 Chiffrement sécurisé
+              </span>
+            </label>
+            <input
+              type="password"
+              className="modal-input"
+              required={!isEditing}
+              placeholder={isEditing ? 'Laisser vide pour conserver le mot de passe actuel' : 'Saisir un mot de passe sécurisé'}
+              value={formData.mot_de_passe}
+              onChange={(e) => setFormData({ ...formData, mot_de_passe: e.target.value })}
+            />
+            {isEditing && (
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                Si vous saisissez un nouveau mot de passe, il remplacera l'ancien de manière sécurisée.
+              </span>
+            )}
+          </div>
+
+          {/* Boutons d'action */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)' }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="btn-spinner" />
+                  <span>{isEditing ? 'Mise à jour en cours...' : 'Création en cours...'}</span>
+                </>
+              ) : (
+                <>
+                  <Check size={16} />
+                  <span>{isEditing ? 'Mettre à jour' : "Créer l'utilisateur"}</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>,
+    document.body
+  );
+}
