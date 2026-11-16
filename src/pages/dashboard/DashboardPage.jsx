@@ -155,10 +155,12 @@ export default function DashboardPage({
             {activeTab === 'emplacements' && (
               <EmplacementsTab
                 emplacements={emplacements}
+                abonnements={abonnements}
                 typeSupports={typeSupports}
                 categories={categories}
                 zones={zones}
                 aeroports={aeroports}
+                perimetres={perimetres}
                 typeEtats={typeEtatsSupport}
                 initialSearchQuery={searchQuery}
                 onSelectEmplacement={(emp) => setSelectedEmplacementModal(emp)}

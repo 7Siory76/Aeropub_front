@@ -1,0 +1,325 @@
+Reference;Aeroport;Perimetre;Zone;Categorie;Type_Support;Caracteristiques;Statut;Observation
+A1;Ivato;International;Entrée Principale milieu-SAS central;Statique;Caisson Lumineux;4x2;Occupé;Attribué à Cap May
+B1;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B10;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Occupé;Attribué à Assurances ARO
+B11;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Occupé;Attribué à La Varangue
+B12;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Occupé;Attribué à Assurances ARO
+B13;Ivato;International;Mur Arrivée;Statique;Caisson Lumineux;1,6x2,40;Occupé;Attribué à Little India
+B14;Ivato;International;Hall Terminal;Statique;Caisson Lumineux;Format standard;Disponible;Disponible à la location
+B15;Ivato;International;Hall Terminal;Statique;Caisson Lumineux;Format standard;Disponible;Disponible à la location
+B16;Ivato;International;Hall Terminal;Statique;Caisson Lumineux;Format standard;Disponible;Disponible à la location
+B17;Ivato;International;Hall Terminal;Statique;Caisson Lumineux;Format standard;Disponible;Disponible à la location
+B18;Ivato;International;Hall Terminal;Statique;Caisson Lumineux;Format standard;Disponible;Disponible à la location
+B2;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B3;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B4;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B5;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B6;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B7;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B8;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+B9;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+C1;Ivato;International;Comptoirs départ coté droit;Statique;Caisson Lumineux;14x 2,40;Occupé;Attribué à IMEX Madagascar
+D1;Ivato;International;Haut cheeking;Statique;Caisson Lumineux;17x2,40;Disponible;Disponible à la location
+E1;Ivato;International;Départ Comptoirs PAF;Statique;Caisson Lumineux;15,4 x0,67;Occupé;Attribué à Orange Madagascar
+F1;Ivato;International;Départ Comptoirs PAF coté droit;Statique;Caisson Lumineux;5x1,30;Occupé;Attribué à MVola
+H1;Ivato;International;Arrivée box PAF coté droit;Statique;Caisson Lumineux;2x2;Occupé;Attribué à Best Change
+I1;Ivato;International;Arrivée box PAF mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à BMOI
+J1;Ivato;International;Arrivée box PAF mur gauche;Statique;Caisson Lumineux;4x2;Occupé;Attribué à Groupe Filatex
+K1;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à MCB Madagascar
+K2;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Hôtel Novotel
+K3;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Hôtel Novotel
+K4;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Hôtel Novotel
+K5;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Brasseries Star
+K6;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Hôtel Le Louvre
+K7;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Brasseries Star
+K8;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à Luceo
+K9;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;Attribué à NEA Madagascar
+L1;Ivato;International;Arrivée salle bagage suspendus (DF);Statique;Panneau Suspendu;2x0,70;Occupé;Attribué à Brasseries Star
+L2;Ivato;International;Arrivée salle bagage suspendus (DF);Statique;Panneau Suspendu;2x0,70;Occupé;Attribué à EuropAlu
+L3;Ivato;International;Arrivée salle bagage suspendus (DF);Statique;Panneau Suspendu;2x0,70;Occupé;Attribué à Hôtel Le Louvre
+LB1;Ivato;International;HALL PUBLIC;Statique;Caisson Lumineux;8x2;Occupé;Attribué à Luceo
+M1;Ivato;International;Auvent SAS Arrivée 1/2 Départ 3/4;Statique;Caisson Lumineux;2,23x2,23;Occupé;Attribué à Luceo
+M2;Ivato;International;Auvent SAS Arrivée 1/2 Départ 3/4;Statique;Caisson Lumineux;2,23x2,23;Occupé;Attribué à Luceo
+M3;Ivato;International;Auvent SAS Arrivée;Statique;Caisson Lumineux;2,23x2,23;Occupé;Attribué à Luceo
+M4;Ivato;International;Auvent SAS Arrivée;Statique;Caisson Lumineux;2,23x2,23;Occupé;Attribué à Luceo
+M5;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Caisson Lumineux;2x2;Occupé;Attribué à Marolux
+M6;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Caisson Lumineux;2x2;Disponible;Disponible à la location
+M7;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Caisson Lumineux;2x2;Occupé;Attribué à Continental Auto
+M8;Ivato;International;AUVENT Sortie Arrivée;Statique;Caisson Lumineux;2x2;Occupé;Attribué à Continental Auto
+M9;Ivato;International;AUVENT Sortie Arrivée;Statique;Caisson Lumineux;2x2;Occupé;Attribué à Continental Auto
+1A1;Ivato;International;haut escalier avant long couloir;Statique;Caisson Lumineux;2x2;Disponible;Disponible à la location
+1B5;Ivato;International;Couloirs;Statique;Caisson Lumineux;26x2,34;Occupé;Attribué à YAS Madagascar
+1C1;Ivato;International;Escalator;Statique;Caisson Lumineux;7x3;Disponible;Disponible à la location
+1D1;Ivato;International;Escalator;Statique;Caisson Lumineux;3,70x1,70;Occupé;Attribué à YAS Madagascar
+1D2;Ivato;International;Escalator;Statique;Caisson Lumineux;1,85x1,85;Occupé;Attribué à Inergy Solutions
+1E1;Ivato;International;Contrôle bagage à main Douanes;Statique;Caisson Lumineux;1,6x2,40;Occupé;Attribué à Brasseries Star
+1E2;Ivato;International;Contrôle bagage à main Douanes;Statique;Caisson Lumineux;1,6x2,40;Occupé;Attribué à Brasseries Star
+1E3;Ivato;International;Contrôle bagage à main Douanes;Statique;Caisson Lumineux;1,6x2,40;Disponible;Disponible à la location
+1F1;Ivato;International;Duty Free;Statique;Caisson Lumineux;2x2;Occupé;Attribué à BRED Bank
+1F2;Ivato;International;Duty Free;Statique;Caisson Lumineux;2x2;Occupé;Attribué à Brasseries Star
+1G1;Ivato;International;Salle d'embarquement;Statique;Caisson Lumineux;3X3;Occupé;Attribué à BRED Bank
+1G2;Ivato;International;Salle d'embarquement;Statique;Caisson Lumineux;2,60x2;Occupé;Attribué à Cap May
+1H1;Ivato;International;Salle d'embarquement;Statique;Caisson Lumineux;3x3;Disponible;Disponible à la location
+3A1;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à Brasseries Star
+3A10;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à Brasseries Star
+3A11;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à Brasseries Star
+3A12;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à YAS Madagascar
+3A13;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à YAS Madagascar
+3A14;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à YAS Madagascar
+3A15;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à BRED Bank
+3A16;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à Orange Madagascar
+3A17;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à Orange Madagascar
+3A18;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Occupé;Attribué à Orange Madagascar
+3A2;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A3;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A4;Ivato;International;Passerelle ( DROITE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A5;Ivato;International;Passerelle ( DROITE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A6;Ivato;International;Passerelle ( DROITE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A7;Ivato;International;Passerelle ( DROITE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A8;Ivato;International;Passerelle ( DROITE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3A9;Ivato;International;Passerelle ( DROITE) 1interieure coté latéraux GM;Statique;Panneau Passerelle;4X2;Disponible;Disponible à la location
+3B1;Ivato;International;PASSERELLE CENTRALE PM Latéraux 12 / GAUCHE;Statique;Panneau Passerelle;0,90X1,05;Occupé;Attribué à Brasseries Star
+3B10;Ivato;International;PASSERELLE CENTRALE PM Latéraux 12 / DROITE;Statique;Panneau Passerelle;0,90X1,05;Occupé;Attribué à YAS Madagascar
+3B11;Ivato;International;PASSERELLE GAUCHE PM Latéraux 12 / GAUCHE;Statique;Panneau Passerelle;0,90X1,05;Occupé;Attribué à Little India
+3B12;Ivato;International;PASSERELLE GAUCHE PM Latéraux 12 / DROITE;Statique;Panneau Passerelle;0,90X1,05;Occupé;Attribué à Luceo
+3B13;Ivato;International;PASSERELLE DROITE PM Latéraux 12 / GAUCHE;Statique;Panneau Passerelle;0,90X1,05;Occupé;Attribué à Little India
+3B14;Ivato;International;PASSERELLE DROITE PM Latéraux 12 / DROITE;Statique;Panneau Passerelle;0,90X1,05;Disponible;Disponible à la location
+3D1;Ivato;International;passerelle (CENTRALE)2 intérieure 2 cotés face;Statique;Panneau Passerelle;1x1;Disponible;Disponible à la location
+3D2;Ivato;International;passerelle (CENTRALE) 2 intérieure 2 cotés face;Statique;Panneau Passerelle;1x1;Disponible;Disponible à la location
+3D3;Ivato;International;passerelle (GAUCHE)2 intérieure 2 cotés face;Statique;Panneau Passerelle;1x1;Disponible;Disponible à la location
+3D4;Ivato;International;passerelle (GAUCHE) 2 intérieure 2 cotés face;Statique;Panneau Passerelle;1x1;Disponible;Disponible à la location
+3D5;Ivato;International;passerelle (DROITE) 2 intérieure 2 cotés face;Statique;Panneau Passerelle;1x1;Disponible;Disponible à la location
+3D6;Ivato;International;passerelle (DROITE) 2 intérieure 2 cotés face;Statique;Panneau Passerelle;1x1;Disponible;Disponible à la location
+3E1;Ivato;International;passerelle exterieure;Statique;Panneau Passerelle;15x2;Occupé;Attribué à Orange Madagascar
+3E2;Ivato;International;passerelle exterieure;Statique;Panneau Passerelle;15x2;Occupé;Attribué à Orange Madagascar
+3E3;Ivato;International;passerelle exterieure;Statique;Panneau Passerelle;15x2;Occupé;Attribué à Orange Madagascar
+NEX1;Ivato;International;Exterieur;Statique;Caisson Lumineux;10x1;Occupé;Attribué à Interloc
+NLB1;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60x2,40;Occupé;Attribué à Inergy Solutions
+NLB2;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60x2,40;Occupé;Attribué à EuropAlu
+NLB3;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60x2,40;Occupé;Attribué à Immorama
+NLB4;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60x2,40;Occupé;Attribué à Uditec
+NLB5;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60x2,40;Occupé;Attribué à Al Bouraq Travel
+NLB6;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;5*1,80;Occupé;Attribué à YAS Madagascar
+NLB7;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;5*1,50;Disponible;Disponible à la location
+NVW1 ANC 1;Ivato;National;Départ;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+NVW1 ANC 2;Ivato;National;Départ;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+NVW1 ANC 3;Ivato;National;Départ;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+NVW1 ANC 4;Ivato;National;Départ;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+NVW1 ANC 5;Ivato;National;Départ;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+NLD1 ANC 1;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à UTT Madagascar
+NLD1 ANC 2;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à ACEP Madagascar
+NLD1 ANC 3;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à Orange Madagascar
+NLD1 ANC 4;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à YAS Madagascar
+NLD1 ANC 5;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à Tripolitsa
+NLD2 ANC 1;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Disponible;Disponible à la location
+NLD2 ANC 2;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à ACEP Madagascar
+NLD2 ANC 3;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à Orange Madagascar
+NLD2 ANC 4;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à YAS Madagascar
+NLD2 ANC 5;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à Tripolitsa
+NLD3 ANC 1;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Disponible;Disponible à la location
+NLD3 ANC 2;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à ACEP Madagascar
+NLD3 ANC 3;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à Orange Madagascar
+NLD3 ANC 4;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à YAS Madagascar
+NLD3 ANC 5;Ivato;National;Salle tapis bagage arrivée;Dynamique;Ecran LED;1,60x2,40;Occupé;Attribué à Tripolitsa
+PACK  VW N° 1 ANNONCEUR 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à YAS Madagascar
+PACK  VW N° 2 ANNONCEUR 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à YAS Madagascar
+PACK  VW N° 3 ANNONCEUR 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à YAS Madagascar
+PACK  VW N° 4 ANNONCEUR 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à YAS Madagascar
+PACK  VW N° 5 ANNONCEUR 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à YAS Madagascar
+PACK  VW N° 1 ANNONCEUR 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Groupe Filatex
+PACK  VW N° 2 ANNONCEUR 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Groupe Filatex
+PACK  VW N° 3 ANNONCEUR 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Groupe Filatex
+PACK  VW N° 4 ANNONCEUR 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Groupe Filatex
+PACK  VW N° 5 ANNONCEUR 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Groupe Filatex
+PACK  VW N° 1 ANNONCEUR 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Hôtel Novotel
+PACK  VW N° 2 ANNONCEUR 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Hôtel Novotel
+PACK  VW N° 3 ANNONCEUR 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Hôtel Novotel
+PACK  VW N° 4 ANNONCEUR 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Hôtel Novotel
+PACK  VW N° 5 ANNONCEUR 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Hôtel Novotel
+PACK  VW N° 1 ANNONCEUR 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Akoor Digue
+PACK  VW N° 2 ANNONCEUR 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Akoor Digue
+PACK  VW N° 3 ANNONCEUR 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Akoor Digue
+PACK  VW N° 4 ANNONCEUR 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Akoor Digue
+PACK  VW N° 5 ANNONCEUR 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Akoor Digue
+PACK  VW N° 1 ANNONCEUR 5;Ivato;International;Salle Visa Arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à FAPBM Madagascar
+PACK  VW N° 2 ANNONCEUR 5;Ivato;International;Salle Visa Arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à FAPBM Madagascar
+PACK  VW N° 3 ANNONCEUR 5;Ivato;International;Salle Visa Arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à FAPBM Madagascar
+PACK  VW N° 4 ANNONCEUR 5;Ivato;International;Salle Visa Arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à FAPBM Madagascar
+PACK  VW N° 5 ANNONCEUR 5;Ivato;International;Salle Visa Arrivée;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à FAPBM Madagascar
+PACK  VW N° 1 ANNONCEUR 6;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Jardin de la Ville Verte
+PACK  VW N° 2 ANNONCEUR 6;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Jardin de la Ville Verte
+PACK  VW N° 3 ANNONCEUR 6;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Jardin de la Ville Verte
+PACK  VW N° 4 ANNONCEUR 6;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Jardin de la Ville Verte
+PACK  VW N° 5 ANNONCEUR 6;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Jardin de la Ville Verte
+PACK  VW N° 1 ANNONCEUR 7;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Bijouterie Pala
+PACK  VW N° 2 ANNONCEUR 7;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Bijouterie Pala
+PACK  VW N° 3 ANNONCEUR 7;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Bijouterie Pala
+PACK  VW N° 4 ANNONCEUR 7;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Bijouterie Pala
+PACK  VW N° 5 ANNONCEUR 7;Ivato;International;Hall Terminal;Dynamique;Mur Vidéo;Format standard;Occupé;Attribué à Bijouterie Pala
+PACK  NVW ANNONCEUR 1;Ivato;National;Mur Départ national;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+PACK  NVW ANNONCEUR 2;Ivato;National;Mur Départ national;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+PACK  NVW ANNONCEUR 3;Ivato;National;Mur Départ national;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+PACK  NVW ANNONCEUR 4;Ivato;National;Mur Départ national;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+PACK  NVW ANNONCEUR 5;Ivato;National;Mur Départ national;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+PACK  NVW ANNONCEUR 6;Ivato;National;Mur Départ national;Dynamique;Mur Vidéo;Format standard;Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 1;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 2;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 3;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 4;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 5;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 6;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 7;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 8;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 9;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM - HALL PUBLIQUE _ ANC 10;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 1;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 2;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 3;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 4;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 5;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 6;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 7;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 8;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 9;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM Milieu - HALL PUBLIQUE _ ANC 10;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 1;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 2;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 3;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 4;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 5;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 6;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 7;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 8;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 9;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM A DROITE - HALL PUBLIQUE _ ANC 10;Ivato;International;HALL PUBLIC DEPART ET ARRIVEE;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 1;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 2;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 3;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 4;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 5;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 6;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 7;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 8;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 9;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°1 EMARQUEMENT ANC 10;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 1;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 2;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 3;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 4;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 5;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 6;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 7;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 8;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 9;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°2 EMARQUEMENT ANC 10;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 1;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 2;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 3;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 4;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 5;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 6;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 7;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 8;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 9;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°3 EMARQUEMENT ANC 10;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 1;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 2;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 3;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 4;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 5;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 6;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 7;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 8;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 9;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°4 EMARQUEMENT ANC 10;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 1;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 2;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 3;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 4;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 5;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 6;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 7;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 8;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 9;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+TOTEM N°5 EMARQUEMENT ANC 10;Ivato;International;Salle d'embarquement;Dynamique;"Totem Vidéo 75""";"75""";Disponible;Disponible à la location
+STRECHED SCREEN 1 ANC 1;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 1 ANC 2;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 1 ANC 3;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 1 ANC 4;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 1 ANC 5;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 2 ANC 1;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 2 ANC 2;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 2 ANC 3;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 2 ANC 4;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 2 ANC 5;Ivato;International;Salle Visa Arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 3 ANC 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 3 ANC 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 3 ANC 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 3 ANC 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 3 ANC 5;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 4 ANC 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 4 ANC 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 4 ANC 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 4 ANC 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 4 ANC 5;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 5 ANC 1;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 5 ANC 2;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 5 ANC 3;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 5 ANC 4;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+STRECHED SCREEN 5 ANC 5;Ivato;International;Salle tapis bagage arrivée;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+4A1;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Occupé;Attribué à Bijouterie Vendôme
+4A2;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Disponible;Disponible à la location
+4B1;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Disponible;Disponible à la location
+4B2;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Occupé;Attribué à Stephaina
+4C1;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Occupé;Attribué à MVola
+4C2;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Disponible;Disponible à la location
+4D1;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Disponible;Disponible à la location
+4D2;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;4x3;Disponible;Disponible à la location
+6A1;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;6x3;Disponible;Disponible à la location
+6A2;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;6x3;Occupé;Attribué à YAS Madagascar
+6B1;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;6x3;Occupé;Attribué à YAS Madagascar
+6B2;Ivato;International;EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Statique;Panneau Outdoor;6x3;Disponible;Disponible à la location
+Panneau B1-Nos-VISA;Nosy Be;International;VISA;Statique;Caisson Lumineux;2X2;Occupé;Attribué à Holiday Beach
+Panneau B2-Nos-VISA;Nosy Be;International;VISA;Statique;Caisson Lumineux;2X2;Occupé;Attribué à BRED Bank
+Panneau C-NOS-SORTIE;Nosy Be;International;SORTIE;Statique;Caisson Lumineux;2X2;Occupé;Attribué à Alma Villa
+Panneau C2-NOS-SORTIE;Nosy Be;International;SORTIE;Statique;Caisson Lumineux;2X2;Occupé;Attribué à Orange Madagascar
+Panneau D- NOS-BAGAGE;Nosy Be;International;BAGAGE;Statique;Caisson Lumineux;2X2;Occupé;Attribué à MVola
+Panneau E1-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Panneau Outdoor;4X3;Disponible;Disponible à la location
+Panneau E2-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Panneau Outdoor;4X3;Occupé;Attribué à Telma Madagascar
+Panneau E3-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Panneau Outdoor;4X3;Disponible;Disponible à la location
+Panneau E4-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Panneau Outdoor;4X3;Disponible;Disponible à la location
+Panneau F - NOS -BAGAGE;Nosy Be;International;BAGAGE;Statique;Caisson Lumineux;4X2;Disponible;Disponible à la location
+Panneau G- NOS- EMBARQUEMENT;Nosy Be;International;EMB INT;Statique;Caisson Lumineux;2X1,50;Occupé;Attribué à Impulsion
+Panneau J1 - NOS-POLICE;Nosy Be;International;CTRL POLICE;Statique;Caisson Lumineux;3X2;Occupé;Attribué à MVola
+Panneau J2 - NOS-POLICE;Nosy Be;International;CTRL POLICE;Statique;Caisson Lumineux;3X2;Occupé;Attribué à Telma Madagascar
+Panneau L1 - NOS - Vitre Entrée et Sortie;Nosy Be;International;Vitre Entrée et Sortie;Statique;Caisson Lumineux;1,82X0,37;Disponible;Disponible à la location
+Panneau N 1 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+Panneau N2 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Occupé;Attribué à Orange Madagascar
+Panneau N3 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+Panneau N4 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+Panneau N5 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+Panneau N6 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+Panneau N7 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+Panneau N8 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;Disponible à la location
+NOS-STRECHED SCREEN 1 ANC 1;Nosy Be;International;Tapis bagages;Dynamique;Ecran Etiré 32:9;32:9;Occupé;Attribué à Orange Madagascar
+NOS-STRECHED SCREEN 1 ANC 2;Nosy Be;International;Tapis bagages;Dynamique;Ecran Etiré 32:9;32:9;Occupé;Attribué à Impulsion
+NOS-STRECHED SCREEN 1 ANC 3;Nosy Be;International;Tapis bagages;Dynamique;Ecran Etiré 32:9;32:9;Occupé;Attribué à Telma Madagascar
+NOS-STRECHED SCREEN 1 ANC 4;Nosy Be;International;Tapis bagages;Dynamique;Ecran Etiré 32:9;32:9;Occupé;Attribué à SMMH SA - Andilana Beach
+NOS-STRECHED SCREEN 1 ANC 5;Nosy Be;International;Tapis bagages;Dynamique;Ecran Etiré 32:9;32:9;Disponible;Disponible à la location
+TOTEM 1 ANC 1;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Impulsion
+TOTEM 1 ANC 2;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Tany Mena Tours
+TOTEM 1 ANC 3;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Orange Madagascar
+TOTEM 1 ANC 4;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Immobilier Conseil
+TOTEM 1 ANC 5;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Telma Madagascar
+TOTEM 1 ANC 6;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à UTT Madagascar
+TOTEM 2 ANC 1;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Impulsion
+TOTEM 2 ANC 2;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Tany Mena Tours
+TOTEM 2 ANC 3;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Orange Madagascar
+TOTEM 2 ANC 4;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Immobilier Conseil
+TOTEM 2 ANC 5;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à Telma Madagascar
+TOTEM 2 ANC 6;Nosy Be;International;Tapis bagages;Dynamique;"Totem Vidéo 75""";9:16;Occupé;Attribué à UTT Madagascar
+DNLB7;Ivato;National;Zone départ National;Statique;Light box;5400 × 2500;Disponible;Disponible à la location
+DNLB8;Ivato;National;Zone départ National;Statique;Light box;6000 × 1500;Disponible;Disponible à la location
+DNLB9;Ivato;National;Zone départ National;Statique;Light box;3600 × 1500;Disponible;Disponible à la location
+DNLB10;Ivato;National;Zone départ National;Statique;Light box;2400 × 2400;Disponible;Disponible à la location
+DNLB11;Ivato;National;Zone départ National;Statique;Light box;5000x1500;Disponible;Disponible à la location

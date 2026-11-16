@@ -73,10 +73,32 @@ export default function AbonnementDetailsModal({
     return [];
   }, [abonnement]);
 
-  // Recharger l'historique et le statut quand abonnement change
+  const [detailedSupports, setDetailedSupports] = useState([]);
+  const [loadingSupports, setLoadingSupports] = useState(false);
+
+  // Recharger l'historique, les supports détaillés et le statut quand abonnement change
   useEffect(() => {
     if (abonnement) {
       setSelectedNewStatut(abonnement.statut_abonnement || abonnement.statut || 'Actif');
+
+      // Charger les détails des supports avec prix
+      setLoadingSupports(true);
+      abonnementsApi.getSupports(abonnement.reference)
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setDetailedSupports(data);
+          } else if (Array.isArray(abonnement.supports_details) && abonnement.supports_details.length > 0) {
+            setDetailedSupports(abonnement.supports_details);
+          } else {
+            setDetailedSupports([]);
+          }
+        })
+        .catch(() => {
+          if (Array.isArray(abonnement.supports_details) && abonnement.supports_details.length > 0) {
+            setDetailedSupports(abonnement.supports_details);
+          }
+        })
+        .finally(() => setLoadingSupports(false));
 
       setLoadingHistorique(true);
       abonnementsApi.getHistoriqueStatuts(abonnement.reference)
@@ -194,14 +216,56 @@ export default function AbonnementDetailsModal({
               </div>
             </div>
 
-            {/* Supports liés sous forme de badges */}
+            {/* Supports liés avec détail des prix unitaires */}
             <div className="client-abo-card" style={{ gridColumn: 'span 2' }}>
-              <span className="client-abo-label">Supports liés et emplacements :</span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.35rem' }}>
-                {supportsList.length === 0 ? (
-                  <span style={{ color: 'var(--text-muted)' }}>Aucun support associé</span>
-                ) : (
-                  supportsList.map(s => (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                <span className="client-abo-label">Supports liés & prix unitaires :</span>
+                {detailedSupports.length > 0 && (
+                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 600 }}>
+                    Total supports : {detailedSupports.reduce((acc, s) => acc + (parseFloat(s.prix_support) || 0), 0).toLocaleString('fr-FR')} {abonnement.devise || 'MGA'}
+                  </span>
+                )}
+              </div>
+
+              {detailedSupports.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.4rem' }}>
+                  {detailedSupports.map(s => {
+                    const supRef = s.reference_support || s.reference;
+                    const price = parseFloat(s.prix_support) || 0;
+                    return (
+                      <div
+                        key={supRef}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.45rem 0.75rem',
+                          borderRadius: '8px',
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid var(--border-glass)',
+                          fontSize: '0.85rem'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span style={{ fontWeight: 700, color: '#06b6d4' }}>
+                            📍 {supRef}
+                          </span>
+                          {(s.nom_type_support || s.nom_zone) && (
+                            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                              • {s.nom_type_support || ''}{s.nom_zone ? ` (${s.nom_zone})` : ''}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontWeight: 700, color: '#10b981' }}>
+                          {price > 0 ? `${price.toLocaleString('fr-FR')} ${abonnement.devise || 'MGA'}` : `0 ${abonnement.devise || 'MGA'}`}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : supportsList.length > 0 ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.35rem' }}>
+                  {supportsList.map(s => (
                     <span key={s} style={{
                       padding: '0.25rem 0.65rem',
                       borderRadius: '9999px',
@@ -213,9 +277,11 @@ export default function AbonnementDetailsModal({
                     }}>
                       📍 {s}
                     </span>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.84rem' }}>Aucun support associé</span>
+              )}
             </div>
 
             <div className="client-abo-card">

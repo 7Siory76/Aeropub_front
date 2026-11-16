@@ -37,22 +37,58 @@ export default function AbonnementEditModal({
   const [availableEmplacements, setAvailableEmplacements] = useState(emplacements);
   const [abonnementsList, setAbonnementsList] = useState(allAbonnements);
 
-  // Initialiser les supports rattachés
-  const initialSupports = useMemo(() => {
-    if (Array.isArray(abonnement?.supports) && abonnement.supports.length > 0) {
-      return abonnement.supports.map(s => typeof s === 'string' ? s : (s.reference_support || s.reference)).filter(Boolean);
+  // Extraire les supports avec prix
+  const extractSupports = (abo) => {
+    if (!abo) return [];
+    if (Array.isArray(abo.supports_details) && abo.supports_details.length > 0) {
+      return abo.supports_details.map(s => ({
+        reference: s.reference_support || s.reference,
+        prix_support: s.prix_support !== undefined && s.prix_support !== null ? s.prix_support : ''
+      })).filter(s => Boolean(s.reference));
     }
-    if (abonnement?.supports_associes) {
-      return abonnement.supports_associes.split(/[,;]+/).map(s => s.trim()).filter(Boolean);
+    if (Array.isArray(abo.supports) && abo.supports.length > 0) {
+      return abo.supports.map(s => {
+        if (typeof s === 'string') return { reference: s.trim(), prix_support: '' };
+        return {
+          reference: s.reference_support || s.reference,
+          prix_support: s.prix_support !== undefined && s.prix_support !== null ? s.prix_support : ''
+        };
+      }).filter(s => Boolean(s.reference));
     }
-    if (abonnement?.reference_emplacement) {
-      return [abonnement.reference_emplacement.trim()];
+    if (abo.supports_associes) {
+      return abo.supports_associes.split(/[,;]+/).map(s => ({ reference: s.trim(), prix_support: '' })).filter(s => Boolean(s.reference));
+    }
+    if (abo.reference_emplacement) {
+      return [{ reference: abo.reference_emplacement.trim(), prix_support: '' }];
     }
     return [];
+  };
+
+  const initialSupports = useMemo(() => {
+    return extractSupports(abonnement);
   }, [abonnement]);
 
   const [selectedSupports, setSelectedSupports] = useState(initialSupports);
   const [supportToAdd, setSupportToAdd] = useState('');
+  const [supportPriceToAdd, setSupportPriceToAdd] = useState('');
+
+  // Charger les supports complets avec prix via l'API si disponible
+  useEffect(() => {
+    if (abonnement?.reference) {
+      abonnementsApi.getSupports(abonnement.reference)
+        .then(sups => {
+          if (Array.isArray(sups) && sups.length > 0) {
+            setSelectedSupports(sups.map(s => ({
+              reference: s.reference_support || s.reference,
+              prix_support: s.prix_support !== undefined && s.prix_support !== null ? s.prix_support : '',
+              nom_type_support: s.nom_type_support,
+              nom_zone: s.nom_zone
+            })));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [abonnement?.reference]);
 
   const [dureeValeur, setDureeValeur] = useState(1);
   const [dureeUnite, setDureeUnite] = useState('an');
@@ -94,10 +130,31 @@ export default function AbonnementEditModal({
     id_type_statut: abonnement?.id_type_statut || ''
   });
 
+  // Mise à jour du prix d'un support spécifique
+  const handleUpdateSupportPrice = (supRef, newPrice) => {
+    setSelectedSupports(prev => prev.map(s => {
+      if (s.reference === supRef) {
+        return { ...s, prix_support: newPrice };
+      }
+      return s;
+    }));
+  };
+
+  // Recalcul automatique du tarif lorsque les supports ou leurs prix changent
+  useEffect(() => {
+    if (selectedSupports.length > 0) {
+      const totalCalc = selectedSupports.reduce((sum, s) => {
+        const p = parseFloat(s.prix_support);
+        return sum + (isNaN(p) ? 0 : p);
+      }, 0);
+      setFormData(prev => ({ ...prev, tarif: totalCalc }));
+    }
+  }, [selectedSupports]);
+
   // Recharger le formulaire quand l'abonnement change
   useEffect(() => {
     if (abonnement) {
-      setSelectedSupports(initialSupports);
+      setSelectedSupports(extractSupports(abonnement));
       setFormData({
         id_client: abonnement.id_client || '',
         id_commercial: abonnement.id_commercial || '',
@@ -134,7 +191,7 @@ export default function AbonnementEditModal({
         prevDurationRef.current = { val: initVal, unite: initUnite };
       }
     }
-  }, [abonnement, initialSupports]);
+  }, [abonnement]);
 
   // Recalcul de l'échéance lorsque la durée change
   useEffect(() => {
@@ -269,7 +326,7 @@ export default function AbonnementEditModal({
   // Liste des emplacements strictement disponibles entre date_debut et date_echeance
   const filteredAvailableEmplacements = useMemo(() => {
     return availableEmplacements.filter(emp => {
-      if (selectedSupports.includes(emp.reference)) return false;
+      if (selectedSupports.some(s => s.reference === emp.reference)) return false;
       const check = checkSupportAvailabilityOnDates(emp.reference, formData.date_debut, formData.date_echeance);
       return check.available;
     });
@@ -282,7 +339,7 @@ export default function AbonnementEditModal({
       setModalError("L'abonnement est déjà actif (ou archivé) : la suppression d'un support requiert une autorisation administrateur.");
       return;
     }
-    setSelectedSupports(prev => prev.filter(s => s !== supRef));
+    setSelectedSupports(prev => prev.filter(s => s.reference !== supRef));
   };
 
   // Ajouter un support à la liste
@@ -305,10 +362,12 @@ export default function AbonnementEditModal({
       return;
     }
 
-    if (!selectedSupports.includes(supportToAdd)) {
-      setSelectedSupports(prev => [...prev, supportToAdd]);
+    if (!selectedSupports.some(s => s.reference === supportToAdd)) {
+      const priceNum = supportPriceToAdd !== '' ? (parseFloat(supportPriceToAdd) || 0) : 0;
+      setSelectedSupports(prev => [...prev, { reference: supportToAdd, prix_support: priceNum }]);
     }
     setSupportToAdd('');
+    setSupportPriceToAdd('');
   };
 
   // Sauvegarder les modifications
@@ -335,14 +394,14 @@ export default function AbonnementEditModal({
     }
     setLoading(true);
     try {
-      for (const supRef of selectedSupports) {
-        const check = checkSupportAvailabilityOnDates(supRef, formData.date_debut, formData.date_echeance);
+      for (const sup of selectedSupports) {
+        const check = checkSupportAvailabilityOnDates(sup.reference, formData.date_debut, formData.date_echeance);
         if (!check.available) {
           const conflictAbo = check.conflictWith;
           const deb = check.conflictDebut ? new Date(check.conflictDebut).toLocaleDateString('fr-FR') : '';
           const fin = check.conflictFin ? new Date(check.conflictFin).toLocaleDateString('fr-FR') : '';
           setModalError(
-            `Impossible d'enregistrer : le support "${supRef}" n'est pas disponible du ${new Date(formData.date_debut).toLocaleDateString('fr-FR')} au ${new Date(formData.date_echeance).toLocaleDateString('fr-FR')} (déjà réservé du ${deb} au ${fin} par le contrat ${conflictAbo?.reference}).`
+            `Impossible d'enregistrer : le support "${sup.reference}" n'est pas disponible du ${new Date(formData.date_debut).toLocaleDateString('fr-FR')} au ${new Date(formData.date_echeance).toLocaleDateString('fr-FR')} (déjà réservé du ${deb} au ${fin} par le contrat ${conflictAbo?.reference}).`
           );
           setLoading(false);
           return;
@@ -364,7 +423,10 @@ export default function AbonnementEditModal({
         id_abonnement_precedent: formData.id_abonnement_precedent || null,
         statut: formData.statut,
         id_type_statut: formData.id_type_statut || undefined,
-        supports: selectedSupports
+        supports: selectedSupports.map(s => ({
+          reference_support: s.reference,
+          prix_support: s.prix_support !== '' && s.prix_support !== null && s.prix_support !== undefined ? parseFloat(s.prix_support) || 0 : 0
+        }))
       });
 
       showSuccess(`Abonnement "${abonnement.reference}" mis à jour avec succès !`);
@@ -453,18 +515,25 @@ export default function AbonnementEditModal({
             />
           </div>
 
-          {/* Section : Gestion des supports liés */}
+          {/* Section : Gestion des supports liés et prix par support */}
           <div className="modal-form-group" style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border-glass)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
               <label className="modal-label" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Layers size={16} style={{ color: '#06b6d4' }} />
-                <span>Supports rattachés au contrat :</span>
+                <span>Supports et prix par support :</span>
               </label>
-              {isLockedForSupportEdit && (
-                <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>
-                  🔒 Verrouillé (Actif / Archivé)
-                </span>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                {selectedSupports.length > 0 && (
+                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 600 }}>
+                    Total supports : {selectedSupports.reduce((sum, s) => sum + (parseFloat(s.prix_support) || 0), 0).toLocaleString('fr-FR')} {formData.devise || 'MGA'}
+                  </span>
+                )}
+                {isLockedForSupportEdit && (
+                  <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>
+                    🔒 Verrouillé (Actif / Archivé)
+                  </span>
+                )}
+              </div>
             </div>
 
             {isLockedForSupportEdit && (
@@ -481,58 +550,74 @@ export default function AbonnementEditModal({
               </div>
             )}
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: isLockedForSupportEdit ? '0' : '0.75rem' }}>
+            {/* Liste des supports avec prix unitaire */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: isLockedForSupportEdit ? '0' : '0.85rem' }}>
               {selectedSupports.length === 0 ? (
                 <span style={{ color: 'var(--text-muted)', fontSize: '0.84rem', fontStyle: 'italic' }}>
                   Aucun support associé à ce contrat
                 </span>
               ) : (
                 selectedSupports.map((sup) => {
-                  const check = checkSupportAvailabilityOnDates(sup, formData.date_debut, formData.date_echeance);
+                  const check = checkSupportAvailabilityOnDates(sup.reference, formData.date_debut, formData.date_echeance);
                   const hasConflict = !check.available;
                   return (
-                    <span
-                      key={sup}
+                    <div
+                      key={sup.reference}
                       style={{
-                        display: 'inline-flex',
+                        display: 'flex',
                         alignItems: 'center',
-                        gap: '0.4rem',
-                        padding: '0.35rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '0.85rem',
-                        fontWeight: 700,
-                        background: hasConflict ? 'rgba(239, 68, 68, 0.15)' : 'rgba(6, 182, 212, 0.15)',
-                        color: hasConflict ? '#ef4444' : '#06b6d4',
-                        border: hasConflict ? '1px solid #ef4444' : '1px solid rgba(6, 182, 212, 0.35)'
+                        justifyContent: 'space-between',
+                        gap: '0.6rem',
+                        padding: '0.5rem 0.85rem',
+                        borderRadius: '8px',
+                        fontSize: '0.88rem',
+                        background: hasConflict ? 'rgba(239, 68, 68, 0.12)' : 'rgba(15, 23, 42, 0.65)',
+                        border: hasConflict ? '1px solid #ef4444' : '1px solid var(--border-glass)',
+                        flexWrap: 'wrap'
                       }}
-                      title={hasConflict ? `Conflit détecté sur cette période avec le contrat ${check.conflictWith?.reference}` : ''}
                     >
-                      📍 {sup}
-                      {hasConflict && (
-                        <span title="Attention : ce support est en conflit sur les dates choisies !" style={{ fontSize: '0.8rem', cursor: 'help' }}>
-                          ⚠️
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>
+                          📍 {sup.reference}
                         </span>
-                      )}
-                      {!isLockedForSupportEdit && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSupport(sup)}
-                          style={{
-                            background: 'transparent',
-                            border: 'none',
-                            color: '#ef4444',
-                            cursor: 'pointer',
-                            padding: '0',
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginLeft: '0.2rem'
-                          }}
-                          title={`Retirer le support ${sup}`}
-                        >
-                          <X size={14} />
-                        </button>
-                      )}
-                    </span>
+                        {sup.nom_type_support && (
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                            ({sup.nom_type_support}{sup.nom_zone ? ` - ${sup.nom_zone}` : ''})
+                          </span>
+                        )}
+                        {hasConflict && (
+                          <span title={`Conflit détecté sur cette période avec le contrat ${check.conflictWith?.reference}`} style={{ cursor: 'help' }}>
+                            ⚠️
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Prix support :</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="any"
+                          disabled={isLockedForSupportEdit}
+                          className="modal-input"
+                          placeholder="0"
+                          style={{ width: '130px', padding: '0.3rem 0.6rem', textAlign: 'right', fontWeight: 700, height: '34px' }}
+                          value={sup.prix_support === 0 ? '' : sup.prix_support}
+                          onChange={(e) => handleUpdateSupportPrice(sup.reference, e.target.value)}
+                        />
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{formData.devise || 'MGA'}</span>
+                        {!isLockedForSupportEdit && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSupport(sup.reference)}
+                            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }}
+                            title={`Retirer le support ${sup.reference}`}
+                          >
+                            <X size={15} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   );
                 })
               )}
@@ -540,20 +625,32 @@ export default function AbonnementEditModal({
 
             {!isLockedForSupportEdit && (
               <div style={{ marginTop: '0.6rem' }}>
-                <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-                  <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ flex: '1 1 240px' }}>
                     <SearchableSelect
                       options={filteredAvailableEmplacements}
                       value={supportToAdd}
                       onChange={(selectedSupportRef) => setSupportToAdd(selectedSupportRef)}
                       placeholder={filteredAvailableEmplacements.length > 0
-                        ? `-- Sélectionner un support disponible à ajouter (${filteredAvailableEmplacements.length} libres) --`
+                        ? `-- Sélectionner un support disponible (${filteredAvailableEmplacements.length} libres) --`
                         : `-- Aucun support disponible sur cette période --`}
                       searchPlaceholder="Rechercher par référence, type, zone..."
                       disabled={filteredAvailableEmplacements.length === 0}
                       getOptionValue={(emp) => emp.reference}
                       getOptionLabel={(emp) => `${emp.reference} — ${emp.nom_type_support || emp.nom_type || 'Support'}`}
                       getOptionSublabel={(emp) => emp.nom_zone ? `Zone : ${emp.nom_zone}` : null}
+                    />
+                  </div>
+                  <div style={{ width: '140px' }}>
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      className="modal-input"
+                      placeholder="Prix support..."
+                      value={supportPriceToAdd}
+                      onChange={(e) => setSupportPriceToAdd(e.target.value)}
+                      style={{ height: '44px' }}
                     />
                   </div>
                   <button
@@ -579,7 +676,12 @@ export default function AbonnementEditModal({
           {/* Tarif, devise et périodicité */}
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 2fr', gap: '0.8rem' }}>
             <div className="modal-form-group">
-              <label className="modal-label">Tarif :</label>
+              <label className="modal-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Tarif total :</span>
+                <span style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: 600 }}>
+                  ⚡ Somme des supports
+                </span>
+              </label>
               <input
                 type="number"
                 step="any"

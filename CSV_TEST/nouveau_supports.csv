@@ -1,0 +1,201 @@
+﻿Reference;Aeroport;Perimetre;Zone;Categorie;Type_Support;Caracteristiques;Statut;Observation
+Panneau B2-Nos-VISA;Nosy Be;International;VISA;Statique;Caisson Lumineux;2X2;Occupé;
+Panneau C-NOS-SORTIE;Nosy Be;International;SORTIE;Statique;Caisson Lumineux;2X2;Occupé;
+Panneau C2-NOS-SORTIE;Nosy Be;International;SORTIE;Statique;Caisson Lumineux;2X2;Occupé;
+Panneau D- NOS-BAGAGE;Nosy Be;International;BAGAGE;Statique;Caisson Lumineux;2X2;Occupé;
+Panneau E1-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Caisson Lumineux;4X3;Disponible;
+Panneau E2-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Caisson Lumineux;4X3;Occupé;
+Panneau E3-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Caisson Lumineux;4X3;Disponible;
+Panneau E4-NOS-EXTERIEUR;Nosy Be;International;OUTDOOR;Statique;Caisson Lumineux;4X3;Disponible;
+Panneau F - NOS -BAGAGE;Nosy Be;International;BAGAGE;Statique;Caisson Lumineux;4X2;Disponible;
+Panneau G- NOS- EMBARQUEMENT;Nosy Be;International;EMB INT;Statique;Caisson Lumineux;2X1,50;Occupé;
+Panneau J1 - NOS-POLICE;Nosy Be;International;CTRL POLICE;Statique;Caisson Lumineux;3X2;Occupé;
+Panneau J2 - NOS-POLICE;Nosy Be;International;CTRL POLICE;Statique;Caisson Lumineux;3X2;Occupé;
+Panneau L1 - NOS - Vitre Entrée et Sortie;Nosy Be;International;Vitre Entrée et Sortie;Statique;Caisson Lumineux;1,82X0,37;Disponible;
+Panneau N 1 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Panneau N2 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Occupé;
+Panneau N3 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Panneau N4 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Panneau N5 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Panneau N6 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Panneau N7 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Panneau N8 - NOS - Piliers Embarquemsnts;Nosy Be;International;Piliers Embarquemsnts;Statique;Caisson Lumineux;0,45X1,20;Disponible;
+Flag;Nosy Be;International;Terminal Passagers;Statique;Caisson Lumineux;Format standard;Occupé;
+PACK STRECHED;Nosy Be;International;Tapis bagages;Statique;Caisson Lumineux;Format standard;Occupé;
+NOS-DYN-024;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-025;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-026;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-027;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+PACK INDOOR TOTEM;Nosy Be;International;Tapis bagages;Statique;Caisson Lumineux;Format standard;Occupé;
+NOS-DYN-029;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-030;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-031;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-032;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NOS-DYN-033;Nosy Be;National;Zone Bagages Arrivée;Numérique;Ecran LED;Format Dynamique;Occupé;Tapis bagages
+NLB1;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60 *2,40;Occupé;
+NLB2;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60 *2,40;Occupé;
+NLB3;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60 *2,40;Occupé;
+NLB4;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60 *2,40;Occupé;
+NLB5;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;1,60 *2,40;Occupé;
+NLB6;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;5*1,80;Occupé;
+NLB6-40;Ivato;National;Salle tapis bagage arrivée;Statique;Caisson Lumineux;5*1,50;Occupé;
+NEX1;Ivato;National;Exterieur;Statique;Panneau 4x3m;2,50*1;Occupé;
+NEX2;Ivato;National;Exterieur;Statique;Panneau 4x3m;2,50*1;Occupé;
+NEX3;Ivato;National;Exterieur;Statique;Panneau 4x3m;2,50*1;Occupé;
+NEX4;Ivato;National;Exterieur;Statique;Panneau 4x3m;2,50*1;Occupé;
+NEX5;Ivato;National;Exterieur;Statique;Panneau 4x3m;10*1;Occupé;
+NEX6;Ivato;National;Exterieur;Statique;Panneau 4x3m;10*1;Occupé;
+NVW1;Ivato;National;Salle tapis bagage arrivée;Numérique;Mur Vidéo;3*3;Occupé;
+NVW2;Ivato;National;Salle tapis bagage arrivée;Numérique;Mur Vidéo;3*3;Occupé;
+NVW3;Ivato;National;Salle tapis bagage arrivée;Numérique;Mur Vidéo;3*3;Occupé;
+NVW4;Ivato;National;Salle tapis bagage arrivée;Numérique;Mur Vidéo;3*3;Disponible;
+NVW5;Ivato;National;Salle tapis bagage arrivée;Numérique;Mur Vidéo;3*3;Disponible;
+NLD123;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Occupé;
+NLD123-53;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Occupé;
+NLD123-54;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Occupé;
+NLD123-55;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Occupé;
+NLD123-56;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Disponible;
+NLD123-57;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Disponible;
+NLD123-58;Ivato;National;Salle tapis bagage arrivée;Statique;Ecran LED;Format standard;Disponible;
+NH1;Ivato;National;Intérieur Hall Public;Statique;Bâche Lumineuse;14,23 * 2,20;Occupé;
+NV1;Ivato;National;Vitre interieur hall public;Statique;Bâche Lumineuse;14,23 * 2,20;Occupé;
+DNLB7 A;Ivato;National;Zone départ National;Statique;Caisson Lumineux;5400 × 2500;Occupé;
+DNLB7 B;Ivato;National;Zone départ National;Statique;Caisson Lumineux;5400 × 2500;Occupé;
+DNLB7 C;Ivato;National;Zone départ National;Statique;Caisson Lumineux;5400 × 2500;Occupé;
+DNLB8 A;Ivato;National;Zone départ National;Statique;Caisson Lumineux;6000 × 1500;Occupé;
+DNLB8 B;Ivato;National;Zone départ National;Statique;Caisson Lumineux;6000 × 1500;Occupé;
+DNLB8 C;Ivato;National;Zone départ National;Statique;Caisson Lumineux;6000 × 1500;Occupé;
+DNLB8 D;Ivato;National;Zone départ National;Statique;Caisson Lumineux;6000 × 1500;Occupé;
+DNLB8 E;Ivato;National;Zone départ National;Statique;Caisson Lumineux;6000 × 1500;Occupé;
+DNLB9 A;Ivato;National;Zone départ National;Statique;Caisson Lumineux;3600 × 1500;Occupé;
+DNLB9 B;Ivato;National;Zone départ National;Statique;Caisson Lumineux;3600 × 1500;Occupé;
+DNLB 10 A;Ivato;National;Zone départ National;Statique;Ecran LED;4,80 X 2,40;Occupé;
+DNLB 10 B;Ivato;National;Zone départ National;Statique;Ecran LED;4,80 X 2,40;Occupé;
+DNLB 10 C;Ivato;National;Zone départ National;Statique;Ecran LED;4,80 X 2,40;Occupé;
+DNLB 10 D;Ivato;National;Zone départ National;Statique;Ecran LED;4,80 X 2,40;Occupé;
+DNLB 10 E;Ivato;National;Zone départ National;Statique;Ecran LED;4,80 X 2,40;Occupé;
+DNLB 10 E-76;Ivato;National;Zone départ National;Statique;Ecran LED;4,80 X 2,40;Occupé;
+EXTERIEUR LUMINEUX_PARKING_OUTDOOR;Ivato;Public;4X3;Outdoor Statique;Panneau 6x3m;Format standard;Disponible;
+DYN-PACKECRAN8x4-A1;Ivato;National;PACK ECRAN 8x 49pouces PILIER;Numérique;Ecran LED;Haute Définition;Occupé;
+DYN-PACKECRAN8x4-A2;Ivato;National;PACK ECRAN 8x 49pouces PILIER;Numérique;Ecran LED;Haute Définition;Occupé;
+DYN-PACKECRAN8x4-A3;Ivato;National;PACK ECRAN 8x 49pouces PILIER;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKECRAN8x4-A4;Ivato;National;PACK ECRAN 8x 49pouces PILIER;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKECRAN8x4-A5;Ivato;National;PACK ECRAN 8x 49pouces PILIER;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A1;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Occupé;Non reconduit
+DYN-PACKTOTEM8To-A2;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Occupé;Non reconduit
+DYN-PACKTOTEM8To-A3;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A4;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A5;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A6;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A7;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A8;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A9;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKTOTEM8To-A10;Ivato;National;PACK TOTEM - 8 Totem 75pouces DF;Numérique;Totem Double Face;Haute Définition;Disponible;
+DYN-PACKSTRECHED-A1;Ivato;National;PACK STRECHED BAR 2SF+ 3DF;Numérique;Ecran Synchronisé;Haute Définition;Occupé;
+DYN-PACKSTRECHED-A2;Ivato;National;PACK STRECHED BAR 2SF+ 3DF;Numérique;Ecran Synchronisé;Haute Définition;Occupé;
+DYN-PACKSTRECHED-A3;Ivato;National;PACK STRECHED BAR 2SF+ 3DF;Numérique;Ecran Synchronisé;Haute Définition;Occupé;
+DYN-PACKSTRECHED-A4;Ivato;National;PACK STRECHED BAR 2SF+ 3DF;Numérique;Ecran Synchronisé;Haute Définition;Disponible;
+DYN-PACKSTRECHED-A5;Ivato;National;PACK STRECHED BAR 2SF+ 3DF;Numérique;Ecran Synchronisé;Haute Définition;Disponible;
+DYN-PACKVideoWAL-A1;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKVideoWAL-A2;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKVideoWAL-A3;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKVideoWAL-A4;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKVideoWAL-A5;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKVideoWAL-A6;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKVideoWAL-A7;Ivato;National;PACK VideoWALL- 6 video wall 3x3;Numérique;Mur Vidéo;Haute Définition;Occupé;
+DYN-PACKOUTDOORI-A1;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Occupé;
+DYN-PACKOUTDOORI-A2;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Occupé;
+DYN-PACKOUTDOORI-A3;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKOUTDOORI-A4;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKOUTDOORI-A5;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKOUTDOORI-A6;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Disponible;
+DYN-PACKOUTDOORI-A7;Ivato;National;PACK OUTDOOR IVATO-Ecrans 3 panneaux;Numérique;Ecran LED;Haute Définition;Disponible;
+1A1;Ivato;International;haut escalier avant long couloir;Statique;Panneau 2x1.5m;2x2;Disponible;DISPONIBLE
+1B5;Ivato;International;Couloirs;Statique;Caisson Lumineux;26x2,34;Occupé;
+1C1;Ivato;International;Escalator;Statique;Caisson Lumineux;7x3;Disponible;DISPONIBLE
+1D1;Ivato;International;Escalator;Statique;Caisson Lumineux;3,70x1,70;Occupé;
+1D2;Ivato;International;Escalator;Statique;Caisson Lumineux;1,85x1,85;Occupé;location  cours
+1E1;Ivato;International;Contrôle bagage à main Douanes;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+1E2;Ivato;International;Contrôle bagage à main Douanes;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+1E3;Ivato;International;Contrôle bagage à main Douanes;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+1F1;Ivato;International;Duty Free;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+1F2;Ivato;International;Duty Free;Statique;Panneau 2x1.5m;2x2;Occupé;DISPONIBLE
+1H1;Ivato;International;Salle d'embarquement;Statique;Caisson Lumineux;3x3;Occupé;location  cours
+3A1 -3A2-3A3;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Occupé;location  cours
+3A4 -3A5-3A6;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Occupé;location  cours
+3A7 -3A8-3A9;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Occupé;location  cours
+3A10 -3A11-3A12;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Occupé;location  cours
+3A13;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Occupé;location  cours
+3A14 -3A15-;Ivato;International;Passerelle ( CENTRALE) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Disponible;DISPONIBLE
+3A16 -3A17-3A18;Ivato;International;Passerelle (GAUCHE ) 1interieure coté latéraux GM;Statique;Caisson Lumineux;4X2;Disponible;DISPONIBLE
+3B1-3B12;Ivato;International;PASSERELLE CENTRALE PM Latéraux 12 / GAUCHE;Statique;Caisson Lumineux;0,90X1,05;Occupé;location  cours
+3B13-3B24;Ivato;International;PASSERELLE CENTRALE PM Latéraux 12 / DROITE;Statique;Caisson Lumineux;0,90X1,05;Occupé;
+3B13-3B24-132;Ivato;International;PASSERELLE GAUCHE PM Latéraux 12 / GAUCHE;Statique;Caisson Lumineux;0,90X1,05;Disponible;DISPONIBLE
+3B13-3B24-133;Ivato;International;PASSERELLE GAUCHE PM Latéraux 12 / DROITE;Statique;Caisson Lumineux;0,90X1,05;Occupé;DISPONIBLE
+3B13-3B24-134;Ivato;International;PASSERELLE DROITE PM Latéraux 12 / GAUCHE;Statique;Caisson Lumineux;0,90X1,05;Disponible;DISPONIBLE
+3B13-3B24-135;Ivato;International;PASSERELLE DROITE PM Latéraux 12 / DROITE;Statique;Caisson Lumineux;0,90X1,05;Disponible;
+3D1-3D2;Ivato;International;passerelle (CENTRALE)2 intérieure 2 cotés face;Statique;Caisson Lumineux;1x1;Disponible;DISPONIBLE
+3D1-3D2-137;Ivato;International;passerelle (CENTRALE) 2 intérieure 2 cotés face;Statique;Caisson Lumineux;1x1;Disponible;DISPONIBLE
+3D1-3D2-138;Ivato;International;passerelle (GAUCHE)2 intérieure 2 cotés face;Statique;Caisson Lumineux;1x1;Disponible;DISPONIBLE
+3E1-3E2-3E3;Ivato;International;passerelle exterieure;Statique;Caisson Lumineux;15x2;Occupé;
+A1;Ivato;International;Entrée Principale milieu-SAS central;Statique;Caisson Lumineux;4x2;Occupé;
+B1;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel filatex -à décaper
+B2;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel filatex -à décaper
+B3;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel filatex -à décaper
+B4;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel filatex -à décaper
+B5;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel filatex -à décaper
+B6;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel filatex -à décaper
+B7;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel sanlam-à décaper
+B8;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel little India -à décaper
+B9;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel connecteo-à décaper
+B10;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel little India -à décaper
+B11;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+B12;Ivato;International;Comptoirs départ;Statique;Caisson Lumineux;1,6x2,40;Occupé;
+B13;Ivato;International;Mur Arrivée;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+B14;Ivato;International;Mur Arrivée;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+B15;Ivato;International;Mur Arrivée;Statique;Caisson Lumineux;1,6x2,40;Disponible;visuel curly aho-à décaper
+B16;Ivato;International;Mur Départ;Statique;Caisson Lumineux;1,6x2,40;Occupé;location  cours
+B17;Ivato;International;Mur Départ;Statique;Caisson Lumineux;2,8x2,40;Occupé;location  cours
+B18;Ivato;International;Mur Départ;Statique;Caisson Lumineux;3,5x1,50;Occupé;location  cours
+B19;Ivato;International;Mur Arrivée;Statique;Caisson Lumineux;3,20x2,40;Occupé;location  cours
+C1;Ivato;International;Comptoirs départ coté droit;Statique;Caisson Lumineux;14x 2,40;Occupé;location  cours
+D1;Ivato;International;Haut cheeking;Statique;Caisson Lumineux;17x2,40;Disponible;
+E1;Ivato;International;Départ Comptoirs PAF;Statique;Caisson Lumineux;15,4 x0,67;Occupé;location  cours
+F1;Ivato;International;Départ Comptoirs PAF coté droit;Statique;Caisson Lumineux;5x1,30;Occupé;location  cours
+H1;Ivato;International;Arrivée box PAF coté droit;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+I1;Ivato;International;Arrivée box PAF mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+J1;Ivato;International;Arrivée box PAF mur gauche;Statique;Caisson Lumineux;4x2;Occupé;location  cours
+K1;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K2;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K3;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K4;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K5;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K6;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K7;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K8;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+K9;Ivato;International;Arrivée tapis bagage mur droit;Statique;Caisson Lumineux;3x2;Occupé;location  cours
+L1;Ivato;International;Arrivée salle bagage suspendus (DF);Statique;Panneau 2x1.5m;2x0,70;Occupé;location  cours
+L2;Ivato;International;Arrivée salle bagage suspendus (DF);Statique;Panneau 2x1.5m;2x0,70;Occupé;location  cours
+L3;Ivato;International;Arrivée salle bagage suspendus (DF);Statique;Panneau 2x1.5m;2x0,70;Occupé;location  cours
+LB1;Ivato;International;HALL PUBLIC;Statique;Caisson Lumineux;8x2;Occupé;location  cours
+M1;Ivato;International;Auvent SAS Arrivée 1/2 Départ 3/4;Statique;Caisson Lumineux;2,23x2,23;Occupé;location  cours
+M2;Ivato;International;Auvent SAS Arrivée 1/2 Départ 3/4;Statique;Caisson Lumineux;2,23x2,23;Occupé;location  cours
+M3;Ivato;International;Auvent SAS Arrivée;Statique;Caisson Lumineux;2,23x2,23;Occupé;location  cours
+M4;Ivato;International;Auvent SAS Arrivée;Statique;Caisson Lumineux;2,23x2,23;Occupé;location  cours
+M5;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+M6;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+M7;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+M8;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+M9;Ivato;International;Arrivée tapis bagage mur gauche;Statique;Panneau 2x1.5m;2x2;Occupé;location  cours
+LB1-189;Ivato;International;Arrivée- face sortie tapis bagage;Statique;Caisson Lumineux;8x2;Occupé;location  cours
+LB2;Ivato;International;Arrivée Mur vers Visa;Statique;Caisson Lumineux;3,20x1,60;Occupé;location  cours
+Arrivée-sortie passerelle;Ivato;International;1,60x2,40;Statique;Caisson Lumineux;ORANGE;Disponible;
+CHARIOT-EUROPALU;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 30 chariots;Occupé;
+CHARIOT-MVOLA;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 60 chariots;Occupé;Attente retour reconduction
+CHARIOT-MCB;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 50 chariots;Occupé;
+CHARIOT-IMMORAMA;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 120 chariots;Occupé;
+CHARIOT-NPAKADIN;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 30 chariots;Occupé;
+CHARIOT-OCITEC;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 20 chariots;Occupé;
+CHARIOT-INERGYSOLU;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 50 chariots;Occupé;
+CHARIOT-ORANGEMONE;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 100 chariots;Occupé;
+CHARIOT-DISPONIBLE;Ivato;Public;Zone Chariots Bagages;Chariots;Standard Chariot;Lot de 170 chariots;Disponible;
