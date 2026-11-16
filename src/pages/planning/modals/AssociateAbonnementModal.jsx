@@ -39,6 +39,7 @@ export default function AssociateAbonnementModal({
     const [dureeValeur, setDureeValeur] = useState(1);
     const [dureeUnite, setDureeUnite] = useState('an');
     const [periodicite, setPeriodicite] = useState('Annuel');
+    const [tarif, setTarif] = useState('');
     const [facture, setFacture] = useState('');
     const [loading, setLoanding] = useState(false);
 
@@ -148,11 +149,14 @@ export default function AssociateAbonnementModal({
             }
 
             const dureeFinale = getDureeContratText(dureeValeur, dureeUnite);
+            const tarifNum = tarif !== '' ? (parseFloat(tarif) || 0) : 0;
 
             await abonnementsApi.create({
                 reference: cleanRef,
                 reference_emplacement: targetEmp.reference,
                 reference_support: targetEmp.reference,
+                supports: [{ reference_support: targetEmp.reference, prix_support: tarifNum }],
+                tarif: tarifNum,
                 id_client: parseInt(clientId, 10),
                 date_debut: startDate,
                 date_fin: endDate,
@@ -301,6 +305,23 @@ export default function AssociateAbonnementModal({
                             />
                         </div>
                     </div>
+                    {/* Tarif / Prix du support */}
+                    <div style={{ marginBottom: '1.25rem' }}>
+                        <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                            Prix du support / Tarif (MGA) :
+                        </label>
+                        <input
+                            type="number"
+                            min="0"
+                            step="any"
+                            className="search-input"
+                            style={{ borderRadius: '10px', padding: '0.65rem 0.85rem', width: '100%' }}
+                            placeholder="Ex. : 1 500 000"
+                            value={tarif}
+                            onChange={(e) => setTarif(e.target.value)}
+                        />
+                    </div>
+
                     {/* Référence Facture / Commande */}
                     <div style={{ marginBottom: '1.5rem' }}>
                         <label style={{ display: 'block', color: 'var(--text-main)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>

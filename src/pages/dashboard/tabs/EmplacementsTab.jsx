@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Plus,
   Search,
@@ -13,17 +14,25 @@ import {
   Tag,
   Tv,
   Layers,
-  FileText
+  FileText,
+  Calendar,
+  User,
+  Clock,
+  Building2,
+  Globe
 } from 'lucide-react';
 import Pagination from '../../../components/Pagination';
+import { abonnementsApi } from '../../../api';
 import styles from './EmplacementsTab.module.css';
 
 export default function EmplacementsTab({
   emplacements = [],
+  abonnements = [],
   typeSupports = [],
   categories = [],
   zones = [],
   aeroports = [],
+  perimetres = [],
   typeEtats = [],
   initialSearchQuery = '',
   onSelectEmplacement,
@@ -33,6 +42,7 @@ export default function EmplacementsTab({
   const [selectedType, setSelectedType] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedAeroport, setSelectedAeroport] = useState('all');
+  const [selectedPerimetre, setSelectedPerimetre] = useState('all');
   const [selectedZone, setSelectedZone] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,6 +50,140 @@ export default function EmplacementsTab({
   const [sortField, setSortField] = useState('reference');
   const [sortDirection, setSortDirection] = useState('asc');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  // Liste des abonnements pour résolution des clients et dates de réservation
+  const [abonnementsList, setAbonnementsList] = useState(abonnements);
+  const [tooltipData, setTooltipData] = useState(null);
+
+  useEffect(() => {
+    if (abonnements && abonnements.length > 0) {
+      setAbonnementsList(abonnements);
+    } else {
+      abonnementsApi.getAll().then(data => setAbonnementsList(data || [])).catch(() => {});
+    }
+  }, [abonnements]);
+
+  // Helper pour trouver les informations de réservation associées au support
+  const getReservationInfo = (emp) => {
+    if (!emp) return null;
+
+    // 1. Si déjà fourni par le backend via la jointure latérale
+    if (emp.reservation_client_nom && emp.reservation_date_debut) {
+      return {
+        clientNom: emp.reservation_client_nom,
+        dateDebut: emp.reservation_date_debut,
+        dateFin: emp.reservation_date_fin || emp.reservation_date_echeance,
+        referenceAbo: emp.reservation_ref_abo,
+        campagne: emp.reservation_campagne
+      };
+    }
+
+    // 2. Recherche dans les abonnements chargés
+    if (!abonnementsList || abonnementsList.length === 0) return null;
+
+    const empRef = String(emp.reference || '').trim().toUpperCase();
+    const now = Date.now();
+
+    const matchingAbos = abonnementsList.filter(abo => {
+      const rawSt = String(abo.statut_abonnement || abo.statut || '').trim().toLowerCase();
+      const cleanSt = rawSt.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (cleanSt.includes('archiv') || cleanSt.includes('resili') || cleanSt.includes('annul') || cleanSt.includes('expir')) {
+        return false;
+      }
+
+      if (Array.isArray(abo.supports_details)) {
+        if (abo.supports_details.some(s => String(s.reference_support || s.reference || '').trim().toUpperCase() === empRef)) {
+          return true;
+        }
+      }
+      if (abo.supports_associes) {
+        const list = abo.supports_associes.split(/[,;]+/).map(s => s.trim().toUpperCase());
+        if (list.includes(empRef)) return true;
+      }
+      if (String(abo.reference_emplacement || abo.reference_support || '').trim().toUpperCase() === empRef) {
+        return true;
+      }
+      if (Array.isArray(abo.supports)) {
+        if (abo.supports.some(s => {
+          const r = typeof s === 'string' ? s.trim().toUpperCase() : String(s.reference_support || s.reference || '').trim().toUpperCase();
+          return r === empRef;
+        })) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (matchingAbos.length === 0) return null;
+
+    // Prioriser le contrat en cours, sinon le prochain futur
+    matchingAbos.sort((a, b) => {
+      const startA = new Date(a.date_debut).getTime();
+      const endA = new Date(a.date_echeance || a.date_fin).getTime();
+      const startB = new Date(b.date_debut).getTime();
+      const endB = new Date(b.date_echeance || b.date_fin).getTime();
+
+      const isCurrentA = startA <= now && endA >= now;
+      const isCurrentB = startB <= now && endB >= now;
+
+      if (isCurrentA && !isCurrentB) return -1;
+      if (!isCurrentA && isCurrentB) return 1;
+      return startA - startB;
+    });
+
+    const bestAbo = matchingAbos[0];
+    return {
+      clientNom: bestAbo.raison_sociale || bestAbo.nom_client || 'Client standard',
+      dateDebut: bestAbo.date_debut,
+      dateFin: bestAbo.date_echeance || bestAbo.date_fin,
+      referenceAbo: bestAbo.reference,
+      campagne: bestAbo.annonceur_campagne
+    };
+  };
+
+  const handleStatusMouseEnter = (e, emp, stateDisplay) => {
+    const stLower = String(stateDisplay || '').toLowerCase();
+    const isOccupied = stLower.includes('occup');
+    const isReserved = stLower.includes('réserv') || stLower.includes('reserv');
+
+    if (!isOccupied && !isReserved) return;
+
+    const resInfo = getReservationInfo(emp);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const isNearTop = rect.top < 180;
+
+    setTooltipData({
+      emp,
+      resInfo,
+      statut: stateDisplay,
+      isOccupied,
+      isReserved,
+      top: isNearTop ? rect.bottom + 10 : rect.top - 10,
+      left: rect.left + rect.width / 2,
+      direction: isNearTop ? 'down' : 'up'
+    });
+  };
+
+  const handleStatusMouseLeave = () => {
+    setTooltipData(null);
+  };
+
+  const formatDateSafe = (d) => {
+    if (!d) return '-';
+    try {
+      const dt = new Date(d);
+      return isNaN(dt.getTime()) ? String(d) : dt.toLocaleDateString('fr-FR');
+    } catch {
+      return String(d);
+    }
+  };
+
+  useEffect(() => {
+    if (!tooltipData) return;
+    const handleScroll = () => setTooltipData(null);
+    window.addEventListener('scroll', handleScroll, true);
+    return () => window.removeEventListener('scroll', handleScroll, true);
+  }, [tooltipData]);
 
   // Synchronisation avec la recherche globale
   useEffect(() => {
@@ -51,7 +195,7 @@ export default function EmplacementsTab({
   // Réinitialiser la pagination lors d'un changement de filtre
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedType, selectedCategory, selectedAeroport, selectedZone, selectedStatus]);
+  }, [searchTerm, selectedType, selectedCategory, selectedAeroport, selectedPerimetre, selectedZone, selectedStatus]);
 
   // Listes déroulantes dédupliquées pour les filtres
   const typeOptions = useMemo(() => {
@@ -71,6 +215,12 @@ export default function EmplacementsTab({
     const names = [...new Set(emplacements.map(e => e.nom_aeroport).filter(Boolean))];
     return names.map((n, i) => ({ id: i + 1, nom: n }));
   }, [aeroports, emplacements]);
+
+  const perimetreOptions = useMemo(() => {
+    if (perimetres && perimetres.length > 0) return perimetres;
+    const names = [...new Set(emplacements.map(e => e.nom_perimetre || e.perimetre).filter(Boolean))];
+    return names.map((n, i) => ({ id: i + 1, nom: n }));
+  }, [perimetres, emplacements]);
 
   const zoneOptions = useMemo(() => {
     let baseZones = zones.length > 0 ? zones : emplacements.map(e => ({ nom_zone: e.nom_zone || e.nom_lieu }));
@@ -97,6 +247,7 @@ export default function EmplacementsTab({
     selectedType !== 'all' ||
     selectedCategory !== 'all' ||
     selectedAeroport !== 'all' ||
+    selectedPerimetre !== 'all' ||
     selectedZone !== 'all' ||
     selectedStatus !== 'all';
 
@@ -105,16 +256,18 @@ export default function EmplacementsTab({
     if (selectedType !== 'all') count++;
     if (selectedCategory !== 'all') count++;
     if (selectedAeroport !== 'all') count++;
+    if (selectedPerimetre !== 'all') count++;
     if (selectedZone !== 'all') count++;
     if (selectedStatus !== 'all') count++;
     return count;
-  }, [selectedType, selectedCategory, selectedAeroport, selectedZone, selectedStatus]);
+  }, [selectedType, selectedCategory, selectedAeroport, selectedPerimetre, selectedZone, selectedStatus]);
 
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedType('all');
     setSelectedCategory('all');
     setSelectedAeroport('all');
+    setSelectedPerimetre('all');
     setSelectedZone('all');
     setSelectedStatus('all');
     setCurrentPage(1);
@@ -133,6 +286,7 @@ export default function EmplacementsTab({
           (emp.nom_categorie || '').toLowerCase().includes(q) ||
           (emp.nom_zone || emp.nom_lieu || '').toLowerCase().includes(q) ||
           (emp.nom_aeroport || '').toLowerCase().includes(q) ||
+          (emp.nom_perimetre || emp.perimetre || '').toLowerCase().includes(q) ||
           (emp.caracteristiques || emp.ref_format || '').toLowerCase().includes(q) ||
           (emp.observation || '').toLowerCase().includes(q);
 
@@ -163,7 +317,19 @@ export default function EmplacementsTab({
         }
       }
 
-      // 5. Zone
+      // 5. Périmètre
+      if (selectedPerimetre !== 'all') {
+        const empPeri = (emp.nom_perimetre || emp.perimetre || '').toLowerCase();
+        const targetPeri = selectedPerimetre.toLowerCase();
+        if (
+          empPeri !== targetPeri &&
+          String(emp.id_perimetre) !== String(selectedPerimetre)
+        ) {
+          return false;
+        }
+      }
+
+      // 6. Zone
       if (selectedZone !== 'all') {
         const empZone = (emp.nom_zone || emp.nom_lieu || emp.type_zone || '').toLowerCase();
         if (empZone !== selectedZone.toLowerCase() && String(emp.id_zone) !== String(selectedZone)) {
@@ -171,7 +337,7 @@ export default function EmplacementsTab({
         }
       }
 
-      // 6. Statut
+      // 7. Statut
       if (selectedStatus !== 'all') {
         const stateDisplay = getStatusSupport(emp).toLowerCase();
         const targetState = selectedStatus.toLowerCase();
@@ -182,7 +348,7 @@ export default function EmplacementsTab({
 
       return true;
     });
-  }, [emplacements, searchTerm, selectedType, selectedCategory, selectedAeroport, selectedZone, selectedStatus]);
+  }, [emplacements, searchTerm, selectedType, selectedCategory, selectedAeroport, selectedPerimetre, selectedZone, selectedStatus]);
 
   // Tri des emplacements
   const sortedEmplacements = useMemo(() => {
@@ -206,6 +372,10 @@ export default function EmplacementsTab({
         case 'zone':
           valA = a.nom_zone || a.nom_lieu || '';
           valB = b.nom_zone || b.nom_lieu || '';
+          break;
+        case 'perimetre':
+          valA = a.nom_perimetre || a.perimetre || '';
+          valB = b.nom_perimetre || b.perimetre || '';
           break;
         case 'caracteristiques':
           valA = a.caracteristiques || '';
@@ -320,6 +490,25 @@ export default function EmplacementsTab({
                 {a.nom}
               </option>
             ))}
+          </select>
+        </div>
+
+        <div className={styles.filterGroup}>
+          <span>Périmètre :</span>
+          <select
+            className={styles.filterSelect}
+            value={selectedPerimetre}
+            onChange={(e) => setSelectedPerimetre(e.target.value)}
+          >
+            <option value="all">Tous les périmètres 🌐</option>
+            {perimetreOptions.map((p) => {
+              const name = p.nom || p.nom_perimetre;
+              return (
+                <option key={p.id || name} value={name}>
+                  {name}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -446,6 +635,19 @@ export default function EmplacementsTab({
                 </button>
               </span>
             )}
+            {selectedPerimetre !== 'all' && (
+              <span className={styles.mobileFilterChip}>
+                Périmètre : {selectedPerimetre}
+                <button
+                  type="button"
+                  className={styles.mobileFilterChipClear}
+                  onClick={() => setSelectedPerimetre('all')}
+                  aria-label="Retirer ce filtre"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            )}
             {selectedZone !== 'all' && (
               <span className={styles.mobileFilterChip}>
                 Zone : {selectedZone}
@@ -543,6 +745,21 @@ export default function EmplacementsTab({
             </div>
 
             <div className={styles.mobileFilterField}>
+              <label className={styles.mobileFilterLabel}>Périmètre</label>
+              <select
+                className={styles.mobileFilterSelect}
+                value={selectedPerimetre}
+                onChange={(e) => setSelectedPerimetre(e.target.value)}
+              >
+                <option value="all">Tous les périmètres 🌐</option>
+                {perimetreOptions.map((p) => {
+                  const name = p.nom || p.nom_perimetre;
+                  return <option key={p.id || name} value={name}>{name}</option>;
+                })}
+              </select>
+            </div>
+
+            <div className={styles.mobileFilterField}>
               <label className={styles.mobileFilterLabel}>Zone d'affichage</label>
               <select
                 className={styles.mobileFilterSelect}
@@ -620,6 +837,9 @@ export default function EmplacementsTab({
                 <th className="table-head-cell sortable" onClick={() => handleSort('zone')}>
                   Zone & Aéroport {renderSortIcon('zone')}
                 </th>
+                <th className="table-head-cell sortable" onClick={() => handleSort('perimetre')}>
+                  Périmètre {renderSortIcon('perimetre')}
+                </th>
                 <th className="table-head-cell sortable" onClick={() => handleSort('caracteristiques')}>
                   Caractéristiques {renderSortIcon('caracteristiques')}
                 </th>
@@ -636,8 +856,10 @@ export default function EmplacementsTab({
                 const stateDisplay = getStatusSupport(emp);
                 const stLower = stateDisplay.toLowerCase();
                 const isOccupied = stLower.includes('occup');
-                const isWarning = stLower.includes('maint') || stLower.includes('réserv') || stLower.includes('reserv');
+                const isReserved = stLower.includes('réserv') || stLower.includes('reserv');
+                const isWarning = stLower.includes('maint') || isReserved;
                 const badgeClass = isOccupied ? 'badge-occupied' : isWarning ? 'badge-warning' : 'badge-available';
+                const hasHoverDetails = isOccupied || isReserved;
 
                 return (
                   <tr
@@ -653,12 +875,60 @@ export default function EmplacementsTab({
                       <strong>{zoneDisplay}</strong>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{aeroDisplay}</span>
                     </td>
+                    <td className="table-body-cell">
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          backgroundColor:
+                            (emp.nom_perimetre || '').toLowerCase().includes('inter')
+                              ? 'rgba(168, 85, 247, 0.15)'
+                              : (emp.nom_perimetre || '').toLowerCase().includes('nat')
+                              ? 'rgba(59, 130, 246, 0.15)'
+                              : 'rgba(148, 163, 184, 0.15)',
+                          color:
+                            (emp.nom_perimetre || '').toLowerCase().includes('inter')
+                              ? '#c084fc'
+                              : (emp.nom_perimetre || '').toLowerCase().includes('nat')
+                              ? '#60a5fa'
+                              : '#cbd5e1',
+                          border: `1px solid ${
+                            (emp.nom_perimetre || '').toLowerCase().includes('inter')
+                              ? 'rgba(168, 85, 247, 0.35)'
+                              : (emp.nom_perimetre || '').toLowerCase().includes('nat')
+                              ? 'rgba(59, 130, 246, 0.35)'
+                              : 'rgba(148, 163, 184, 0.25)'
+                          }`
+                        }}
+                      >
+                        <Globe size={12} />
+                        {emp.nom_perimetre || emp.perimetre || 'Non défini'}
+                      </span>
+                    </td>
                     <td className="cell-muted" style={{ fontSize: '0.84rem' }}>
                       {emp.caracteristiques || emp.ref_format || '-'}
                     </td>
                     <td className="table-body-cell" style={{ textAlign: 'center' }}>
-                      <span className={`wireframe-badge ${badgeClass}`}>
+                      <span
+                        className={`wireframe-badge ${badgeClass}`}
+                        style={{
+                          cursor: hasHoverDetails ? 'help' : 'inherit',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                        onMouseEnter={(e) => hasHoverDetails && handleStatusMouseEnter(e, emp, stateDisplay)}
+                        onMouseLeave={handleStatusMouseLeave}
+                      >
                         {stateDisplay}
+                        {hasHoverDetails && (
+                          <span style={{ fontSize: '0.72rem', opacity: 0.8, marginLeft: '2px' }}>ℹ️</span>
+                        )}
                       </span>
                     </td>
                     <td className="cell-muted" style={{ fontSize: '0.82rem' }}>{emp.observation || '-'}</td>
@@ -681,7 +951,9 @@ export default function EmplacementsTab({
             const stateDisplay = getStatusSupport(emp);
             const stLower = stateDisplay.toLowerCase();
             const isOccupied = stLower.includes('occup');
-            const isWarning = stLower.includes('maint') || stLower.includes('réserv') || stLower.includes('reserv');
+            const isReserved = stLower.includes('réserv') || stLower.includes('reserv');
+            const isWarning = stLower.includes('maint') || isReserved;
+            const hasHoverDetails = isOccupied || isReserved;
 
             const borderClass = isOccupied
               ? styles.borderOccupied
@@ -714,8 +986,21 @@ export default function EmplacementsTab({
                     </span>
                   </div>
 
-                  <span className={`${styles.empStatusBadge} ${statusBadgeClass}`}>
+                  <span
+                    className={`${styles.empStatusBadge} ${statusBadgeClass}`}
+                    style={{
+                      cursor: hasHoverDetails ? 'help' : 'inherit',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    onMouseEnter={(e) => hasHoverDetails && handleStatusMouseEnter(e, emp, stateDisplay)}
+                    onMouseLeave={handleStatusMouseLeave}
+                  >
                     {stateDisplay}
+                    {hasHoverDetails && (
+                      <span style={{ fontSize: '0.72rem', opacity: 0.8, marginLeft: '2px' }}>ℹ️</span>
+                    )}
                   </span>
                 </div>
 
@@ -727,6 +1012,14 @@ export default function EmplacementsTab({
                       <span className={styles.empDetailLabel}>Emplacement :</span>
                       <strong>{zoneDisplay}</strong>
                       <span style={{ color: 'var(--text-muted)' }}>{aeroDisplay}</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.empDetailRow}>
+                    <Globe size={15} className={styles.empDetailIcon} />
+                    <div>
+                      <span className={styles.empDetailLabel}>Périmètre :</span>
+                      <span>{emp.nom_perimetre || emp.perimetre || 'Non défini'}</span>
                     </div>
                   </div>
 
@@ -790,6 +1083,102 @@ export default function EmplacementsTab({
           <span>Ajouter un support publicitaire</span>
         </button>
       </div>
+
+      {/* Info-bulle flottante (Survol statut Occupé / Réservé) */}
+      {tooltipData && createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            top: `${tooltipData.top}px`,
+            left: `${tooltipData.left}px`,
+            transform: tooltipData.direction === 'down' ? 'translate(-50%, 0)' : 'translate(-50%, -100%)',
+            zIndex: 999999,
+            backgroundColor: 'rgba(15, 23, 42, 0.96)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.1)',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            minWidth: '260px',
+            maxWidth: '340px',
+            pointerEvents: 'none',
+            color: '#f8fafc',
+            fontSize: '0.85rem',
+            fontFamily: 'inherit',
+            lineHeight: 1.45,
+            transition: 'opacity 0.15s ease, transform 0.15s ease'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Tv size={14} style={{ color: '#38bdf8' }} />
+              <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#38bdf8', letterSpacing: '0.5px' }}>
+                {tooltipData.emp?.reference}
+              </span>
+            </div>
+            <span style={{
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.4px',
+              padding: '2px 8px',
+              borderRadius: '9999px',
+              backgroundColor: tooltipData.isOccupied ? 'rgba(239, 68, 68, 0.25)' : 'rgba(245, 158, 11, 0.25)',
+              color: tooltipData.isOccupied ? '#fca5a5' : '#fde047',
+              border: `1px solid ${tooltipData.isOccupied ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.4)'}`
+            }}>
+              {tooltipData.statut}
+            </span>
+          </div>
+
+          {tooltipData.resInfo ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <Building2 size={15} style={{ color: '#38bdf8', marginTop: '2px', flexShrink: 0 }} />
+                <div style={{ wordBreak: 'break-word' }}>
+                  <span style={{ color: '#94a3b8', fontSize: '0.78rem', display: 'block' }}>Client :</span>
+                  <strong style={{ color: '#ffffff', fontSize: '0.9rem' }}>{tooltipData.resInfo.clientNom}</strong>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <Calendar size={15} style={{ color: '#34d399', marginTop: '2px', flexShrink: 0 }} />
+                <div>
+                  <span style={{ color: '#94a3b8', fontSize: '0.78rem', display: 'block' }}>Période d'occupation :</span>
+                  <span style={{ color: '#e2e8f0', fontWeight: 500 }}>
+                    Du <strong style={{ color: '#fff' }}>{formatDateSafe(tooltipData.resInfo.dateDebut)}</strong> au <strong style={{ color: '#fff' }}>{formatDateSafe(tooltipData.resInfo.dateFin)}</strong>
+                  </span>
+                </div>
+              </div>
+
+              {tooltipData.resInfo.referenceAbo && (
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: '#cbd5e1',
+                  marginTop: '2px',
+                  borderTop: '1px dashed rgba(255,255,255,0.1)',
+                  paddingTop: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <FileText size={12} style={{ color: '#94a3b8', flexShrink: 0 }} />
+                  <span>
+                    Abonnement : <strong style={{ color: '#f1f5f9' }}>{tooltipData.resInfo.referenceAbo}</strong>
+                    {tooltipData.resInfo.campagne ? ` (${tooltipData.resInfo.campagne})` : ''}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '0.8rem', padding: '4px 0' }}>
+              Aucun détail de contrat en cours associé trouvé.
+            </div>
+          )}
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
